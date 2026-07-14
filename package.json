@@ -1,0 +1,41 @@
+{
+  "name": "stackql-provider-nvidia",
+  "version": "0.1.0",
+  "description": "StackQL Provider for NVIDIA NGC and NVIDIA Cloud Functions (NVCF)",
+  "type": "module",
+  "scripts": {
+    "fetch-specs": "bash ./bin/fetch-specs.sh",
+    "harvest-ngc": "node ./provider-dev/scripts/harvest_ngc_spec.mjs",
+    "clean-specs": "node ./provider-dev/scripts/clean_specs.mjs",
+    "pin-specs": "node ./provider-dev/scripts/pin_specs.mjs",
+    "build-inventory": "node ./provider-dev/scripts/build_inventory.mjs",
+    "split": "node ./bin/split.mjs",
+    "generate-mappings": "bash ./bin/generate-mappings.sh",
+    "map-operations": "node ./provider-dev/scripts/map_operations.mjs",
+    "normalize": "node ./bin/normalize.mjs",
+    "generate-provider": "bash ./bin/generate-provider.sh",
+    "generate-docs": "bash ./bin/generate-docs.sh",
+    "start-server": "bash ./bin/start-server.sh",
+    "stop-server": "bash ./bin/stop-server.sh",
+    "server-status": "bash ./bin/server-status.sh",
+    "test-meta-routes": "node ./bin/test-meta-routes.cjs",
+    "test-integration": "node ./tests/integration/run_integration_tests.mjs"
+  },
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^12.1.0",
+    "@stackql/pgwire-lite": "^1.0.1",
+    "@stackql/provider-utils": "^0.7.6",
+    "js-yaml": "^4.1.0",
+    "pluralize": "^8.0.0"
+  },
+  "keywords": [
+    "stackql",
+    "nvidia",
+    "ngc",
+    "nvcf",
+    "provider"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
