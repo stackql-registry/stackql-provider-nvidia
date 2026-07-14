@@ -1,0 +1,13 @@
+{
+  "files": {
+    "nvcf_openapi.json": {
+      "url": "https://api.nvcf.nvidia.com/v3/openapi",
+      "info": {
+        "docsPage": "https://docs.nvidia.com/nvcf/api",
+        "openapi": "3.1.0",
+        "title": "Cloud Functions",
+        "specVersion": "2.245.1"
+      }
+    }
+  }
+}

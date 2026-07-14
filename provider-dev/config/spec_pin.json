@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "nvcf_openapi.json": {
+      "url": "https://api.nvcf.nvidia.com/v3/openapi",
+      "fetched": "2026-07-14",
+      "sha256": "b79060bfb9f6ff7295286f46d7c8e422f36d4ac94588183cc623f6acf3489efd",
+      "bytes": 112602,
+      "docsPage": "https://docs.nvidia.com/nvcf/api",
+      "openapi": "3.1.0",
+      "title": "Cloud Functions",
+      "specVersion": "2.245.1",
+      "decision": {
+        "canonicalSource": "The OpenAPI Spec link on the NVCF API documentation page (docsPage) resolves to this URL, served by the NVCF API itself. A companion Postman collection is referenced from the same documentation set.",
+        "hostSplit": "The spec declares a single server (https://api.nvcf.nvidia.com) but the NVCF documentation (cloud-functions user guide, API page) states the primary domain for function management is api.ngc.nvidia.com and the NVCF domain for function invocation and queue details is api.nvcf.nvidia.com. Hosts are carried per operation group; the per-operation assignment with evidence is recorded in endpoint_inventory.csv.",
+        "validation": "swagger-parser 12.1.0 validate: clean, no repairs required"
+      }
+    }
+  }
+}
