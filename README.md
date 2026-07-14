@@ -58,7 +58,25 @@ npm run generate-mappings -- --provider-name nvidia --input-dir provider-dev/sou
 node provider-dev/scripts/map_operations.mjs
 ```
 
-`map_operations.mjs` populates the StackQL resource/method/verb columns in `provider-dev/config/all_services.csv`, driven by rules. It validates that every generator-relevant operation is mapped or explicitly skipped with a reason code, that method names are unique per resource, and that overloaded SQL verbs have unique required-parameter signatures - and fails without writing on any violation.
+`map_operations.mjs` populates the StackQL resource/method/verb columns in `provider-dev/config/all_services.csv` from the endpoint inventory (`provider-dev/config/endpoint_inventory.csv`, produced by `build_inventory.mjs` - the single source of truth for classification). It validates that every generator-relevant operation is mapped or explicitly skipped with a reason code, that method names are unique per resource, and that overloaded SQL verbs have unique required-parameter signatures - and fails without writing on any violation.
+
+## Service Coverage
+
+489 upstream operations inventoried (54 NVCF, 435 NGC core); 221 mapped (101 select, 40 insert, 29 update, 32 delete, 3 replace, 16 exec), 268 skipped with reason codes (141 deprecated team-scoped twins per the NGC deprecation schedule, 36 deprecated-inline, 34 internal-admin, 23 service-infra, 22 data-plane file transfer, 12 other), 81 resources across 7 services:
+
+| Service | Resources | Contents |
+|---|---|---|
+| `orgs` | 8 | organizations, teams, users, role grants, invitations, current user |
+| `registry` | 32 | org-scoped artifact metadata: models, resources, recipes, helm chart versions, collections, shares, encryption keys |
+| `catalog` | 21 | guest artifact metadata reads plus the GPU and CSP catalogs |
+| `nvcf_functions` | 7 | functions, versions, metadata, authorizations (sharing grants), secrets, rate limits |
+| `nvcf_deployments` | 7 | deployments, GPU specs, cluster groups and GPUs, registry credentials, telemetries |
+| `nvcf_queues` | 2 | queue details, queue position |
+| `nvcf_invocation` | 4 | HTTP-polling invocation (pexec + status), assets, assertion tokens |
+
+**Public reads need no auth.** Catalog artifact metadata and the GPU catalog serve unauthenticated (wire-proven) - start there before any account setup. Function sharing maps as grants-as-data: authorize = `INSERT`, list = `SELECT`, revoke = `DELETE`.
+
+Engineering findings, open questions and phase 2 obligations are in [NOTES.md](NOTES.md).
 
 ## License
 
