@@ -66,9 +66,9 @@ Every step is deterministic and re-runnable. Manual mapping decisions are applie
 
 ### 1. Split into service specs
 
-`npm run split` with `--provider-name nvidia`. Candidate service split (final decision from the endpoint inventory, recorded in `provider-dev/config/service_names.json`):
+`npm run split` with `--provider-name nvidia`. Final service split (decided from the endpoint inventory 2026-07-14, recorded in `provider-dev/config/service_names.json`; assignment rules in `provider-dev/scripts/service_rules.mjs` are driven by the inventory CSV):
 
-`orgs` (organizations, users, memberships), `registry` (container images, models, resources, helm charts - metadata), `catalog` (public catalog reads, if distinct from registry), `nvcf_functions` (functions, versions, authorizations), `nvcf_deployments` (deployments, cluster groups, GPUs), `nvcf_queues` (queue details, position), `usage` (any billing/measurement surface found in the harvest, if present)
+`orgs` (organizations, teams, users, role grants, invitations, current user), `registry` (org-scoped artifact metadata: models, resources, recipes, helm chart versions, collections, shares, encryption keys), `catalog` (guest artifact metadata reads plus GPU and CSP catalogs - confirmed distinct from registry: different path families and auth posture), `nvcf_functions` (functions, versions, metadata, authorizations, secrets, rate limits), `nvcf_deployments` (deployments, GPU specs, cluster groups, registry credentials, telemetries), `nvcf_queues` (queue details, position), `nvcf_invocation` (added vs the candidate list: pexec polling invocation, assets, assertion tokens - all served from `api.nvcf.nvidia.com`). No `usage` service: no billing/measurement surface exists in the harvest (the Subscription Service definition is not publicly retrievable; recorded in `download_manifest.json`).
 
 ### 2. Generate mappings
 

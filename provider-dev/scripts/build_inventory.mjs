@@ -144,7 +144,7 @@ function classifyNvcf(p, verb, op) {
     'Function Management': () => {
       if (p === '/v2/nvcf/functions' && verb === 'get') return r('nvcf_functions', 'functions', 'list', 'select');
       if (p === '/v2/nvcf/functions' && verb === 'post') return r('nvcf_functions', 'functions', 'create', 'insert');
-      if (p === '/v2/nvcf/functions/ids') return r('nvcf_functions', 'functions', 'list_ids', 'select');
+      if (p === '/v2/nvcf/functions/ids') return r('nvcf_functions', 'function_ids', 'list', 'select', 'own resource: same empty path-param signature as functions.list');
       if (p === '/v2/nvcf/functions/{functionId}/versions' && verb === 'get') return r('nvcf_functions', 'function_versions', 'list', 'select');
       if (p === '/v2/nvcf/functions/{functionId}/versions' && verb === 'post') return r('nvcf_functions', 'function_versions', 'create', 'insert');
       if (p === '/v2/nvcf/functions/{functionId}/versions/{functionVersionId}') {
@@ -367,8 +367,16 @@ function classifyModels(p, verb, op) {
     if (verb === 'delete') return r('registry', 'collections', 'delete', 'delete');
   }
   if (p.startsWith('/v1/org/{org-name}/collections/{collection-name}')) {
-    if (p.includes('/share') ) {
-      const target = p.includes('/product') ? '_product' : (p.includes('/shares/org') ? '_org' : (p.includes('/shares/team/') ? '_team' : ''));
+    if (p.includes('/share')) {
+      // /share is the legacy org-wide share (its PUT is deprecated inline);
+      // product shares get their own resource - same path-param signature
+      // as the org-wide share otherwise
+      if (p.endsWith('/share') && verb === 'delete') return { skip: 'legacy-twin (PUT counterpart deprecated inline; superseded by /shares/org)' };
+      if (p.endsWith('/share/product')) {
+        if (verb === 'put') return r('registry', 'collection_product_shares', 'add', 'insert', 'grants-as-data');
+        if (verb === 'delete') return r('registry', 'collection_product_shares', 'remove', 'delete', 'grants-as-data');
+      }
+      const target = p.includes('/shares/org') ? '_org' : '_team';
       if (verb === 'put') return r('registry', 'collection_shares', `add${target}`, 'insert', 'grants-as-data');
       if (verb === 'delete') return r('registry', 'collection_shares', `remove${target}`, 'delete', 'grants-as-data');
     }
@@ -458,8 +466,9 @@ function classifyModels(p, verb, op) {
     if (p.endsWith('/release-type')) return r('registry', 'artifacts', 'set_release_type', 'exec', 'single-field action endpoint');
     if (p.endsWith('/terms-of-service')) return r('registry', 'artifacts', 'set_terms_of_service', 'exec', 'single-field action endpoint');
     if (p.endsWith('/share/product')) {
-      if (verb === 'put') return r('registry', 'artifact_shares', 'add_product', 'insert', 'grants-as-data');
-      if (verb === 'delete') return r('registry', 'artifact_shares', 'remove_product', 'delete');
+      // own resource: same path-param signature as artifact_shares
+      if (verb === 'put') return r('registry', 'artifact_product_shares', 'add', 'insert', 'grants-as-data');
+      if (verb === 'delete') return r('registry', 'artifact_product_shares', 'remove', 'delete');
     }
     if (p.endsWith('/share')) {
       if (verb === 'put') return r('registry', 'artifact_shares', 'add', 'insert', 'grants-as-data');
@@ -481,8 +490,8 @@ function classifyModels(p, verb, op) {
     if (/\{artifactType\}\/spec$/.test(p) && verb === 'post') return r('registry', 'artifact_specs', 'create', 'insert');
   }
 
-  // generic {type} file listings (duplicate of typed file listings)
-  if (/^\/v1\/org\/\{org\}\/\{type\}\/\{name\}\/\{version\}\/files$/.test(p)) return r('registry', 'artifact_version_files', 'list', 'select');
+  // generic {type} file listings (duplicates of the /versions/{version-id}/files listings)
+  if (/^\/v1\/org\/\{org\}\/\{type\}\/\{name\}\/\{version\}\/files$/.test(p)) return { skip: 'duplicate-endpoint-family (same listing as /versions/{version-id}/files)' };
   if (/^\/v1\/\{type\}\/org\/\{org\}\/\{name\}\/\{version\}\/files$/.test(p)) return { skip: 'duplicate-endpoint-family (typed/guest file listing twins)' };
 
   return { error: `unclassified registry operation: ${verb} ${p}` };

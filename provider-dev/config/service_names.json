@@ -1,0 +1,9 @@
+{
+  "orgs": "NGC organizations, teams, users, role grants, invitations and the current user (source: ngc_kas)",
+  "registry": "NGC private registry - org-scoped artifact metadata: models, resources, recipes, helm chart versions, collections, shares, encryption keys (source: ngc_models, org-scoped families)",
+  "catalog": "NGC public catalog - guest artifact metadata reads plus the GPU and CSP catalogs; the zero-setup surface (source: ngc_models, guest families)",
+  "nvcf_functions": "NVCF functions, versions, metadata, authorizations (function sharing grants), secrets and rate limits (source: nvcf)",
+  "nvcf_deployments": "NVCF deployments, GPU specifications, cluster groups and GPUs, registry credentials, telemetries (source: nvcf)",
+  "nvcf_queues": "NVCF queue details and queue position (source: nvcf)",
+  "nvcf_invocation": "NVCF HTTP-polling invocation (pexec + status), assets and invocation assertion tokens (source: nvcf)"
+}
