@@ -1,0 +1,39 @@
+{
+  "generated": "2026-07-14",
+  "sources": {
+    "ngc_kas.json": {
+      "openapi": "3.0.1",
+      "title": "NGC API Documentation",
+      "version": "v3.249.6",
+      "paths": 77,
+      "fixes": [
+        {
+          "rule": "repair-relative-server",
+          "note": "servers [{\"url\":\"/\"}] is relative/absent; set to https://api.ngc.nvidia.com (the host the definition is served from)"
+        }
+      ],
+      "notes": [],
+      "validation": "clean"
+    },
+    "ngc_models.json": {
+      "openapi": "3.1.0",
+      "title": "Models API",
+      "version": "0.0.1-SNAPSHOT",
+      "paths": 231,
+      "fixes": [],
+      "notes": [
+        "info.version is a placeholder (0.0.1-SNAPSHOT); left as-is"
+      ],
+      "validation": "clean"
+    },
+    "nvcf_openapi.json": {
+      "openapi": "3.1.0",
+      "title": "Cloud Functions",
+      "version": "2.245.1",
+      "paths": 35,
+      "fixes": [],
+      "notes": [],
+      "validation": "clean"
+    }
+  }
+}
