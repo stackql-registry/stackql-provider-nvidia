@@ -1,0 +1,4150 @@
+openapi: 3.1.0
+info:
+  title: catalog API
+  description: nvidia catalog API
+  version: 0.0.1-SNAPSHOT
+paths:
+  /v1/csps:
+    get:
+      tags:
+        - Cloud service providers
+      summary: List cloud service providers
+      description: List cloud service providers
+      operationId: listCloudServiceProviders
+      parameters:
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            maximum: 5000
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: integer
+            maximum: 10000
+            minimum: 0
+        - name: include-disabled
+          in: query
+          description: Include disabled
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+    post:
+      tags:
+        - Cloud service providers
+      summary: Create cloud service provider
+      description: Create cloud service provider
+      operationId: createCloudServiceProvider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudServiceProviderCreateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+  /v1/{artifactType}/{orgName}/{artifactName}/spec:
+    get:
+      tags:
+        - AIPlayground
+      summary: Get AI Playground for public artifactType
+      description: Get AI Playground for public artifactType
+      operationId: getPublicModelArtifactsSpec
+      parameters:
+        - name: orgName
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: artifactType
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - models
+              - helm-charts
+              - endpoints
+              - agents
+              - blueprints
+              - apis
+              - playbooks
+              - skills
+            maxLength: 262144
+            minLength: 0
+        - name: artifactName
+          in: path
+          description: Model name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIPlaygroundResponse'
+      x-ssa-scopes: []
+  /v1/recipes:
+    get:
+      tags:
+        - Resources
+      summary: List public recipes
+      description: List public recipes
+      operationId: listPublicRecipes
+      parameters:
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/resources:
+    get:
+      tags:
+        - Resources
+      summary: List public recipes
+      description: List public recipes
+      operationId: listPublicRecipes_1
+      parameters:
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/models:
+    get:
+      tags:
+        - Models
+      summary: List public models
+      description: This operation lists public models.
+      operationId: listPublicModels
+      parameters:
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 1000
+            minLength: 0
+            minimum: 1
+        - name: page-reference
+          in: query
+          description: Page reference
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 1024
+            minLength: 0
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/gpus:
+    get:
+      tags:
+        - GpuByPci
+      summary: Get all GPUs
+      description: Get all GPU by PCI records
+      operationId: getGpus
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - readGpuByPci
+      x-ssa-scopes:
+        - kas
+        - readGpuByPci
+  /v1/collections:
+    get:
+      tags:
+        - Collections
+      summary: List public collections
+      description: List public collections
+      operationId: listPublicCollections
+      parameters:
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/gpus/pci-device-id/{pci_device-id}:
+    get:
+      tags:
+        - GpuByPci
+      summary: Get GPU by PCI Device ID
+      description: Get all GPU records matching the given PCI Device ID
+      operationId: getGpuByPciDeviceId
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - readGpuByPci
+      x-ssa-scopes:
+        - kas
+        - readGpuByPci
+    post:
+      tags:
+        - GpuByPci
+      summary: Create GPU by PCI Device ID only
+      description: >-
+        Create a new GPU record using only PCI Device ID (pciVendorId and
+        pciSubsystemDeviceId default to 'unknown')
+      operationId: createGpuByPciDeviceId
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GpuByPciCreateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - createGpuByPci
+      x-ssa-scopes:
+        - kas
+        - createGpuByPci
+    delete:
+      tags:
+        - GpuByPci
+      summary: Delete GPU by PCI Device ID only
+      description: >-
+        Delete a GPU record using only PCI Device ID (pciVendorId and
+        pciSubsystemDeviceId default to 'unknown')
+      operationId: deleteGpuByPciDeviceId
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - deleteGpuByPci
+      x-ssa-scopes:
+        - deleteGpuByPci
+        - kas
+    patch:
+      tags:
+        - GpuByPci
+      summary: Partially update GPU by PCI Device ID only
+      description: >-
+        Partially update a GPU record using only PCI Device ID (pciVendorId and
+        pciSubsystemDeviceId default to 'unknown'). Only provided fields will be
+        updated.
+      operationId: updateGpuByPciDeviceId
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GpuByPciUpdateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - updateGpuByPci
+      x-ssa-scopes:
+        - kas
+        - updateGpuByPci
+  /v1/gpus/pci-device-id/{pci_device-id}/pci-vendor-id/{pci_vendor-id}/pci-subsystem-device-id/{pci_subsystem-device-id}:
+    get:
+      tags:
+        - GpuByPci
+      summary: Get GPU by PCI Device ID, Vendor ID, and Subsystem Device ID
+      description: Get a single GPU record matching the full PCI composite key
+      operationId: getGpuByPciDeviceIdVendorIdSubsystemDeviceId
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_vendor_id
+          in: path
+          description: PCI Vendor ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_subsystem_device_id
+          in: path
+          description: PCI Subsystem Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - readGpuByPci
+      x-ssa-scopes:
+        - kas
+        - readGpuByPci
+    post:
+      tags:
+        - GpuByPci
+      summary: Create GPU by PCI Device ID, Vendor ID, and Subsystem Device ID
+      description: Create a new GPU record using the full PCI composite key
+      operationId: createGpuByPciFullKey
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_vendor_id
+          in: path
+          description: PCI Vendor ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_subsystem_device_id
+          in: path
+          description: PCI Subsystem Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GpuByPciCreateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - createGpuByPci
+      x-ssa-scopes:
+        - kas
+        - createGpuByPci
+    delete:
+      tags:
+        - GpuByPci
+      summary: Delete GPU by PCI Device ID, Vendor ID, and Subsystem Device ID
+      description: Delete a GPU record matching the full PCI composite key
+      operationId: deleteGpuByPciFullKey
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_vendor_id
+          in: path
+          description: PCI Vendor ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_subsystem_device_id
+          in: path
+          description: PCI Subsystem Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - deleteGpuByPci
+      x-ssa-scopes:
+        - deleteGpuByPci
+        - kas
+    patch:
+      tags:
+        - GpuByPci
+      summary: >-
+        Partially update GPU by PCI Device ID, Vendor ID, and Subsystem Device
+        ID
+      description: >-
+        Partially update a GPU record matching the full PCI composite key. Only
+        provided fields will be updated.
+      operationId: updateGpuByPciFullKey
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_vendor_id
+          in: path
+          description: PCI Vendor ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_subsystem_device_id
+          in: path
+          description: PCI Subsystem Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GpuByPciUpdateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - updateGpuByPci
+      x-ssa-scopes:
+        - kas
+        - updateGpuByPci
+  /v1/csps/{csp_name}/deployments/params:
+    get:
+      tags:
+        - Cloud service provider deployment parameters
+      summary: Get cloud service provider deployment parameters details
+      description: Get cloud service provider deployment parameters details
+      operationId: getCloudServiceProviderDeploymentParametersDetails
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+    post:
+      tags:
+        - Cloud service provider deployment parameters
+      summary: Create cloud service provider deployment parameters
+      description: Create cloud service provider deployment parameters
+      operationId: createCloudServiceProviderDeploymentParameters
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentParametersCreateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+    delete:
+      tags:
+        - Cloud service provider deployment parameters
+      summary: Delete cloud service provider deployment parameters
+      description: Delete cloud service provider deployment parameters
+      operationId: deleteCloudServiceProviderDeploymentParameters
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+    patch:
+      tags:
+        - Cloud service provider deployment parameters
+      summary: Update cloud service provider deployment parameters
+      description: Update cloud service provider deployment parameters
+      operationId: updateCloudServiceProviderDeploymentParameters
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentParametersUpdateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+  /v1/csps/{csp_name}/deployments/params/meta:
+    get:
+      tags:
+        - Deployment parameters meta
+      summary: Get cloud service provider deployment parameters meta details
+      description: Get cloud service provider deployment parameters meta details
+      operationId: getCloudServiceProviderDeploymentParametersMetaDetails
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+    post:
+      tags:
+        - Deployment parameters meta
+      summary: Create cloud service provider deployment parameters meta
+      description: Create cloud service provider deployment parameters meta
+      operationId: createCloudServiceProviderDeploymentParametersMeta
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentParametersMetaCreateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+    delete:
+      tags:
+        - Deployment parameters meta
+      summary: Delete cloud service provider deployment parameters meta
+      description: Delete cloud service provider deployment parameters meta
+      operationId: deleteCloudServiceProviderDeploymentParametersMeta
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+    patch:
+      tags:
+        - Deployment parameters meta
+      summary: Update cloud service provider deployment parameters meta
+      description: Update cloud service provider deployment parameters meta
+      operationId: updateCloudServiceProviderDeploymentParametersMeta
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentParametersMetaUpdateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+  /v1/csps/{csp_name}:
+    get:
+      tags:
+        - Cloud service providers
+      summary: Get cloud service provider details
+      description: Get cloud service provider details
+      operationId: getCloudServiceProviderDetails
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+    delete:
+      tags:
+        - Cloud service providers
+      summary: Delete cloud service provider
+      description: Delete cloud service provider
+      operationId: deleteCloudServiceProvider
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+    patch:
+      tags:
+        - Cloud service providers
+      summary: Update cloud service provider
+      description: Update cloud service provider
+      operationId: updateCloudServiceProvider
+      parameters:
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudServiceProviderUpdateRequest'
+        required: true
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+      x-ssa-scopes:
+        - kas
+  /v1/{artifact_type}/{org_name}/{artifact_name}/versions/{version_id}/signature:
+    get:
+      tags:
+        - ArtifactSigning
+      description: >-
+        Request to retrieve a pre-signed Download URL for the signature of an
+        artifact version as a guest.
+      operationId: getArtifactVersionSignatureAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: artifact_type
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - MODEL
+              - MODEL_SCRIPT
+              - HELM_CHART
+              - REPOSITORY
+              - COLLECTION
+              - ENDPOINT
+              - BLUEPRINT
+              - PLAYBOOK
+              - AGENT
+              - API
+              - SKILL
+            maxLength: 262144
+            minLength: 0
+        - name: artifact_name
+          in: path
+          description: Artifact name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: redirect
+          in: query
+          description: Get redirect URL
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/{artifact_type}/{org_name}/{artifact_name}/versions/{version_id}/files:
+    get:
+      tags:
+        - Artifact Version Files
+      summary: List artifact files in org as guest
+      description: List files of the artifact version in org as guest
+      operationId: listArtifactFilesInOrgAsGuest
+      parameters:
+        - name: artifact_type
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - MODEL
+              - MODEL_SCRIPT
+              - HELM_CHART
+              - REPOSITORY
+              - COLLECTION
+              - ENDPOINT
+              - BLUEPRINT
+              - PLAYBOOK
+              - AGENT
+              - API
+              - SKILL
+            maxLength: 262144
+            minLength: 0
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: artifact_name
+          in: path
+          description: Artifact name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-reference
+          in: query
+          description: Page reference
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 1024
+            minLength: 0
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/{artifact_type}:
+    get:
+      tags:
+        - Artifacts
+      summary: List public artifacts
+      description: List public artifacts
+      operationId: listPublicArtifacts
+      parameters:
+        - name: artifact_type
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - helm-charts
+              - endpoints
+              - agents
+              - blueprints
+              - apis
+              - playbooks
+              - skills
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/{artifact_type}/{org_name}/{artifact_name}:
+    get:
+      tags:
+        - Artifacts
+      summary: Get artifact in org as guest
+      description: Get artifact details in org as guest
+      operationId: getArtifactInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: artifact_type
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - helm-charts
+              - endpoints
+              - agents
+              - blueprints
+              - apis
+              - playbooks
+              - skills
+            maxLength: 262144
+            minLength: 0
+        - name: artifact_name
+          in: path
+          description: Artifact name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: resolve-labels
+          in: query
+          description: Resolve labels
+          required: false
+          schema:
+            type: boolean
+        - name: remove-unresolved-labels
+          in: query
+          description: Remove unresolved labels
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/recipes/{org_name}/{recipe_name}/versions/{version_id}/files:
+    get:
+      tags:
+        - Resource Version Files endpoints
+      summary: List recipe files in org as guest
+      description: List files of the recipe version in org as guest
+      operationId: listModeFilesInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-reference
+          in: query
+          description: Page reference
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 1024
+            minLength: 0
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/resources/{org_name}/{recipe_name}/versions/{version_id}/files:
+    get:
+      tags:
+        - Resource Version Files endpoints
+      summary: List recipe files in org as guest
+      description: List files of the recipe version in org as guest
+      operationId: listModeFilesInOrgAsGuest_1
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-reference
+          in: query
+          description: Page reference
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 1024
+            minLength: 0
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/recipes/{org_name}/{recipe_name}/versions/{version_id}:
+    get:
+      tags:
+        - Resource Versions
+      summary: Get recipe version in org as guest
+      description: Get recipe version in org as guest
+      operationId: getRecipeVersionInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/resources/{org_name}/{recipe_name}/versions/{version_id}:
+    get:
+      tags:
+        - Resource Versions
+      summary: Get recipe version in org as guest
+      description: Get recipe version in org as guest
+      operationId: getRecipeVersionInOrgAsGuest_1
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/recipes/{org_name}/{recipe_name}/versions:
+    get:
+      tags:
+        - Resource Versions
+      summary: List recipe versions in org as guest
+      description: List recipe versions in org as guest
+      operationId: listRecipeVersionsInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+        - name: sort-order
+          in: query
+          description: Sort order
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - ALPHABETIC_ASC
+              - ALPHABETIC_DESC
+              - CREATED_DATE_ASC
+              - CREATED_DATE_DESC
+              - SEMVER_ASC
+              - SEMVER_DESC
+              - DISPLAY_NAME_ASC
+              - DISPLAY_NAME_DESC
+              - UPDATED_DATE_ASC
+              - UPDATED_DATE_DESC
+              - PUBLISHER_ASC
+              - PUBLISHER_DESC
+              - BUILT_BY_ASC
+              - BUILT_BY_DESC
+              - RESOURCE_ID_ASC
+              - RESOURCE_ID_DESC
+            maxLength: 262144
+            minLength: 0
+        - name: release-type
+          in: query
+          description: Release Type
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - BETA
+              - GA
+              - EA
+              - FEATURE
+              - PRODUCTION
+              - LTSB
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/resources/{org_name}/{recipe_name}/versions:
+    get:
+      tags:
+        - Resource Versions
+      summary: List recipe versions in org as guest
+      description: List recipe versions in org as guest
+      operationId: listRecipeVersionsInOrgAsGuest_1
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+        - name: sort-order
+          in: query
+          description: Sort order
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - ALPHABETIC_ASC
+              - ALPHABETIC_DESC
+              - CREATED_DATE_ASC
+              - CREATED_DATE_DESC
+              - SEMVER_ASC
+              - SEMVER_DESC
+              - DISPLAY_NAME_ASC
+              - DISPLAY_NAME_DESC
+              - UPDATED_DATE_ASC
+              - UPDATED_DATE_DESC
+              - PUBLISHER_ASC
+              - PUBLISHER_DESC
+              - BUILT_BY_ASC
+              - BUILT_BY_DESC
+              - RESOURCE_ID_ASC
+              - RESOURCE_ID_DESC
+            maxLength: 262144
+            minLength: 0
+        - name: release-type
+          in: query
+          description: Release Type
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - BETA
+              - GA
+              - EA
+              - FEATURE
+              - PRODUCTION
+              - LTSB
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/recipes/{org_name}/{recipe_name}:
+    get:
+      tags:
+        - Resources
+      summary: Get recipe in org as guest
+      description: Get recipe details in org as guest
+      operationId: getRecipeInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: resolve-labels
+          in: query
+          description: Resolve labels
+          required: false
+          schema:
+            type: boolean
+        - name: remove-unresolved-labels
+          in: query
+          description: Remove unresolved labels
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/resources/{org_name}/{recipe_name}:
+    get:
+      tags:
+        - Resources
+      summary: Get recipe in org as guest
+      description: Get recipe details in org as guest
+      operationId: getRecipeInOrgAsGuest_1
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: recipe_name
+          in: path
+          description: Recipe name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: resolve-labels
+          in: query
+          description: Resolve labels
+          required: false
+          schema:
+            type: boolean
+        - name: remove-unresolved-labels
+          in: query
+          description: Remove unresolved labels
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/models/{org_name}/{model_name}:
+    get:
+      tags:
+        - Models
+      summary: Get model in org as guest
+      description: This operation gets info of a model in the org as guest.
+      operationId: getModelInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: model_name
+          in: path
+          description: Model name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: resolve-labels
+          in: query
+          description: Resolve labels
+          required: false
+          schema:
+            type: boolean
+        - name: remove-unresolved-labels
+          in: query
+          description: Remove unresolved labels
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/models/{org_name}/{model_name}/versions:
+    get:
+      tags:
+        - Model Version
+      summary: List model versions in org as guest
+      description: List model versions in org as guest
+      operationId: listModelVersionsInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: model_name
+          in: path
+          description: Model name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: release-type
+          in: query
+          description: Release Type
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - BETA
+              - GA
+              - EA
+              - FEATURE
+              - PRODUCTION
+              - LTSB
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 1000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+        - name: sort-order
+          in: query
+          description: Sort order
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - ALPHABETIC_ASC
+              - ALPHABETIC_DESC
+              - CREATED_DATE_ASC
+              - CREATED_DATE_DESC
+              - SEMVER_ASC
+              - SEMVER_DESC
+              - DISPLAY_NAME_ASC
+              - DISPLAY_NAME_DESC
+              - UPDATED_DATE_ASC
+              - UPDATED_DATE_DESC
+              - PUBLISHER_ASC
+              - PUBLISHER_DESC
+              - BUILT_BY_ASC
+              - BUILT_BY_DESC
+              - RESOURCE_ID_ASC
+              - RESOURCE_ID_DESC
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/models/{org_name}/{model_name}/versions/{version_id}:
+    get:
+      tags:
+        - Model Version
+      summary: Get model version in org as guest
+      description: Get model version in org as guest
+      operationId: getModelVersionInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: model_name
+          in: path
+          description: Model name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 512
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/models/{org_name}/{model_name}/versions/{version_id}/files:
+    get:
+      tags:
+        - Model Version Files
+      summary: List model files in org as guest
+      description: List files of the model version in org as guest
+      operationId: listModeFilesInOrgAsGuest_2
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: model_name
+          in: path
+          description: Model name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-reference
+          in: query
+          description: Page reference
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 1024
+            minLength: 0
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/helm-charts/{org_name}/{artifact_name}/versions:
+    get:
+      tags:
+        - Helm Charts
+      summary: List chart versions in org as guest
+      description: List chart versions in org as guest
+      operationId: listHelmChartVersionsInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: artifact_name
+          in: path
+          description: Artifact name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+        - name: sort-order
+          in: query
+          description: Sort order
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - ALPHABETIC_ASC
+              - ALPHABETIC_DESC
+              - CREATED_DATE_ASC
+              - CREATED_DATE_DESC
+              - SEMVER_ASC
+              - SEMVER_DESC
+              - DISPLAY_NAME_ASC
+              - DISPLAY_NAME_DESC
+              - UPDATED_DATE_ASC
+              - UPDATED_DATE_DESC
+              - PUBLISHER_ASC
+              - PUBLISHER_DESC
+              - BUILT_BY_ASC
+              - BUILT_BY_DESC
+              - RESOURCE_ID_ASC
+              - RESOURCE_ID_DESC
+            maxLength: 262144
+            minLength: 0
+        - name: release-type
+          in: query
+          description: Release Type
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - BETA
+              - GA
+              - EA
+              - FEATURE
+              - PRODUCTION
+              - LTSB
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/helm-charts/{org_name}/{artifact_name}/versions/{version_id}:
+    get:
+      tags:
+        - Helm Charts
+      summary: Get chart version in org as guest
+      description: Get chart version in org as guest
+      operationId: getHelmChartVersionInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: artifact_name
+          in: path
+          description: Artifact name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: version_id
+          in: path
+          description: Version ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/gpus/pci-device-id/{pci_device-id}/pci-vendor-id/{pci_vendor-id}:
+    get:
+      tags:
+        - GpuByPci
+      summary: Get GPUs by PCI Device ID and Vendor ID
+      description: >-
+        Get all GPUs by PCI records matching the given PCI Device ID and Vendor
+        ID
+      operationId: getGpuByPciDeviceIdVendorId
+      parameters:
+        - name: pci_device_id
+          in: path
+          description: PCI Device ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+        - name: pci_vendor_id
+          in: path
+          description: PCI Vendor ID
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 32
+            minLength: 0
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - ssa:
+            - kas
+            - readGpuByPci
+      x-ssa-scopes:
+        - kas
+        - readGpuByPci
+  /v1/csps/{artifact_type}/{org_name}/{artifact_name}/deployments/{csp_name}/params:
+    get:
+      tags:
+        - Artifact deployment parameters
+      summary: Get public artifact deployment parameters details in org
+      description: Get public artifact deployment parameters details in org
+      operationId: getPublicArtifactDeploymentParametersInOrg
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: artifact_type
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - repositories
+              - recipes
+              - models
+            maxLength: 262144
+            minLength: 0
+        - name: artifact_name
+          in: path
+          description: Artifact name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: csp_name
+          in: path
+          description: Cloud service provider name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: inherit-csp-parameters
+          in: query
+          description: Inherit CSP parameters
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/csps/{artifact_type}/{org_name}/{artifact_name}/deployments/params:
+    get:
+      tags:
+        - Artifact deployment parameters
+      summary: List public artifact deployment parameters in org
+      description: List public artifact deployment parameters in org
+      operationId: listPublicArtifactDeploymentParametersInOrg
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: artifact_type
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - repositories
+              - recipes
+              - models
+            maxLength: 262144
+            minLength: 0
+        - name: artifact_name
+          in: path
+          description: Artifact name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: inherit-csp-parameters
+          in: query
+          description: Inherit CSP parameters
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/collections/{org_name}/{collection_name}:
+    get:
+      tags:
+        - Collections
+      summary: Get collection in org as guest
+      description: Get collection details in org as guest
+      operationId: getCollectionInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: collection_name
+          in: path
+          description: Collection name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: resolve-labels
+          in: query
+          description: Resolve labels
+          required: false
+          schema:
+            type: boolean
+        - name: remove-unresolved-labels
+          in: query
+          description: Remove unresolved labels
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+  /v1/collections/{org_name}/{collection_name}/artifacts/{artifact_type}:
+    get:
+      tags:
+        - Collections
+      summary: List collection artifacts in org as guest
+      description: >-
+        List collection artifacts the user can access in the specified org as
+        guest
+      operationId: listCollectionArtifactsInOrgAsGuest
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+        - name: collection_name
+          in: path
+          description: Collection name
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+        - name: artifact_type
+          in: path
+          description: Artifact type
+          required: true
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - MODEL
+              - MODEL_SCRIPT
+              - HELM_CHART
+              - REPOSITORY
+              - COLLECTION
+              - ENDPOINT
+              - BLUEPRINT
+              - PLAYBOOK
+              - AGENT
+              - API
+              - SKILL
+            maxLength: 262144
+            minLength: 0
+        - name: page-size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 5000
+            minLength: 0
+            minimum: 1
+        - name: page-number
+          in: query
+          description: Page number - zero based index
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            maxLength: 262144
+            maximum: 10000
+            minLength: 0
+            minimum: 0
+        - name: order-by
+          in: query
+          description: Order by
+          required: false
+          schema:
+            type: string
+            format: UTF-8
+            enum:
+              - ALPHABETIC_ASC
+              - ALPHABETIC_DESC
+              - CREATED_DATE_ASC
+              - CREATED_DATE_DESC
+              - SEMVER_ASC
+              - SEMVER_DESC
+              - DISPLAY_NAME_ASC
+              - DISPLAY_NAME_DESC
+              - UPDATED_DATE_ASC
+              - UPDATED_DATE_DESC
+              - PUBLISHER_ASC
+              - PUBLISHER_DESC
+              - BUILT_BY_ASC
+              - BUILT_BY_DESC
+              - RESOURCE_ID_ASC
+              - RESOURCE_ID_DESC
+            maxLength: 262144
+            minLength: 0
+        - name: resolve-labels
+          in: query
+          description: Resolve labels
+          required: false
+          schema:
+            type: boolean
+        - name: remove-unresolved-labels
+          in: query
+          description: Remove unresolved labels
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-ssa-scopes: []
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        requestStatus:
+          $ref: '#/components/schemas/RequestStatus'
+          description: Request status information
+    GpuByPciCreateRequest:
+      type: object
+      description: GPU by PCI properties
+      properties:
+        pciDeviceId:
+          type: string
+          description: PCI Device ID
+        pciVendorId:
+          type: string
+          description: PCI Vendor ID
+        pciSubsystemDeviceId:
+          type: string
+          description: PCI Subsystem Device ID
+        labelName:
+          type: string
+          description: Label name for the GPU
+        displayName:
+          type: string
+          description: Display name for the GPU
+        cudaMajorVersion:
+          type: string
+          description: CUDA major version
+        cudaMinorVersion:
+          type: string
+          description: CUDA minor version
+        memorySizeGb:
+          type: integer
+          format: int32
+          description: Memory size in GB (smallint range)
+          maximum: 32767
+          minimum: 0
+        formFactor:
+          type: string
+          description: GPU form factor
+        gpuCounts:
+          type: array
+          items:
+            type: integer
+            format: int32
+            maximum: 255
+            minimum: 0
+          uniqueItems: true
+      required:
+        - displayName
+        - pciDeviceId
+    GpuByPciUpdateRequest:
+      type: object
+      description: GPU by PCI update properties
+      properties:
+        labelName:
+          type: string
+          description: Label name for the GPU
+        displayName:
+          type: string
+          description: Display name for the GPU
+        cudaMajorVersion:
+          type: string
+          description: CUDA major version
+        cudaMinorVersion:
+          type: string
+          description: CUDA minor version
+        memorySizeGb:
+          type: integer
+          format: int32
+          description: Memory size in GB (smallint range)
+          maximum: 32767
+          minimum: 0
+        formFactor:
+          type: string
+          description: GPU form factor
+        gpuCounts:
+          type: array
+          items:
+            type: integer
+            format: int32
+            maximum: 255
+            minimum: 0
+          uniqueItems: true
+    CloudServiceProviderCreateRequest:
+      type: object
+      description: Request to create a new Cloud Service Provider
+      properties:
+        name:
+          type: string
+          description: Unique name of the Cloud Service Provider
+        displayName:
+          type: string
+          description: Display name of the Cloud Service Provider
+        description:
+          type: string
+          description: Description of the Cloud Service Provider
+        isEnabled:
+          type: boolean
+          description: Determines if this Cloud Service Provider is enabled
+        logo:
+          type: string
+          description: URL for the logo image
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtifactAttribute'
+        labels:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+    DeploymentParametersCreateRequest:
+      type: object
+      description: Request to create a new deployment parameters
+      properties:
+        cpu:
+          $ref: '#/components/schemas/DeploymentCpuParameters'
+          description: Deployment CPU Parameters object
+        gpu:
+          $ref: '#/components/schemas/DeploymentGpuParameters'
+          description: Deployment GPU Parameters object
+        memory:
+          $ref: '#/components/schemas/DeploymentMemoryParameters'
+          description: Deployment Memory Parameters object
+        storage:
+          $ref: '#/components/schemas/DeploymentStorageParameters'
+          description: Deployment Storage Parameters object
+        container:
+          $ref: '#/components/schemas/DeploymentArtifactParameters'
+          description: Deployment Artifact Parameters object
+        model:
+          $ref: '#/components/schemas/DeploymentArtifactParameters'
+          description: Deployment Artifact Parameters object
+        resource:
+          $ref: '#/components/schemas/DeploymentArtifactParameters'
+          description: Deployment Artifact Parameters object
+    DeploymentParametersUpdateRequest:
+      type: object
+      description: Request to update existing deployment parameters
+      properties:
+        cpu:
+          $ref: '#/components/schemas/DeploymentCpuParameters'
+          description: Deployment CPU Parameters object
+        gpu:
+          $ref: '#/components/schemas/DeploymentGpuParameters'
+          description: Deployment GPU Parameters object
+        memory:
+          $ref: '#/components/schemas/DeploymentMemoryParameters'
+          description: Deployment Memory Parameters object
+        storage:
+          $ref: '#/components/schemas/DeploymentStorageParameters'
+          description: Deployment Storage Parameters object
+        container:
+          $ref: '#/components/schemas/DeploymentArtifactParameters'
+          description: Deployment Artifact Parameters object
+        model:
+          $ref: '#/components/schemas/DeploymentArtifactParameters'
+          description: Deployment Artifact Parameters object
+        resource:
+          $ref: '#/components/schemas/DeploymentArtifactParameters'
+          description: Deployment Artifact Parameters object
+    DeploymentParametersMetaCreateRequest:
+      type: object
+      description: >-
+        Properties for the cloud service provider deployment parameters meta to
+        create
+      properties:
+        cpu:
+          $ref: '#/components/schemas/DeploymentCpuParametersMeta'
+          description: Cloud Service Provider Deployment CPU Parameters object
+        gpu:
+          $ref: '#/components/schemas/DeploymentGpuParametersMeta'
+          description: Cloud Service Provider Deployment GPU Parameters object
+        memory:
+          $ref: '#/components/schemas/DeploymentMemoryParametersMeta'
+          description: Cloud Service Provider Deployment Memory Parameters object
+        storage:
+          $ref: '#/components/schemas/DeploymentStorageParametersMeta'
+          description: Cloud Service Provider Deployment Storage Parameters object
+      required:
+        - gpu
+        - storage
+    DeploymentParametersMetaUpdateRequest:
+      type: object
+      description: >-
+        Properties for the cloud service provider deployment parameters meta to
+        create
+      properties:
+        cpu:
+          $ref: '#/components/schemas/DeploymentCpuParametersMeta'
+          description: Cloud Service Provider Deployment CPU Parameters object
+        gpu:
+          $ref: '#/components/schemas/DeploymentGpuParametersMeta'
+          description: Cloud Service Provider Deployment GPU Parameters object
+        memory:
+          $ref: '#/components/schemas/DeploymentMemoryParametersMeta'
+          description: Cloud Service Provider Deployment Memory Parameters object
+        storage:
+          $ref: '#/components/schemas/DeploymentStorageParametersMeta'
+          description: Cloud Service Provider Deployment Storage Parameters object
+    CloudServiceProviderUpdateRequest:
+      type: object
+      description: Request to update existing Cloud Service Provider
+      properties:
+        displayName:
+          type: string
+          description: Display name of the Cloud Service Provider
+        description:
+          type: string
+          description: Description of the Cloud Service Provider
+        isEnabled:
+          type: boolean
+          description: Determines if this Cloud Service Provider is enabled
+        logo:
+          type: string
+          description: URL for the logo image
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtifactAttribute'
+        labels:
+          type: array
+          items:
+            type: string
+    AIPlaygroundResponse:
+      type: object
+      description: Request to fetch an AI Playground config
+      properties:
+        artifactName:
+          type: string
+          description: Unique name of the model
+        artifactType:
+          type: string
+          description: ArtifactTypeEnum of the artifact
+        namespace:
+          type: string
+          description: org/team of the model
+        nvcfFunctionId:
+          type: string
+          description: NVCF function id for the model playground
+        attributes:
+          type: string
+          description: Metadata json string
+        openAPISpec:
+          type: string
+          description: OpenAPI specification for this model
+        createdDate:
+          type: string
+          description: Creation date in ISO-8601 format
+          pattern: \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+Z
+        updatedDate:
+          type: string
+          description: Updated date in ISO-8601 format
+          pattern: \d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+Z
+    RequestStatus:
+      type: object
+      description: Request status information
+      properties:
+        statusCode:
+          type: string
+          description: Describes response status reported by the server.
+          enum:
+            - UNKNOWN
+            - SUCCESS
+            - UNAUTHORIZED
+            - PAYMENT_REQUIRED
+            - FORBIDDEN
+            - TIMEOUT
+            - EXISTS
+            - NOT_FOUND
+            - INTERNAL_ERROR
+            - INVALID_REQUEST
+            - INVALID_REQUEST_VERSION
+            - INVALID_REQUEST_DATA
+            - METHOD_NOT_ALLOWED
+            - CONFLICT
+            - UNPROCESSABLE_ENTITY
+            - TOO_MANY_REQUESTS
+            - INSUFFICIENT_STORAGE
+            - SERVICE_UNAVAILABLE
+        statusDescription:
+          type: string
+          description: Status description
+        requestId:
+          type: string
+          description: Request ID
+        serverId:
+          type: string
+          description: Server ID
+    ArtifactAttribute:
+      type: object
+      description: Attribute on the artifact
+      properties:
+        key:
+          type: string
+          maxLength: 255
+          pattern: '[a-zA-Z0-9]+'
+        value:
+          type: string
+          maxLength: 255
+    DeploymentCpuParameters:
+      type: object
+      description: Deployment CPU Parameters object
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: Total count of CPUs
+    DeploymentGpuParameters:
+      type: object
+      description: Deployment GPU Parameters object
+      properties:
+        count:
+          type: integer
+          format: int64
+          description: Total count of GPUs
+        type:
+          type: string
+          description: GPU Type
+    DeploymentMemoryParameters:
+      type: object
+      description: Deployment Memory Parameters object
+      properties:
+        capacityInGB:
+          type: integer
+          format: int64
+          description: Capacity in GB
+    DeploymentStorageParameters:
+      type: object
+      description: Deployment Storage Parameters object
+      properties:
+        capacityInGB:
+          type: integer
+          format: int64
+          description: Capacity in GB
+    DeploymentArtifactParameters:
+      type: object
+      description: Deployment Artifact Parameters object
+      properties:
+        artifactType:
+          type: string
+          description: Artifact type
+          enum:
+            - MODEL
+            - MODEL_SCRIPT
+            - HELM_CHART
+            - REPOSITORY
+            - COLLECTION
+            - ENDPOINT
+            - BLUEPRINT
+            - PLAYBOOK
+            - AGENT
+            - API
+            - SKILL
+        name:
+          type: string
+          description: Unique name of the artifact
+        displayName:
+          type: string
+          description: Display name of the artifact
+        orgName:
+          type: string
+          description: Name of the org that the artifact belongs to
+        teamName:
+          type: string
+          description: Name of the team that the artifact belongs to
+        versionId:
+          type: string
+          description: ID of the version or tag
+        filePath:
+          type: string
+          description: Path to a file in an artifact version
+      required:
+        - name
+        - orgName
+    DeploymentCpuParametersMeta:
+      type: object
+      description: Cloud Service Provider Deployment CPU Parameters object
+      properties:
+        count:
+          $ref: '#/components/schemas/CountableResource'
+          description: Countable Resource object
+      required:
+        - count
+    DeploymentGpuParametersMeta:
+      type: object
+      description: Cloud Service Provider Deployment GPU Parameters object
+      properties:
+        count:
+          $ref: '#/components/schemas/CountableResource'
+          description: Countable Resource object
+        type:
+          $ref: '#/components/schemas/EnumerableResource'
+          description: Enumerable Resource object
+      required:
+        - type
+    DeploymentMemoryParametersMeta:
+      type: object
+      description: Cloud Service Provider Deployment Memory Parameters object
+      properties:
+        capacityInGB:
+          $ref: '#/components/schemas/CountableResource'
+          description: Countable Resource object
+      required:
+        - capacityInGB
+    DeploymentStorageParametersMeta:
+      type: object
+      description: Cloud Service Provider Deployment Storage Parameters object
+      properties:
+        capacityInGB:
+          $ref: '#/components/schemas/CountableResource'
+          description: Countable Resource object
+      required:
+        - capacityInGB
+    CountableResource:
+      type: object
+      description: Countable Resource object
+      properties:
+        minValue:
+          type: integer
+          format: int64
+          description: Minimum value
+        maxValue:
+          type: integer
+          format: int64
+          description: Maximum value
+        defaultValue:
+          type: integer
+          format: int64
+          description: >-
+            Deprecated: Default value. Please use actual CloudServiceProvider
+            values instead
+    EnumerableResource:
+      type: object
+      description: Enumerable Resource object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnumerableResourceItem'
+        defaultItemName:
+          type: string
+          description: >-
+            Deprecated: Default item name. Please use actual
+            CloudServiceProvider values instead
+    EnumerableResourceItem:
+      type: object
+      description: Enumerable Resource Item object
+      properties:
+        name:
+          type: string
+          description: Name
+        displayName:
+          type: string
+          description: Display name
+        logo:
+          type: string
+          description: Logo URL
+servers:
+  - url: https://models.ngc.nvidia.com
+    description: Generated server url - production
+    x-internal: true

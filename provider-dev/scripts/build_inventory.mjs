@@ -21,6 +21,7 @@ const cleanedDir = path.join(repoRoot, 'provider-dev', 'downloaded', 'cleaned');
 const outPath = path.join(repoRoot, 'provider-dev', 'config', 'endpoint_inventory.csv');
 
 const HTTP_VERBS = ['get', 'post', 'put', 'patch', 'delete'];
+const NON_GENERATOR_VERBS = ['head', 'options', 'trace'];
 
 const SOURCES = {
   'nvcf_openapi.json': 'nvcf',
@@ -518,11 +519,13 @@ for (const [file, source] of Object.entries(SOURCES)) {
   const spec = JSON.parse(fs.readFileSync(abs, 'utf8'));
 
   for (const [pathKey, pathItem] of Object.entries(spec.paths || {})) {
-    for (const verb of HTTP_VERBS) {
+    for (const verb of [...HTTP_VERBS, ...NON_GENERATOR_VERBS]) {
       const op = pathItem[verb];
       if (!op) continue;
 
       let c;
+      if (NON_GENERATOR_VERBS.includes(verb)) c = { skip: 'non-generator-http-verb' };
+      else
       if (file === 'nvcf_openapi.json') c = classifyNvcf(pathKey, verb, op);
       else if (file === 'ngc_kas.json') c = classifyKas(pathKey, verb, op);
       else c = classifyModels(pathKey, verb, op);

@@ -1,0 +1,195 @@
+openapi: 3.1.0
+info:
+  title: nvcf_queues API
+  description: nvidia nvcf_queues API
+  version: 2.245.1
+paths:
+  /v2/nvcf/queues/{requestId}/position:
+    get:
+      tags:
+        - Queue Details
+      summary: Queue Position
+      description: >-
+        Using the specified function invocation request id, returns the
+        estimated  position of the corresponding message up to 1000 in the
+        queue. Requires a bearer token or an api-key with 'queue_details' scope
+        in the HTTP  Authorization header. 
+      operationId: getPositionInQueue
+      parameters:
+        - name: requestId
+          in: path
+          description: Function invocation request id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            maxLength: 36
+            minLength: 36
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPositionInQueueResponse'
+  /v2/nvcf/queues/functions/{functionId}/versions/{versionId}:
+    get:
+      tags:
+        - Queue Details
+      summary: Queue Details
+      description: >-
+        Provides details of all the queues associated with the specified
+        function.  If a function has multiple versions and they are all
+        deployed, then the  response includes details of all the queues. If the
+        specified function  is public, then Account Admin cannot perform this
+        operation. Requires a bearer token or an api-key with 'queue_details'
+        scope in the HTTP  Authorization header. 
+      operationId: getQueuesDetails
+      parameters:
+        - name: functionId
+          in: path
+          description: Function id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            maxLength: 36
+            minLength: 36
+        - name: versionId
+          in: path
+          description: Function version id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            maxLength: 36
+            minLength: 36
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQueuesResponse'
+  /v2/nvcf/queues/functions/{functionId}:
+    get:
+      tags:
+        - Queue Details
+      summary: Queue Details
+      description: >-
+        Provides details of all the queues associated with the specified
+        function.  If a function has multiple versions and they are all
+        deployed, then the  response includes details of all the queues. If the
+        specified function  is public, then Account Admin cannot perform this
+        operation. Requires a bearer token or an api-key with 'queue_details'
+        scope in the HTTP  Authorization header. 
+      operationId: getQueuesDetails_1
+      parameters:
+        - name: functionId
+          in: path
+          description: Function id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            maxLength: 36
+            minLength: 36
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQueuesResponse'
+components:
+  schemas:
+    GetPositionInQueueResponse:
+      type: object
+      description: Request position in queue for invocation request
+      properties:
+        functionVersionId:
+          type: string
+          format: uuid
+          description: Function version id
+          maxLength: 36
+          minLength: 36
+        functionId:
+          type: string
+          format: uuid
+          description: Function id
+          maxLength: 36
+          minLength: 36
+        positionInQueue:
+          type: integer
+          format: int32
+          description: Position of request in queue
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+        - functionId
+        - functionVersionId
+    GetQueuesResponse:
+      type: object
+      description: Request queue details of all the functions with same id in an account
+      properties:
+        functionId:
+          type: string
+          format: uuid
+          description: Function id
+          maxLength: 36
+          minLength: 36
+        queues:
+          type: array
+          description: Details of all the queues associated with same named functions
+          items:
+            $ref: '#/components/schemas/QueueDto'
+          maxItems: 2147483647
+          minItems: 0
+      required:
+        - functionId
+        - queues
+    QueueDto:
+      type: object
+      description: >-
+        Data Transfer Object(DTO) representing a request queue for function
+        version
+      properties:
+        functionVersionId:
+          type: string
+          format: uuid
+          description: Function version id
+          maxLength: 36
+          minLength: 36
+        functionName:
+          type: string
+          format: UTF-8
+          description: Function name
+          maxLength: 262144
+          minLength: 0
+        functionStatus:
+          type: string
+          format: UTF-8
+          description: Function status
+          enum:
+            - ACTIVE
+            - DEPLOYING
+            - ERROR
+            - INACTIVE
+            - DELETED
+            - DEGRADED
+            - DEGRADING
+          maxLength: 262144
+          minLength: 0
+        queueDepth:
+          type: integer
+          format: int32
+          description: Approximate number of messages in the request queue
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+        - functionName
+        - functionStatus
+        - functionVersionId
+servers:
+  - url: https://api.nvcf.nvidia.com
+    description: Generated server url
