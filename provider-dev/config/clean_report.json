@@ -44,16 +44,20 @@
       "paths": 232,
       "fixes": [
         {
-          "rule": "inject-sdk-responses",
-          "note": "27 SDK data classes added to components.schemas (ngcsdk 4.36.6); 200 responses injected on 0 response-less operations (0 of them declared an untyped 2xx; 0 on the bare Response envelope): "
-        },
-        {
           "rule": "gateway-v2-path-prefix",
           "note": "229 path(s) rewritten /v1/ -> /v2/; servers [{\"description\":\"Generated server url - production\",\"url\":\"https://models.ngc.nvidia.com\",\"x-internal\":true}] -> https://api.ngc.nvidia.com (the public gateway serving the definition)"
         },
         {
           "rule": "snake-case-path-params",
           "note": "209 path key(s) and 986 path parameter name(s) converted to snake_case"
+        },
+        {
+          "rule": "inject-sdk-operations",
+          "note": "4 SDK-documented operation(s) injected: DELETE /v2/org/{org_name}/models/{model_name} (deleteModelInOrg); DELETE /v2/org/{org_name}/team/{team_name}/models/{model_name} (deleteModelInTeam); DELETE /v2/org/{org_name}/resources/{recipe_name} (deleteResourceInOrg); DELETE /v2/org/{org_name}/team/{team_name}/resources/{recipe_name} (deleteResourceInTeam)"
+        },
+        {
+          "rule": "inject-sdk-responses",
+          "note": "27 SDK data classes added to components.schemas (ngcsdk 4.36.6); 200 responses injected on 0 response-less operations (0 of them declared an untyped 2xx; 0 on the bare Response envelope): "
         }
       ],
       "notes": [

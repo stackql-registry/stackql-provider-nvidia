@@ -135,6 +135,14 @@ class Smoke:
         try:
             if sql.lstrip().upper().startswith(("SELECT", "SHOW", "DESCRIBE")) or "RETURNING" in sql.upper():
                 out = self.sq.execute(sql)
+                # pystackql's execute() swallows an HTTP error on a SELECT into
+                # an empty result set (3.8.4); executeStmt() surfaces it as
+                # [{"error": ...}] - re-run an empty SELECT that way so a 403
+                # can never pass as "no rows"
+                if not out:
+                    probe = self.sq.executeStmt(sql)
+                    if isinstance(probe, list) and probe and isinstance(probe[0], dict) and "error" in probe[0]:
+                        out = probe
             else:
                 out = self.sq.executeStmt(sql)
         except Exception as exc:  # noqa: BLE001
@@ -200,7 +208,7 @@ class Smoke:
             for r in rows:
                 if str(r.get("name", "")).startswith(SMOKE_PREFIX):
                     print(f"  sweeping registry model {r['name']}")
-                    self.q(f"DELETE FROM nvidia.private_registry.artifacts WHERE artifact_type = 'models' AND artifact_name = '{r['name']}'")
+                    self.q(f"DELETE FROM nvidia.private_registry.models WHERE model_name = '{r['name']}'")
         rows, err = self.q("SELECT id, version_id, name, status FROM nvidia.nvcf_functions.functions")
         if err:
             print(f"  WARN nvcf sweep list failed (NVCF may not be enabled): {err[:120]}")
@@ -216,8 +224,11 @@ class Smoke:
     def read_smokes(self) -> None:
         print("== tier 1: public catalog ==")
         self.step("show services", "SHOW SERVICES IN nvidia", expect_rows=True, contains="nvcf_functions")
-        self.step("catalog models (public, paginated, LIMIT pushdown)", "SELECT name, org_name, display_name FROM nvidia.catalog.models LIMIT 5", expect_rows=True)
-        self.step("catalog model get (nvidia org)", "SELECT name, display_name, latest_version_id_str FROM nvidia.catalog.models WHERE org_name = 'nvidia' AND model_name = 'llama-3.1-8b-instruct'")
+        models = self.step("catalog models (public, paginated, LIMIT pushdown)", "SELECT name, org_name, display_name FROM nvidia.catalog.models LIMIT 5", expect_rows=True)
+        if models:
+            first = models[0]
+            self.step("catalog model get ($.model, by org_name + model_name)", f"SELECT name, display_name, latest_version_id_str FROM nvidia.catalog.models WHERE org_name = '{first['org_name']}' AND model_name = '{first['name']}'", expect_rows=True, contains=str(first["name"]))
+            self.step("catalog model versions ($.modelVersions)", f"SELECT version_id, status FROM nvidia.catalog.model_versions WHERE org_name = '{first['org_name']}' AND model_name = '{first['name']}'")
         self.step("catalog GPU catalog (bare array)", "SELECT display_name, pci_device_id, memory_size_gb FROM nvidia.catalog.gpus", expect_rows=True)
         self.step("catalog collections", "SELECT name, org_name, display_name FROM nvidia.catalog.collections LIMIT 5")
 
@@ -228,7 +239,7 @@ class Smoke:
         self.step("org users (NGC_ORG resolved, paginated)", "SELECT email, name, is_active FROM nvidia.orgs.users", expect_rows=True)
         self.step("org teams", "SELECT name, description FROM nvidia.orgs.teams")
         self.step("registry models (NGC_ORG resolved)", "SELECT name, framework, latest_version_id_str, updated_date FROM nvidia.private_registry.models")
-        self.step("registry artifacts (containers, generic resource)", "SELECT name, display_name, updated_date FROM nvidia.private_registry.artifacts WHERE artifact_type = 'containers'")
+        self.step("registry artifacts (helm-charts, generic resource)", "SELECT name, display_name, updated_date FROM nvidia.private_registry.artifacts WHERE artifact_type = 'helm-charts'")
         self.step("registry collections", "SELECT name, display_name FROM nvidia.private_registry.collections")
         if self.team:
             self.step("registry models by team (*_by_team twin)", f"SELECT name FROM nvidia.private_registry.models WHERE team_name = '{self.team}'")
@@ -264,7 +275,7 @@ class Smoke:
         self.step("model UPDATE (display_name)", f"UPDATE nvidia.private_registry.models SET display_name = 'StackQL smoke v2' WHERE model_name = '{name}'")
         self.step("model reflects UPDATE", f"SELECT display_name FROM nvidia.private_registry.models WHERE model_name = '{name}'", expect_rows=True, contains="v2")
         self.step("model versions (empty for a new model)", f"SELECT id, status FROM nvidia.private_registry.model_versions WHERE model_name = '{name}'")
-        self.step("model DELETE (via artifacts, artifact_type = models)", f"DELETE FROM nvidia.private_registry.artifacts WHERE artifact_type = 'models' AND artifact_name = '{name}'")
+        self.step("model DELETE", f"DELETE FROM nvidia.private_registry.models WHERE model_name = '{name}'")
         rows, err = self.q("SELECT name FROM nvidia.private_registry.models")
         self.note("model gone after DELETE", not err and all(r.get("name") != name for r in rows), err or "")
 

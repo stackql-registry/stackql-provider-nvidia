@@ -519,6 +519,7 @@ function classifyModelsCore(p, verb, op) {
   if (p === '/v2/org/{org_name}/models/{model_name}') {
     if (verb === 'get') return r('private_registry', 'models', 'get', 'select');
     if (verb === 'patch') return r('private_registry', 'models', 'update', 'update');
+    if (verb === 'delete') return r('private_registry', 'models', 'delete', 'delete', 'injected from SDK evidence (clean_specs inject-sdk-operations)');
   }
   if (p === '/v2/org/{org_name}/models/{model_name}/encryption-key') return r('private_registry', 'model_encryption_keys', 'delete', 'delete');
   if (p.includes('/models/{model_name}/shares/')) {
@@ -542,6 +543,7 @@ function classifyModelsCore(p, verb, op) {
     if (p === `${base}/{recipe_name}`) {
       if (verb === 'get') return r('private_registry', `${resBase}s`, 'get', 'select');
       if (verb === 'patch') return r('private_registry', `${resBase}s`, 'update', 'update');
+      if (verb === 'delete') return r('private_registry', `${resBase}s`, 'delete', 'delete', 'injected from SDK evidence (clean_specs inject-sdk-operations)');
     }
     if (p === `${base}/{recipe_name}/versions` && verb === 'get') return r('private_registry', `${resBase}_versions`, 'list', 'select');
     if (p === `${base}/{recipe_name}/versions` && verb === 'post') return r('private_registry', `${resBase}_versions`, 'create', 'insert');

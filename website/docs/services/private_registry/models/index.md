@@ -950,6 +950,20 @@ The following methods are available for this resource:
     <td></td>
     <td>This operation updates details of a model in the org.</td>
 </tr>
+<tr>
+    <td><a href="#delete_by_team"><CopyableCode code="delete_by_team" /></a></td>
+    <td><CopyableCode code="delete" /></td>
+    <td><a href="#parameter-team_name"><code>team_name</code></a>, <a href="#parameter-model_name"><code>model_name</code></a></td>
+    <td></td>
+    <td>This operation deletes a model in the org/team (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).</td>
+</tr>
+<tr>
+    <td><a href="#delete"><CopyableCode code="delete" /></a></td>
+    <td><CopyableCode code="delete" /></td>
+    <td><a href="#parameter-model_name"><code>model_name</code></a></td>
+    <td></td>
+    <td>This operation deletes a model in the org (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).</td>
+</tr>
 </tbody>
 </table>
 
@@ -1578,6 +1592,39 @@ model_name = '{{ model_name }}' --required
 RETURNING
 model,
 request_status;
+```
+</TabItem>
+</Tabs>
+
+
+## `DELETE` examples
+
+<Tabs
+    defaultValue="delete_by_team"
+    values={[
+        { label: 'delete_by_team', value: 'delete_by_team' },
+        { label: 'delete', value: 'delete' }
+    ]}
+>
+<TabItem value="delete_by_team">
+
+This operation deletes a model in the org/team (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).
+
+```sql
+DELETE FROM nvidia.private_registry.models
+WHERE team_name = '{{ team_name }}' --required
+AND model_name = '{{ model_name }}' --required
+;
+```
+</TabItem>
+<TabItem value="delete">
+
+This operation deletes a model in the org (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).
+
+```sql
+DELETE FROM nvidia.private_registry.models
+WHERE model_name = '{{ model_name }}' --required
+;
 ```
 </TabItem>
 </Tabs>

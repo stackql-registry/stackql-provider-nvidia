@@ -1,10 +1,10 @@
 # `nvidia` provider for [`stackql`](https://github.com/stackql/stackql)
 
-This repository generates and documents the `nvidia` provider for StackQL, enabling SQL-based query and provisioning operations against the NVIDIA NGC control plane: NVIDIA Cloud Functions (NVCF - functions and versions, deployments and GPU specifications, cluster groups and GPU inventory, request queues, sharing grants, HTTP-polling invocation), the NGC private registry (models, resources, recipes, containers and helm charts as metadata, collections, shares, encryption keys), the public NGC catalog, and NGC organizations, teams, users, roles and invitations. The provider is built using the `@stackql/provider-utils` package.
+This repository generates and documents the `nvidia` provider for StackQL, enabling SQL-based query and provisioning operations against the NVIDIA NGC control plane: NVIDIA Cloud Functions (NVCF - functions and versions, deployments and GPU specifications, cluster groups and GPU inventory, request queues, sharing grants, HTTP-polling invocation), the NGC private registry (models, resources, recipes, helm charts and other artifacts as metadata, collections, shares, encryption keys), the public NGC catalog, and NGC organizations, teams, users, roles and invitations. The provider is built using the `@stackql/provider-utils` package.
 
 ## Positioning
 
-NVIDIA publishes a Go Terraform provider, [`NVIDIA/terraform-provider-ngc`](https://github.com/NVIDIA/terraform-provider-ngc), covering NVCF functions and telemetry endpoints (one resource and one data source each); it reads `NGC_API_KEY`, `NGC_ORG` and `NGC_TEAM`, and this provider uses the same variables. The surface here is generated mechanically from the published NVCF OpenAPI document and the NGC API definitions behind the NGC API explorer: 338 operations across 7 services and 83 resources, with response schemas for the registry taken from the `ngcsdk` Python SDK's data classes. The query surfaces that matter: GPU and cluster-group inventory, NVCF function fleet state by deployment specification, function sharing audits, registry and model estate reports, and org membership - the AI infrastructure control plane as data.
+NVIDIA publishes a Go Terraform provider, [`NVIDIA/terraform-provider-ngc`](https://github.com/NVIDIA/terraform-provider-ngc), covering NVCF functions and telemetry endpoints (one resource and one data source each); it reads `NGC_API_KEY`, `NGC_ORG` and `NGC_TEAM`, and this provider uses the same variables. The surface here is generated mechanically from the published NVCF OpenAPI document and the NGC API definitions behind the NGC API explorer: 342 operations across 7 services and 83 resources, with response schemas for the registry taken from the `ngcsdk` Python SDK's data classes. The query surfaces that matter: GPU and cluster-group inventory, NVCF function fleet state by deployment specification, function sharing audits, registry and model estate reports, and org membership - the AI infrastructure control plane as data.
 
 ## Design Principles
 
@@ -87,7 +87,7 @@ The split assigns operations to services from the inventory, sets each service's
 | Service | Resources | Contents |
 |---|---|---|
 | `orgs` | 11 | organizations, teams, users, team members and member roles, role grants, invitations, current user |
-| `private_registry` | 31 | org-scoped artifact metadata: models, resources, recipes, generic artifacts (containers, helm charts), versions and files, collections, shares, deployment parameters, encryption keys, workflows; `*_by_team` twins |
+| `private_registry` | 31 | org-scoped artifact metadata: models, resources, recipes, generic artifacts (helm charts, endpoints, blueprints, agents, playbooks, APIs, skills), versions and files, collections, shares, deployment parameters, encryption keys, workflows; `*_by_team` twins |
 | `catalog` | 21 | public artifact metadata reads plus the GPU and cloud service provider catalogs, NIM metadata publishing |
 | `nvcf_functions` | 7 | functions, versions, function ids, metadata, authorizations (sharing grants), secrets, rate limits |
 | `nvcf_deployments` | 7 | deployments and GPU specifications, cluster groups and GPUs, registry credentials, telemetries |

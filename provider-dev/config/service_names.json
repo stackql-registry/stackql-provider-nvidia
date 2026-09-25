@@ -5,7 +5,7 @@
   },
   "private_registry": {
     "title": "NVIDIA NGC Private Registry",
-    "description": "Org-scoped artifact metadata in the NGC private registry: models, resources, recipes, generic artifacts (containers, helm charts), versions and files, collections, shares, deployment parameters, encryption keys and workflows. Team-scoped twins are mapped as *_by_team methods (source: the Private Artifacts (Models) API definition, responses from the ngcsdk data classes)."
+    "description": "Org-scoped artifact metadata in the NGC private registry: models, resources, recipes, generic artifacts (helm charts, endpoints, blueprints, agents, playbooks, APIs, skills), versions and files, collections, shares, deployment parameters, encryption keys and workflows. Team-scoped twins are mapped as *_by_team methods (source: the Private Artifacts (Models) API definition, responses from the ngcsdk data classes)."
   },
   "catalog": {
     "title": "NVIDIA NGC Catalog",

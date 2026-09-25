@@ -18113,6 +18113,53 @@
           "updateModel",
           "kas"
         ]
+      },
+      "delete": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Delete model in org",
+        "description": "This operation deletes a model in the org (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).",
+        "operationId": "deleteModelInOrg",
+        "parameters": [
+          {
+            "description": "Organization name",
+            "in": "path",
+            "name": "org_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Model name",
+            "in": "path",
+            "name": "model_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        },
+        "x-stackql-sdk-evidence": "ngcsdk registry/api"
       }
     },
     "/v2/org/{org_name}/models/{model_name}/encryption-key": {
@@ -21537,6 +21584,53 @@
           "updateRecipe",
           "kas"
         ]
+      },
+      "delete": {
+        "tags": [
+          "Resources"
+        ],
+        "summary": "Delete resource in org",
+        "description": "This operation deletes a resource in the org (SDK evidence: ngcsdk registry/api/resources.py remove; not declared in the published definition).",
+        "operationId": "deleteResourceInOrg",
+        "parameters": [
+          {
+            "description": "Organization name",
+            "in": "path",
+            "name": "org_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Recipe name",
+            "in": "path",
+            "name": "recipe_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 262144,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        },
+        "x-stackql-sdk-evidence": "ngcsdk registry/api"
       }
     },
     "/v2/org/{org_name}/resources/{recipe_name}/versions": {
@@ -26550,6 +26644,65 @@
           "updateModel",
           "kas"
         ]
+      },
+      "delete": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Delete model in org/team",
+        "description": "This operation deletes a model in the org/team (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).",
+        "operationId": "deleteModelInTeam",
+        "parameters": [
+          {
+            "description": "Organization name",
+            "in": "path",
+            "name": "org_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Team name",
+            "in": "path",
+            "name": "team_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Model name",
+            "in": "path",
+            "name": "model_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        },
+        "x-stackql-sdk-evidence": "ngcsdk registry/api"
       }
     },
     "/v2/org/{org_name}/team/{team_name}/models/{model_name}/encryption-key": {
@@ -30562,6 +30715,65 @@
           "updateRecipe",
           "kas"
         ]
+      },
+      "delete": {
+        "tags": [
+          "Resources"
+        ],
+        "summary": "Delete resource in org/team",
+        "description": "This operation deletes a resource in the org/team (SDK evidence: ngcsdk registry/api/resources.py remove; not declared in the published definition).",
+        "operationId": "deleteResourceInTeam",
+        "parameters": [
+          {
+            "description": "Organization name",
+            "in": "path",
+            "name": "org_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Team name",
+            "in": "path",
+            "name": "team_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Recipe name",
+            "in": "path",
+            "name": "recipe_name",
+            "required": true,
+            "schema": {
+              "format": "UTF-8",
+              "maxLength": 262144,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        },
+        "x-stackql-sdk-evidence": "ngcsdk registry/api"
       }
     },
     "/v2/org/{org_name}/team/{team_name}/resources/{recipe_name}/versions": {

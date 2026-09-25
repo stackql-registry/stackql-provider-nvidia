@@ -144,6 +144,19 @@ const SDK_RESPONSE_CLASSES = {
   status: 'HealthResponse', statusDetails: 'HealthResponse'
 };
 
+// Operations the definition omits but the SDK's API layer proves
+// (registry/api/models.py remove_model and resources.py remove issue DELETE
+// on the entity path the definition only declares GET/PATCH for). Each
+// entry names the path (cleaned form), the sibling verb whose parameters
+// are copied, and the operationId to inject; the response is the bare
+// Response envelope.
+const SDK_DOCUMENTED_OPERATIONS = [
+  { path: '/v2/org/{org_name}/models/{model_name}', verb: 'delete', copyFrom: 'get', operationId: 'deleteModelInOrg', tags: ['Models'], summary: 'Delete model in org', description: 'This operation deletes a model in the org (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).' },
+  { path: '/v2/org/{org_name}/team/{team_name}/models/{model_name}', verb: 'delete', copyFrom: 'get', operationId: 'deleteModelInTeam', tags: ['Models'], summary: 'Delete model in org/team', description: 'This operation deletes a model in the org/team (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).' },
+  { path: '/v2/org/{org_name}/resources/{recipe_name}', verb: 'delete', copyFrom: 'get', operationId: 'deleteResourceInOrg', tags: ['Resources'], summary: 'Delete resource in org', description: 'This operation deletes a resource in the org (SDK evidence: ngcsdk registry/api/resources.py remove; not declared in the published definition).' },
+  { path: '/v2/org/{org_name}/team/{team_name}/resources/{recipe_name}', verb: 'delete', copyFrom: 'get', operationId: 'deleteResourceInTeam', tags: ['Resources'], summary: 'Delete resource in org/team', description: 'This operation deletes a resource in the org/team (SDK evidence: ngcsdk registry/api/resources.py remove; not declared in the published definition).' }
+];
+
 function sdkResponseClass(operationId) {
   const base = String(operationId || '').replace(/(InOrg|InTeam|ForTeam|AsGuest|FromAnotherOrg|_\d+)+$/, '');
   return SDK_RESPONSE_CLASSES[base] || 'Response';
@@ -155,70 +168,6 @@ function sdkResponseClass(operationId) {
 // ---------------------------------------------------------------------------
 
 const RULES = [
-  {
-    name: 'inject-sdk-responses',
-    applies: (file) => file === SDK_RESPONSE_FILE,
-    fix: (spec) => {
-      if (!fs.existsSync(SDK_SCHEMAS_PATH)) throw new Error(`${SDK_SCHEMAS_PATH} not found - run harvest_ngc_sdk_schemas.mjs first`);
-      const sdk = JSON.parse(fs.readFileSync(SDK_SCHEMAS_PATH, 'utf8'));
-      spec.components = spec.components || {};
-      spec.components.schemas = spec.components.schemas || {};
-      let added = 0;
-      for (const [name, schema] of Object.entries(sdk.schemas)) {
-        if (spec.components.schemas[name]) continue; // the definition's own schema wins
-        spec.components.schemas[name] = schema;
-        added++;
-      }
-      const counts = {};
-      let injected = 0, generic = 0, untyped = 0;
-      // a 2xx whose schema resolves to nothing projectable (no properties,
-      // no items, not a scalar or array) is as good as absent
-      const resolve = (s) => {
-        let cur = s;
-        for (let i = 0; i < 10 && cur && cur.$ref; i++) cur = spec.components.schemas[cur.$ref.split('/').pop()];
-        return cur;
-      };
-      const projectable = (op) => {
-        const codes = Object.keys(op.responses || {}).filter((c) => c.startsWith('2')).sort();
-        if (codes.length === 0) return false;
-        const content = op.responses[codes[0]].content || {};
-        const media = content['application/json'] || Object.values(content)[0];
-        if (!media) return codes.length > 0 && Object.keys(content).length > 0; // non-json content is left alone
-        const s = resolve(media.schema);
-        if (!s) return false;
-        if (s.properties || s.items || ['array', 'string', 'integer', 'number', 'boolean'].includes(s.type)) return true;
-        return false;
-      };
-      forEachOperation(spec, (pathKey, item, verb, op) => {
-        if (!HTTP_VERBS.slice(0, 5).includes(verb)) return;
-        op.responses = op.responses || {};
-        const had2xx = Object.keys(op.responses).some((c) => c.startsWith('2'));
-        if (had2xx && projectable(op)) return;
-        if (had2xx) {
-          untyped++;
-          for (const c of Object.keys(op.responses)) if (c.startsWith('2')) delete op.responses[c];
-        }
-        let cls = sdkResponseClass(op.operationId);
-        let schema;
-        if (cls.startsWith('[]')) {
-          cls = cls.slice(2);
-          schema = { type: 'array', items: { $ref: `#/components/schemas/${cls}` } };
-        } else {
-          schema = { $ref: `#/components/schemas/${cls}` };
-        }
-        if (!spec.components.schemas[cls]) throw new Error(`response class ${cls} for ${op.operationId} is not in the definition or the SDK harvest`);
-        op.responses['200'] = {
-          description: `OK (response schema from the ngcsdk ${sdk.version} data class ${cls})`,
-          content: { 'application/json': { schema } }
-        };
-        counts[cls] = (counts[cls] || 0) + 1;
-        injected++;
-        if (cls === 'Response') generic++;
-      });
-      const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, v]) => `${k} x${v}`).join(', ');
-      return `${added} SDK data classes added to components.schemas (ngcsdk ${sdk.version}); 200 responses injected on ${injected} response-less operations (${untyped} of them declared an untyped 2xx; ${generic} on the bare Response envelope): ${top}`;
-    }
-  },
   {
     name: 'stamp-missing-version-field',
     applies: (file, spec) => !spec.info || !spec.info.version,
@@ -391,6 +340,95 @@ const RULES = [
         for (const verb of HTTP_VERBS) if (item[verb]) prune(pathKey, item[verb]);
       }
       return `${dropped.length} query parameter(s) with prose names dropped (wire names unknown): ${[...new Set(dropped)].slice(0, 6).join('; ')}${dropped.length > 6 ? '; ...' : ''}`;
+    }
+  },
+  {
+    name: 'inject-sdk-operations',
+    applies: (file) => file === SDK_RESPONSE_FILE,
+    fix: (spec) => {
+      const notes = [];
+      for (const entry of SDK_DOCUMENTED_OPERATIONS) {
+        const item = spec.paths[entry.path];
+        if (!item) throw new Error(`SDK-documented operation path ${entry.path} is not in the definition (path cleaning must run first)`);
+        if (item[entry.verb]) { notes.push(`${entry.verb.toUpperCase()} ${entry.path} now declared upstream - rule entry can be retired`); continue; }
+        const sibling = item[entry.copyFrom];
+        if (!sibling) throw new Error(`no ${entry.copyFrom} sibling on ${entry.path} to copy parameters from`);
+        item[entry.verb] = {
+          tags: entry.tags,
+          summary: entry.summary,
+          description: entry.description,
+          operationId: entry.operationId,
+          parameters: JSON.parse(JSON.stringify((sibling.parameters || []).filter((p) => p.in === 'path'))),
+          responses: { '200': { description: 'OK', content: { 'application/json': { schema: { $ref: '#/components/schemas/Response' } } } } },
+          'x-stackql-sdk-evidence': 'ngcsdk registry/api'
+        };
+        notes.push(`${entry.verb.toUpperCase()} ${entry.path} (${entry.operationId})`);
+      }
+      return `${notes.filter((n) => !n.includes('retired')).length} SDK-documented operation(s) injected: ${notes.join('; ')}`;
+    }
+  },
+  {
+    name: 'inject-sdk-responses',
+    applies: (file) => file === SDK_RESPONSE_FILE,
+    fix: (spec) => {
+      if (!fs.existsSync(SDK_SCHEMAS_PATH)) throw new Error(`${SDK_SCHEMAS_PATH} not found - run harvest_ngc_sdk_schemas.mjs first`);
+      const sdk = JSON.parse(fs.readFileSync(SDK_SCHEMAS_PATH, 'utf8'));
+      spec.components = spec.components || {};
+      spec.components.schemas = spec.components.schemas || {};
+      let added = 0;
+      for (const [name, schema] of Object.entries(sdk.schemas)) {
+        if (spec.components.schemas[name]) continue; // the definition's own schema wins
+        spec.components.schemas[name] = schema;
+        added++;
+      }
+      const counts = {};
+      let injected = 0, generic = 0, untyped = 0;
+      // a 2xx whose schema resolves to nothing projectable (no properties,
+      // no items, not a scalar or array) is as good as absent
+      const resolve = (s) => {
+        let cur = s;
+        for (let i = 0; i < 10 && cur && cur.$ref; i++) cur = spec.components.schemas[cur.$ref.split('/').pop()];
+        return cur;
+      };
+      const projectable = (op) => {
+        const codes = Object.keys(op.responses || {}).filter((c) => c.startsWith('2')).sort();
+        if (codes.length === 0) return false;
+        const content = op.responses[codes[0]].content || {};
+        const media = content['application/json'] || Object.values(content)[0];
+        if (!media) return codes.length > 0 && Object.keys(content).length > 0; // non-json content is left alone
+        const s = resolve(media.schema);
+        if (!s) return false;
+        if (s.properties || s.items || ['array', 'string', 'integer', 'number', 'boolean'].includes(s.type)) return true;
+        return false;
+      };
+      forEachOperation(spec, (pathKey, item, verb, op) => {
+        if (!HTTP_VERBS.slice(0, 5).includes(verb)) return;
+        op.responses = op.responses || {};
+        const had2xx = Object.keys(op.responses).some((c) => c.startsWith('2'));
+        if (had2xx && projectable(op)) return;
+        if (had2xx) {
+          untyped++;
+          for (const c of Object.keys(op.responses)) if (c.startsWith('2')) delete op.responses[c];
+        }
+        let cls = sdkResponseClass(op.operationId);
+        let schema;
+        if (cls.startsWith('[]')) {
+          cls = cls.slice(2);
+          schema = { type: 'array', items: { $ref: `#/components/schemas/${cls}` } };
+        } else {
+          schema = { $ref: `#/components/schemas/${cls}` };
+        }
+        if (!spec.components.schemas[cls]) throw new Error(`response class ${cls} for ${op.operationId} is not in the definition or the SDK harvest`);
+        op.responses['200'] = {
+          description: `OK (response schema from the ngcsdk ${sdk.version} data class ${cls})`,
+          content: { 'application/json': { schema } }
+        };
+        counts[cls] = (counts[cls] || 0) + 1;
+        injected++;
+        if (cls === 'Response') generic++;
+      });
+      const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, v]) => `${k} x${v}`).join(', ');
+      return `${added} SDK data classes added to components.schemas (ngcsdk ${sdk.version}); 200 responses injected on ${injected} response-less operations (${untyped} of them declared an untyped 2xx; ${generic} on the bare Response envelope): ${top}`;
     }
   }
 ];

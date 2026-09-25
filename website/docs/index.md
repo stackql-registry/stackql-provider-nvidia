@@ -21,7 +21,7 @@ id: 'provider-intro'
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
 
-Query, provision and operate the NVIDIA NGC control plane using SQL - NVIDIA Cloud Functions (NVCF: functions and versions, deployments and GPU specifications, cluster groups and GPU inventory, request queues, function sharing grants, HTTP-polling invocation), the NGC private registry (models, resources, recipes, containers and helm charts as metadata, collections, shares, encryption keys), the public NGC catalog (artifact metadata, the GPU and cloud service provider catalogs - readable without an account) and NGC organizations, teams, users, roles and invitations. GPU capacity by cluster group, NVCF function fleet state by deployment specification, function sharing audits and registry estate reports are the queries this provider exists for.
+Query, provision and operate the NVIDIA NGC control plane using SQL - NVIDIA Cloud Functions (NVCF: functions and versions, deployments and GPU specifications, cluster groups and GPU inventory, request queues, function sharing grants, HTTP-polling invocation), the NGC private registry (models, resources, recipes, helm charts and other artifacts as metadata, collections, shares, encryption keys), the public NGC catalog (artifact metadata, the GPU and cloud service provider catalogs - readable without an account) and NGC organizations, teams, users, roles and invitations. GPU capacity by cluster group, NVCF function fleet state by deployment specification, function sharing audits and registry estate reports are the queries this provider exists for.
 
 
 :::info[Provider Summary] 
@@ -167,12 +167,12 @@ FROM nvidia.private_registry.models
 ORDER BY updated_date DESC;
 ```
 
-Containers, helm charts and resources through the generic artifacts resource:
+Helm charts, endpoints, blueprints, agents, playbooks, APIs and skills through the generic artifacts resource (`artifact_type` takes the plural path segment: `helm-charts`, `endpoints`, `agents`, `blueprints`, `apis`, `playbooks`, `skills`; models, resources and recipes have their own resources; container images are served by the separate container registry API and are not in this provider):
 
 ```sql
 SELECT name, display_name, latest_version_id_str, updated_date
 FROM nvidia.private_registry.artifacts
-WHERE artifact_type = 'containers';
+WHERE artifact_type = 'helm-charts';
 ```
 
 ### Public catalog, no account needed
@@ -244,8 +244,8 @@ UPDATE nvidia.private_registry.models
 SET display_name = 'ResNet-50 fine-tuned v2'
 WHERE model_name = 'resnet50-finetuned';
 
-DELETE FROM nvidia.private_registry.artifacts
-WHERE artifact_type = 'models' AND artifact_name = 'resnet50-finetuned';
+DELETE FROM nvidia.private_registry.models
+WHERE model_name = 'resnet50-finetuned';
 ```
 
 ### The whole GPU estate in one statement

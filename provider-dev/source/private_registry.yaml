@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NVIDIA NGC Private Registry
-  description: 'Org-scoped artifact metadata in the NGC private registry: models, resources, recipes, generic artifacts (containers, helm charts), versions and files, collections, shares, deployment parameters, encryption keys and workflows. Team-scoped twins are mapped as *_by_team methods (source: the Private Artifacts (Models) API definition, responses from the ngcsdk data classes).'
+  description: 'Org-scoped artifact metadata in the NGC private registry: models, resources, recipes, generic artifacts (helm charts, endpoints, blueprints, agents, playbooks, APIs, skills), versions and files, collections, shares, deployment parameters, encryption keys and workflows. Team-scoped twins are mapped as *_by_team methods (source: the Private Artifacts (Models) API definition, responses from the ngcsdk data classes).'
   version: 0.0.1-SNAPSHOT
 paths:
   /encryption-keys:
@@ -2213,6 +2213,30 @@ paths:
       summary: Update model in org
       tags:
         - Models
+    delete:
+      tags:
+        - Models
+      summary: Delete model in org
+      description: 'This operation deletes a model in the org (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).'
+      operationId: deleteModelInOrg
+      parameters:
+        - description: Model name
+          in: path
+          name: model_name
+          required: true
+          schema:
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-stackql-sdk-evidence: ngcsdk registry/api
   /models/{model_name}/encryption-key:
     delete:
       description: Disassociate encryption key from model in org and mark it for offline deletion
@@ -4066,6 +4090,30 @@ paths:
       summary: Update recipe in org
       tags:
         - Resources
+    delete:
+      tags:
+        - Resources
+      summary: Delete resource in org
+      description: 'This operation deletes a resource in the org (SDK evidence: ngcsdk registry/api/resources.py remove; not declared in the published definition).'
+      operationId: deleteResourceInOrg
+      parameters:
+        - description: Recipe name
+          in: path
+          name: recipe_name
+          required: true
+          schema:
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-stackql-sdk-evidence: ngcsdk registry/api
   /resources/{recipe_name}/versions:
     get:
       description: List recipe versions in org
@@ -6407,6 +6455,39 @@ paths:
       summary: Update model in team
       tags:
         - Models
+    delete:
+      tags:
+        - Models
+      summary: Delete model in org/team
+      description: 'This operation deletes a model in the org/team (SDK evidence: ngcsdk registry/api/models.py remove_model; not declared in the published definition).'
+      operationId: deleteModelInTeam
+      parameters:
+        - description: Team name
+          in: path
+          name: team_name
+          required: true
+          schema:
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+            type: string
+        - description: Model name
+          in: path
+          name: model_name
+          required: true
+          schema:
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-stackql-sdk-evidence: ngcsdk registry/api
   /team/{team_name}/models/{model_name}/encryption-key:
     delete:
       description: Disassociate encryption key from model in team and mark it for offline deletion
@@ -8485,6 +8566,39 @@ paths:
       summary: Update recipe in team
       tags:
         - Resources
+    delete:
+      tags:
+        - Resources
+      summary: Delete resource in org/team
+      description: 'This operation deletes a resource in the org/team (SDK evidence: ngcsdk registry/api/resources.py remove; not declared in the published definition).'
+      operationId: deleteResourceInTeam
+      parameters:
+        - description: Team name
+          in: path
+          name: team_name
+          required: true
+          schema:
+            format: UTF-8
+            maxLength: 255
+            minLength: 0
+            type: string
+        - description: Recipe name
+          in: path
+          name: recipe_name
+          required: true
+          schema:
+            format: UTF-8
+            maxLength: 262144
+            minLength: 0
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      x-stackql-sdk-evidence: ngcsdk registry/api
   /team/{team_name}/resources/{recipe_name}/versions:
     get:
       description: List recipe versions in team

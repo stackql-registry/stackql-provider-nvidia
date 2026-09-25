@@ -2,7 +2,7 @@
 
 ## Project
 
-This repository builds and documents the `nvidia` provider for [StackQL](https://github.com/stackql/stackql), enabling SQL-based query and provisioning operations against the NVIDIA NGC control plane: NVIDIA Cloud Functions (NVCF - functions and versions, deployments and GPU specifications, cluster groups and GPU inventory, request queues, sharing grants, HTTP-polling invocation), the NGC private registry (models, resources, recipes, generic artifacts such as containers and helm charts, versions and files, collections, shares, encryption keys), the public NGC catalog, and NGC organizations, teams, users, roles and invitations.
+This repository builds and documents the `nvidia` provider for [StackQL](https://github.com/stackql/stackql), enabling SQL-based query and provisioning operations against the NVIDIA NGC control plane: NVIDIA Cloud Functions (NVCF - functions and versions, deployments and GPU specifications, cluster groups and GPU inventory, request queues, sharing grants, HTTP-polling invocation), the NGC private registry (models, resources, recipes, generic artifacts such as helm charts, endpoints and blueprints, versions and files, collections, shares, encryption keys), the public NGC catalog, and NGC organizations, teams, users, roles and invitations.
 
 **Scope notes, recorded so they are never relitigated**: Run:ai and DGX Cloud Lepton have their own control planes and are reserved future siblings. The NIM / API-catalog inference endpoints (`integrate.api.nvidia.com`) are a data-plane LLM surface, out of scope. Artifact binary push/pull is the registry data plane, skipped (`data-plane-file-transfer`). Streaming and gRPC invocation forms are not in the published spec; the HTTP-polling form is mapped (`nvcf_invocation`). Fleet Command, Base Command batch, subscription/billing and notification definitions are out of scope (recorded in `download_manifest.json`).
 
@@ -10,7 +10,7 @@ The provider is a hybrid build: paths, parameters and request bodies come from t
 
 ## Positioning context
 
-NVIDIA publishes a Go Terraform provider ([`NVIDIA/terraform-provider-ngc`](https://github.com/NVIDIA/terraform-provider-ngc)) covering NVCF functions and telemetry endpoints (one resource and one data source each). State that once, factually. This provider's counter is mechanical completeness from the published definitions (338 operations, 7 services, 83 resources) and the query surfaces that matter: GPU and cluster-group inventory, NVCF fleet state by deployment specification, function sharing audits, registry estate reports, org membership - the AI infrastructure control plane as data. Capability statements and runnable examples, never editorializing.
+NVIDIA publishes a Go Terraform provider ([`NVIDIA/terraform-provider-ngc`](https://github.com/NVIDIA/terraform-provider-ngc)) covering NVCF functions and telemetry endpoints (one resource and one data source each). State that once, factually. This provider's counter is mechanical completeness from the published definitions (342 operations, 7 services, 83 resources) and the query surfaces that matter: GPU and cluster-group inventory, NVCF fleet state by deployment specification, function sharing audits, registry estate reports, org membership - the AI infrastructure control plane as data. Capability statements and runnable examples, never editorializing.
 
 ## Spec sources (three, all pinned)
 

@@ -82,7 +82,8 @@ check('83 resources in total', resourceTotal === 83, String(resourceTotal));
 // org_name server variable: required only when NGC_ORG is unset
 r = await runSql('SHOW METHODS IN nvidia.private_registry.models', NO_ENV);
 let m = Object.fromEntries(r.rows.map((x) => [x.MethodName, x]));
-check('private_registry.models methods (8: list/get/create/update + _by_team twins)', r.rows.length === 8 && ['list', 'get', 'create', 'update', 'list_by_team', 'get_by_team', 'create_by_team', 'update_by_team'].every((k) => m[k]), JSON.stringify(Object.keys(m)));
+check('private_registry.models methods (10: list/get/create/update/delete + _by_team twins; delete is SDK-evidenced)', r.rows.length === 10 && ['list', 'get', 'create', 'update', 'delete', 'list_by_team', 'get_by_team', 'create_by_team', 'update_by_team', 'delete_by_team'].every((k) => m[k]), JSON.stringify(Object.keys(m)));
+check('models.delete is DELETE requiring model_name (+ org_name when NGC_ORG is unset)', m.delete?.SQLVerb === 'DELETE' && /model_name/.test(m.delete?.RequiredParams) && /org_name/.test(m.delete?.RequiredParams), JSON.stringify(m.delete));
 check('models.list requires org_name when NGC_ORG is unset; get requires model_name + org_name; list_by_team adds team_name',
   m.list?.RequiredParams === 'org_name' && /model_name/.test(m.get?.RequiredParams) && /org_name/.test(m.get?.RequiredParams) && /team_name/.test(m.list_by_team?.RequiredParams) && /org_name/.test(m.list_by_team?.RequiredParams), JSON.stringify([m.list, m.get, m.list_by_team]));
 check('models verbs (list/get SELECT, create INSERT, update UPDATE)', m.list?.SQLVerb === 'SELECT' && m.get?.SQLVerb === 'SELECT' && m.create?.SQLVerb === 'INSERT' && m.update?.SQLVerb === 'UPDATE', JSON.stringify(m));

@@ -15,8 +15,7 @@
 //   - snake_case surface: kebab query parameters (resolve_labels ->
 //     resolve-labels) and camelCase body properties (display_name ->
 //     displayName) via request.nativeCasing
-//   - the registry model INSERT / UPDATE / DELETE lifecycle (delete via the
-//     generic artifacts resource)
+//   - the registry model INSERT / UPDATE / DELETE lifecycle
 //   - the NVCF function INSERT (function + first version), version get,
 //     authorization grants INSERT / SELECT / DELETE, deployment INSERT /
 //     SELECT / DELETE, queue details on the second host, the polling
@@ -154,8 +153,8 @@ try {
   r = await runSql("SELECT display_name FROM nvidia.private_registry.models WHERE model_name = 'it-model'");
   check('model reflects UPDATE', r.rows && r.rows[0]?.display_name === 'IT Model v2', r.err || JSON.stringify(r.rows));
   mark = log.length;
-  r = await runSql("DELETE FROM nvidia.private_registry.artifacts WHERE artifact_type = 'models' AND artifact_name = 'it-model'");
-  check('model DELETE via artifacts (artifact_type = models) -> DELETE /v2/org/ORG_A/models/it-model', !r.err && calls(mark, 'DELETE', `/v2/org/${ORG_A}/models/it-model`).length === 1, r.err || JSON.stringify(log.slice(mark).map((e) => `${e.method} ${e.path}`)));
+  r = await runSql("DELETE FROM nvidia.private_registry.models WHERE model_name = 'it-model'");
+  check('model DELETE (SDK-evidenced operation) -> DELETE /v2/org/ORG_A/models/it-model', !r.err && calls(mark, 'DELETE', `/v2/org/${ORG_A}/models/it-model`).length === 1, r.err || JSON.stringify(log.slice(mark).map((e) => `${e.method} ${e.path}`)));
   r = await runSql('SELECT name FROM nvidia.private_registry.models');
   check('model gone after DELETE', r.rows && !has(r.rows, 'name', 'it-model'), r.err || JSON.stringify(r.rows));
 
