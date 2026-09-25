@@ -7,8 +7,15 @@
 // and re-runnable; regenerate the inventory to change mappings, never edit
 // either CSV by hand.
 //
+// all_services.csv is committed as the durable record of every
+// operation -> resource.method mapping: a diff there on a regeneration is a
+// breaking-change review (a method moving resource, a resource renamed),
+// not noise. This script prints that diff against the committed CSV before
+// overwriting it.
+//
 // Validates before writing:
 //   - every all_services.csv row resolves to a mapped inventory operation
+//     (by service + operationId) on the same rebased path and verb
 //   - every mapped inventory operation appears in all_services.csv
 //   - method names are unique per (service, resource)
 //   - overloaded SQL verbs have unique required path-param signatures per
@@ -19,83 +26,16 @@
 
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { loadInventory, parseCsv, csvField } from './lib/inventory.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const inventoryPath = path.join(repoRoot, 'provider-dev', 'config', 'endpoint_inventory.csv');
 const csvPath = path.join(repoRoot, 'provider-dev', 'config', 'all_services.csv');
 
-// ---------------------------------------------------------------------------
-// CSV helpers (RFC 4180, preserves column order)
-// ---------------------------------------------------------------------------
-
-function parseCsv(text) {
-  const rows = [];
-  let row = [], field = '', inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; } else { inQuotes = false; }
-      } else { field += c; }
-    } else if (c === '"') {
-      inQuotes = true;
-    } else if (c === ',') {
-      row.push(field); field = '';
-    } else if (c === '\n' || c === '\r') {
-      if (c === '\r' && text[i + 1] === '\n') i++;
-      row.push(field); field = '';
-      if (row.length > 1 || row[0] !== '') rows.push(row);
-      row = [];
-    } else { field += c; }
-  }
-  if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
-  return rows;
-}
-
-const csvField = (v) => (/[",\n\r]/.test(v) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
-
-// split rewrites path-param names to snake_case ({org-name} -> {org_name});
-// canonicalize both sides for the join
-const canonPath = (p) => p.replace(/\{[^}]+\}/g, (m) => m.replace(/-/g, '_'));
 const pathParams = (p) => (p.match(/\{[^}]+\}/g) || []).map((s) => s.slice(1, -1)).sort().join(',');
 
-// ---------------------------------------------------------------------------
-// Load the inventory: mapped rows keyed by operationId and by (path, verb)
-// ---------------------------------------------------------------------------
-
-const inv = parseCsv(fs.readFileSync(inventoryPath, 'utf8'));
-const invCol = Object.fromEntries(inv[0].map((h, i) => [h, i]));
-
-const byOpId = new Map();
-const dupOpIds = new Set();
-const byPathVerb = new Map();
-const mappedInventory = [];
-
-for (const row of inv.slice(1)) {
-  if (!row[invCol.service]) continue; // skipped operation
-  const entry = {
-    service: row[invCol.service],
-    resource: row[invCol.resource],
-    method: row[invCol.method],
-    sqlVerb: row[invCol.sql_verb],
-    objectKey: row[invCol.object_key_candidate],
-    path: row[invCol.path],
-    verb: row[invCol.verb]
-  };
-  mappedInventory.push(entry);
-  const opId = row[invCol.operation_id];
-  if (opId) {
-    if (byOpId.has(opId)) dupOpIds.add(opId);
-    byOpId.set(opId, entry);
-  }
-  byPathVerb.set(`${canonPath(entry.path)}::${entry.verb}`, entry);
-}
-for (const opId of dupOpIds) byOpId.delete(opId); // ambiguous - fall back to path+verb
-
-// ---------------------------------------------------------------------------
-// Fill all_services.csv
-// ---------------------------------------------------------------------------
+const { byServiceOp } = loadInventory();
 
 const rows = parseCsv(fs.readFileSync(csvPath, 'utf8'));
 const header = rows[0];
@@ -111,28 +51,28 @@ const errors = [];
 const matched = new Set();
 
 for (const row of rows.slice(1)) {
+  const service = row[col.filename].replace(/\.yaml$/, '');
   const opId = row[col.operationId];
-  const entry = (opId && byOpId.get(opId)) || byPathVerb.get(`${canonPath(row[col.path])}::${row[col.verb]}`);
+  const entry = byServiceOp.get(`${service}::${opId}`);
   if (!entry) {
     errors.push(`no inventory mapping for ${row[col.filename]} ${row[col.verb]} ${row[col.path]} (${opId || 'no operationId'})`);
     continue;
   }
-  const service = row[col.filename].replace(/\.yaml$/, '');
-  if (service !== entry.service) {
-    errors.push(`service mismatch for ${row[col.verb]} ${row[col.path]}: split put it in ${service}, inventory says ${entry.service}`);
+  if (entry.rebased_path !== row[col.path] || entry.verb !== row[col.verb]) {
+    errors.push(`path/verb mismatch for ${service} ${opId}: split has ${row[col.verb]} ${row[col.path]}, inventory has ${entry.verb} ${entry.rebased_path}`);
     continue;
   }
-  matched.add(`${canonPath(entry.path)}::${entry.verb}`);
+  matched.add(`${service}::${opId}`);
   row[col.stackql_resource_name] = entry.resource;
   row[col.stackql_method_name] = entry.method;
-  row[col.stackql_verb] = entry.sqlVerb;
+  row[col.stackql_verb] = entry.sql_verb;
   // multi-array-prop candidates stay empty pending a wire check
-  row[col.stackql_object_key] = /^\$\.[A-Za-z_]+$/.test(entry.objectKey) ? entry.objectKey : '';
+  row[col.stackql_object_key] = /^\$\.[A-Za-z_]+$/.test(entry.object_key_candidate) ? entry.object_key_candidate : '';
 }
 
-for (const entry of mappedInventory) {
-  if (!matched.has(`${canonPath(entry.path)}::${entry.verb}`)) {
-    errors.push(`in inventory but not in all_services.csv: ${entry.verb} ${entry.path} (${entry.service}.${entry.resource}.${entry.method})`);
+for (const [key, entry] of byServiceOp) {
+  if (!matched.has(key)) {
+    errors.push(`in inventory but not in all_services.csv: ${entry.verb} ${entry.rebased_path} (${entry.service}.${entry.resource}.${entry.method})`);
   }
 }
 
@@ -154,7 +94,7 @@ for (const row of rows.slice(1)) {
 
   const sqlVerb = row[col.stackql_verb];
   if (sqlVerb === 'exec') continue;
-  const sigKey = `${service}.${resource}.${sqlVerb}::${pathParams(canonPath(row[col.path]))}`;
+  const sigKey = `${service}.${resource}.${sqlVerb}::${pathParams(row[col.path])}`;
   if (sigSeen.has(sigKey)) {
     errors.push(`signature clash on ${sigKey} (${sigSeen.get(sigKey)} and ${row[col.stackql_method_name]})`);
   }
@@ -165,6 +105,48 @@ if (errors.length > 0) {
   console.error(`FAILED with ${errors.length} error(s) - nothing written:`);
   for (const e of errors) console.error(`  ${e}`);
   process.exit(1);
+}
+
+// ---------------------------------------------------------------------------
+// Mapping diff against the committed CSV (review aid; the CI drift gate is
+// the enforcement)
+// ---------------------------------------------------------------------------
+
+function committedMappings() {
+  try {
+    const text = execSync('git show HEAD:provider-dev/config/all_services.csv', { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    const t = parseCsv(text);
+    const c = Object.fromEntries(t[0].map((h, i) => [h, i]));
+    const m = new Map();
+    for (const r of t.slice(1)) {
+      if (!r[c.stackql_resource_name]) continue;
+      m.set(`${r[c.filename].replace(/\.yaml$/, '')}::${r[c.operationId]}`, `${r[c.stackql_resource_name]}.${r[c.stackql_method_name]} [${r[c.stackql_verb]}]`);
+    }
+    return m;
+  } catch {
+    return null;
+  }
+}
+
+const previous = committedMappings();
+if (previous) {
+  const current = new Map();
+  for (const row of rows.slice(1)) {
+    if (!row[col.stackql_resource_name]) continue;
+    current.set(`${row[col.filename].replace(/\.yaml$/, '')}::${row[col.operationId]}`, `${row[col.stackql_resource_name]}.${row[col.stackql_method_name]} [${row[col.stackql_verb]}]`);
+  }
+  const added = [...current.keys()].filter((k) => !previous.has(k));
+  const removed = [...previous.keys()].filter((k) => !current.has(k));
+  const changed = [...current.keys()].filter((k) => previous.has(k) && previous.get(k) !== current.get(k));
+  if (added.length || removed.length || changed.length) {
+    console.log(`Mapping diff vs the committed all_services.csv: +${added.length} added, -${removed.length} removed, ${changed.length} changed (review before commit - these are the provider's user-facing contract):`);
+    for (const k of changed.slice(0, 40)) console.log(`  changed ${k}: ${previous.get(k)} -> ${current.get(k)}`);
+    for (const k of removed.slice(0, 40)) console.log(`  removed ${k}: ${previous.get(k)}`);
+    for (const k of added.slice(0, 40)) console.log(`  added   ${k}: ${current.get(k)}`);
+    if (added.length + removed.length + changed.length > 120) console.log('  ...');
+  } else {
+    console.log('Mapping diff vs the committed all_services.csv: none');
+  }
 }
 
 const outArgIdx = process.argv.indexOf('--out');

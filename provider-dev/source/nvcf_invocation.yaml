@@ -1,721 +1,28 @@
 openapi: 3.1.0
 info:
-  title: nvcf_invocation API
-  description: nvidia nvcf_invocation API
-  version: 2.245.1
+  title: NVIDIA Cloud Functions - Invocation
+  description: NVCF HTTP-polling invocation (pexec and status), assets and invocation assertion tokens (served from api.nvcf.nvidia.com).
+  version: 2.256.0
 paths:
-  /v2/nvcf/tokens/functions:
-    post:
-      tags:
-        - Function Invocation Assertion Token
-      summary: Issue Function Invocation Token
-      description: >-
-        Issues an assertion token from Notary Service for specified functionIds
-        and/or functionVersionIds 
-      operationId: issueMultiFunctionsInvocationToken
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MultiFunctionsInvocationTokenRequest'
-        required: true
-      responses:
-        '200':
-          description: Invocation assertion token is issued
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-        '403':
-          description: >
-            Either missing scope in the auth(JWT / ApiKey) token and/or missing
-            resource entry
-             in the ApiKey for the function.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-        '429':
-          description: >-
-            Client is doing too many requests per second and should slow down
-            request rate.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-  /v2/nvcf/tokens/functions/{functionId}/versions/{functionVersionId}:
-    post:
-      tags:
-        - Function Invocation Assertion Token
-      summary: Issue Function Invocation Token
-      description: >-
-        Issues an assertion token from Notary Service for a specific functionId
-        and/or functionVersionId 
-      operationId: issueInvocationToken
-      parameters:
-        - name: functionId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-        - name: functionVersionId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InvocationTokenRequest'
-        required: true
-      responses:
-        '200':
-          description: Invocation assertion token is issued
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-        '403':
-          description: >
-            Either missing scope in the auth(JWT / ApiKey) token and/or missing
-            resource entry
-             in the ApiKey for the function.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-        '429':
-          description: >-
-            Client is doing too many requests per second and should slow down
-            request rate.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-  /v2/nvcf/tokens/functions/{functionId}:
-    post:
-      tags:
-        - Function Invocation Assertion Token
-      summary: Issue Function Invocation Token
-      description: >-
-        Issues an assertion token from Notary Service for a specific functionId
-        and/or functionVersionId 
-      operationId: issueInvocationToken_1
-      parameters:
-        - name: functionId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InvocationTokenRequest'
-        required: true
-      responses:
-        '200':
-          description: Invocation assertion token is issued
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-        '403':
-          description: >
-            Either missing scope in the auth(JWT / ApiKey) token and/or missing
-            resource entry
-             in the ApiKey for the function.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-        '429':
-          description: >-
-            Client is doing too many requests per second and should slow down
-            request rate.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/InvocationTokenResponse'
-  /v2/nvcf/pexec/functions/{functionId}:
-    post:
-      tags:
-        - Function Invocation
-      summary: Call Function
-      description: >-
-        Deprecated and will be removed soon. Please use the new NVCF Invocation
-        API  endpoint to invoke a function.  Invokes the specified function that
-        was successfully deployed. If the version  is not specified, any active
-        function versions will handle the request. If  the version is specified
-        in the URI, then the request is exclusively processed  by the designated
-        version of the function. By default, this endpoint will block  for 5
-        seconds. If the request is not fulfilled before the timeout, it's
-        status  is considered in-progress or pending and the response includes
-        HTTP status code  202 with an invocation request ID, indicating that the
-        client should commence  polling for the result using the invocation
-        request ID. Access to this endpoint  mandates inclusion of a bearer
-        token with 'invoke_function' scope in the  HTTP Authorization header.
-        Additionally, this endpoint has the capability to  provide updates on
-        the progress of the request, contingent upon the workload's  provision
-        of such information. In-progress responses are returned in order. If no
-        in-progress response is received  during polling you will receive the
-        most recent in-progress response. Only the first  256 unread in-progress
-        messages are kept. 
-      operationId: invokeFunction
-      parameters:
-        - name: NVCF-INPUT-ASSET-REFERENCES
-          in: header
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: UTF-8
-              maxLength: 262144
-              minLength: 0
-            maxItems: 2147483647
-            minItems: 0
-        - name: NVCF-POLL-SECONDS
-          in: header
-          required: false
-          schema:
-            type: integer
-            format: int32
-            maximum: 300
-            minimum: 0
-        - name: functionId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-        required: true
-      responses:
-        '200':
-          description: Invocation is fulfilled
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '202':
-          description: Result is pending. Client should poll using the requestId.
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '302':
-          description: >
-            Client should use the URL specified in the 'Location' response
-            header to fetch
-             large result.
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-            Location:
-              description: URL to get the result
-              style: simple
-              schema:
-                type: string
-        '402':
-          description: >-
-            Cloud credits expired for public functions. Please contact NVIDIA
-            representatives.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '403':
-          description: >
-            Either missing scope in the auth(JWT / ApiKey) token and/or missing
-            resource entry
-             in the ApiKey for the function.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '429':
-          description: >-
-            Client is doing too many requests per second and should slow down
-            request rate.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-      deprecated: true
-  /v2/nvcf/pexec/functions/{functionId}/versions/{versionId}:
-    post:
-      tags:
-        - Function Invocation
-      summary: Call Function
-      description: >-
-        Deprecated and will be removed soon. Please use the new NVCF Invocation
-        API  endpoint to invoke a function.  Invokes the specified function that
-        was successfully deployed. If the version  is not specified, any active
-        function versions will handle the request. If  the version is specified
-        in the URI, then the request is exclusively processed  by the designated
-        version of the function. By default, this endpoint will block  for 5
-        seconds. If the request is not fulfilled before the timeout, it's
-        status  is considered in-progress or pending and the response includes
-        HTTP status code  202 with an invocation request ID, indicating that the
-        client should commence  polling for the result using the invocation
-        request ID. Access to this endpoint  mandates inclusion of a bearer
-        token with 'invoke_function' scope in the  HTTP Authorization header.
-        Additionally, this endpoint has the capability to  provide updates on
-        the progress of the request, contingent upon the workload's  provision
-        of such information. In-progress responses are returned in order. If no
-        in-progress response is received  during polling you will receive the
-        most recent in-progress response. Only the first  256 unread in-progress
-        messages are kept. 
-      operationId: invokeFunction_1
-      parameters:
-        - name: NVCF-INPUT-ASSET-REFERENCES
-          in: header
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: UTF-8
-              maxLength: 262144
-              minLength: 0
-            maxItems: 2147483647
-            minItems: 0
-        - name: NVCF-POLL-SECONDS
-          in: header
-          required: false
-          schema:
-            type: integer
-            format: int32
-            maximum: 300
-            minimum: 0
-        - name: functionId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-        - name: versionId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-        required: true
-      responses:
-        '200':
-          description: Invocation is fulfilled
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '202':
-          description: Result is pending. Client should poll using the requestId.
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '302':
-          description: >
-            Client should use the URL specified in the 'Location' response
-            header to fetch
-             large result.
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-            Location:
-              description: URL to get the result
-              style: simple
-              schema:
-                type: string
-        '402':
-          description: >-
-            Cloud credits expired for public functions. Please contact NVIDIA
-            representatives.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '403':
-          description: >
-            Either missing scope in the auth(JWT / ApiKey) token and/or missing
-            resource entry
-             in the ApiKey for the function.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '429':
-          description: >-
-            Client is doing too many requests per second and should slow down
-            request rate.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-      deprecated: true
   /v2/nvcf/assets:
     get:
-      tags:
-        - Asset Management
-      summary: List Assets
-      description: >-
-        List assets owned by the current NVIDIA Cloud Account. Requires a 
-        bearer token with 'invoke_function' scope in the HTTP Authorization
-        header. 
+      deprecated: true
+      description: 'List assets owned by the current NVIDIA Cloud Account. Requires a  bearer token with ''invoke_function'' scope in the HTTP Authorization header. '
       operationId: getAssets
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListAssetsResponse'
-      deprecated: true
-    post:
+          description: OK
+      summary: List Assets
       tags:
         - Asset Management
-      summary: Create Asset
-      description: >-
-        Creates a unique id representing an asset and a pre-signed URL to upload
-        the  asset artifact to AWS S3 bucket for the NVIDIA Cloud Account.
-        Requires a  bearer token  with 'invoke_function' scope in the HTTP
-        Authorization header. 
+      parameters: []
+    post:
+      deprecated: true
+      description: 'Creates a unique id representing an asset and a pre-signed URL to upload the  asset artifact to AWS S3 bucket for the NVIDIA Cloud Account. Requires a  bearer token  with ''invoke_function'' scope in the HTTP Authorization header. '
       operationId: createAsset
       requestBody:
         content:
@@ -725,435 +32,1050 @@ paths:
         required: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateAssetResponse'
-      deprecated: true
-  /v2/nvcf/pexec/status/{requestId}:
-    get:
-      tags:
-        - Function Invocation
-      summary: Poll For Result Using Function Invocation Request
-      description: >-
-        Deprecated and will be removed soon. Please use the new NVCF Invocation
-        API  endpoint to invoke a function and stream results without polling. 
-        Retrieves the status of an in-progress or pending request using its
-        unique  invocation request ID. If the result is available, it will be
-        included in  the response, marking the request as fulfilled. Conversely,
-        if the result is  not yet available, the request is deemed pending.
-        Access to this endpoint  mandates inclusion of a bearer token with
-        'invoke_function' scope in the  HTTP Authorization header. In-progress
-        responses are returned in order. If no in-progress response is received 
-        during polling you will receive the most recent in-progress response.
-        Only the first  256 unread in-progress messages are kept. 
-      operationId: getFunctionInvocationResult
-      parameters:
-        - name: requestId
-          in: path
-          description: Invocation Request Id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      responses:
-        '200':
-          description: Invocation is fulfilled
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '202':
-          description: Result is pending. Client should poll using the requestId.
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '302':
-          description: >
-            Client should use the URL specified in the 'Location' response
-            header to fetch
-             large result.
-          headers:
-            NVCF-REQID:
-              description: Invocation Request Id
-              style: simple
-              schema:
-                type: string
-            NVCF-PERCENT-COMPLETE:
-              description: Percentage complete
-              style: simple
-              schema:
-                type: string
-            NVCF-STATUS:
-              description: Invocation status
-              style: simple
-              schema:
-                type: string
-            Location:
-              description: URL to get the result
-              style: simple
-              schema:
-                type: string
-        '402':
-          description: >-
-            Cloud credits expired for public functions. Please contact NVIDIA
-            representatives.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-        '403':
-          description: >
-            Either missing scope in the auth(JWT / ApiKey) token and/or missing
-            resource entry
-             in the ApiKey for the function.
-          content:
-            '*/*':
-              schema:
-                type: object
-                properties:
-                  short:
-                    type: integer
-                    format: int32
-                  char:
-                    type: string
-                  int:
-                    type: integer
-                    format: int32
-                  long:
-                    type: integer
-                    format: int64
-                  float:
-                    type: number
-                    format: float
-                  double:
-                    type: number
-                    format: double
-                  direct:
-                    type: boolean
-                  readOnly:
-                    type: boolean
-      deprecated: true
-  /v2/nvcf/assets/{assetId}:
-    get:
+          description: OK
+      summary: Create Asset
       tags:
         - Asset Management
-      summary: Show Asset Details
-      description: >-
-        Returns details for the specified asset-id belonging to the current
-        NVIDIA  Cloud Account. Requires a bearer token with 'invoke_function'
-        scope in  the HTTP Authorization header. 
+      parameters: []
+  /v2/nvcf/assets/{asset_id}:
+    get:
+      deprecated: true
+      description: 'Returns details for the specified asset-id belonging to the current NVIDIA  Cloud Account. Requires a bearer token with ''invoke_function'' scope in  the HTTP Authorization header. '
       operationId: getAsset
       parameters:
-        - name: assetId
+        - description: Asset id
           in: path
-          description: Asset id
+          name: asset_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetResponse'
-      deprecated: true
-    delete:
+          description: OK
+      summary: Show Asset Details
       tags:
         - Asset Management
-      summary: Delete Asset
-      description: >-
-        Deletes asset belonging to the current NVIDIA Cloud Account. Requires  a
-        bearer token with 'invoke_function' scope in the HTTP Authorization
-        header. 
+    delete:
+      deprecated: true
+      description: 'Deletes asset belonging to the current NVIDIA Cloud Account. Requires  a bearer token with ''invoke_function'' scope in the HTTP Authorization header. '
       operationId: deleteAsset
       parameters:
-        - name: assetId
+        - description: Id of the asset to be deleted
           in: path
-          description: Id of the asset to be deleted
+          name: asset_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
       responses:
         '204':
           description: No Content
+      summary: Delete Asset
+      tags:
+        - Asset Management
+  /v2/nvcf/pexec/functions/{function_id}:
+    post:
       deprecated: true
+      description: 'Deprecated and will be removed soon. Please use the new NVCF Invocation API  endpoint to invoke a function.  Invokes the specified function that was successfully deployed. If the version  is not specified, any active function versions will handle the request. If  the version is specified in the URI, then the request is exclusively processed  by the designated version of the function. By default, this endpoint will block  for 5 seconds. If the request is not fulfilled before the timeout, it''s status  is considered in-progress or pending and the response includes HTTP status code  202 with an invocation request ID, indicating that the client should commence  polling for the result using the invocation request ID. Access to this endpoint  mandates inclusion of a bearer token with ''invoke_function'' scope in the  HTTP Authorization header. Additionally, this endpoint has the capability to  provide updates on the progress of the request, contingent upon the workload''s  provision of such information. In-progress responses are returned in order. If no in-progress response is received  during polling you will receive the most recent in-progress response. Only the first  256 unread in-progress messages are kept. '
+      operationId: invokeFunction
+      parameters:
+        - in: header
+          name: NVCF-INPUT-ASSET-REFERENCES
+          required: false
+          schema:
+            items:
+              format: UTF-8
+              maxLength: 262144
+              minLength: 0
+              type: string
+            maxItems: 2147483647
+            minItems: 0
+            type: array
+            nullable: true
+        - in: header
+          name: NVCF-POLL-SECONDS
+          required: false
+          schema:
+            format: int32
+            maximum: 300
+            minimum: 0
+            type: integer
+            nullable: true
+        - in: path
+          name: function_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              description: (opaque JSON object)
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Invocation is fulfilled
+          headers:
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '202':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Result is pending. Client should poll using the requestId.
+          headers:
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '302':
+          description: |
+            Client should use the URL specified in the 'Location' response header to fetch
+             large result.
+          headers:
+            Location:
+              description: URL to get the result
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '402':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Cloud credits expired for public functions. Please contact NVIDIA representatives.
+        '403':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: |
+            Either missing scope in the auth(JWT / ApiKey) token and/or missing resource entry
+             in the ApiKey for the function.
+        '429':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Client is doing too many requests per second and should slow down request rate.
+      summary: Call Function
+      tags:
+        - Function Invocation
+  /v2/nvcf/pexec/functions/{function_id}/versions/{version_id}:
+    post:
+      deprecated: true
+      description: 'Deprecated and will be removed soon. Please use the new NVCF Invocation API  endpoint to invoke a function.  Invokes the specified function that was successfully deployed. If the version  is not specified, any active function versions will handle the request. If  the version is specified in the URI, then the request is exclusively processed  by the designated version of the function. By default, this endpoint will block  for 5 seconds. If the request is not fulfilled before the timeout, it''s status  is considered in-progress or pending and the response includes HTTP status code  202 with an invocation request ID, indicating that the client should commence  polling for the result using the invocation request ID. Access to this endpoint  mandates inclusion of a bearer token with ''invoke_function'' scope in the  HTTP Authorization header. Additionally, this endpoint has the capability to  provide updates on the progress of the request, contingent upon the workload''s  provision of such information. In-progress responses are returned in order. If no in-progress response is received  during polling you will receive the most recent in-progress response. Only the first  256 unread in-progress messages are kept. '
+      operationId: invokeFunction_1
+      parameters:
+        - in: header
+          name: NVCF-INPUT-ASSET-REFERENCES
+          required: false
+          schema:
+            items:
+              format: UTF-8
+              maxLength: 262144
+              minLength: 0
+              type: string
+            maxItems: 2147483647
+            minItems: 0
+            type: array
+            nullable: true
+        - in: header
+          name: NVCF-POLL-SECONDS
+          required: false
+          schema:
+            format: int32
+            maximum: 300
+            minimum: 0
+            type: integer
+            nullable: true
+        - in: path
+          name: function_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+        - description: Function version id
+          in: path
+          name: version_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              description: (opaque JSON object)
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Invocation is fulfilled
+          headers:
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '202':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Result is pending. Client should poll using the requestId.
+          headers:
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '302':
+          description: |
+            Client should use the URL specified in the 'Location' response header to fetch
+             large result.
+          headers:
+            Location:
+              description: URL to get the result
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '402':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Cloud credits expired for public functions. Please contact NVIDIA representatives.
+        '403':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: |
+            Either missing scope in the auth(JWT / ApiKey) token and/or missing resource entry
+             in the ApiKey for the function.
+        '429':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Client is doing too many requests per second and should slow down request rate.
+      summary: Call Function
+      tags:
+        - Function Invocation
+  /v2/nvcf/pexec/status/{request_id}:
+    get:
+      deprecated: true
+      description: 'Deprecated and will be removed soon. Please use the new NVCF Invocation API  endpoint to invoke a function and stream results without polling.  Retrieves the status of an in-progress or pending request using its unique  invocation request ID. If the result is available, it will be included in  the response, marking the request as fulfilled. Conversely, if the result is  not yet available, the request is deemed pending. Access to this endpoint  mandates inclusion of a bearer token with ''invoke_function'' scope in the  HTTP Authorization header. In-progress responses are returned in order. If no in-progress response is received  during polling you will receive the most recent in-progress response. Only the first  256 unread in-progress messages are kept. '
+      operationId: getFunctionInvocationResult
+      parameters:
+        - description: Invocation Request Id
+          in: path
+          name: request_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Invocation is fulfilled
+          headers:
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '202':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Result is pending. Client should poll using the requestId.
+          headers:
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '302':
+          description: |
+            Client should use the URL specified in the 'Location' response header to fetch
+             large result.
+          headers:
+            Location:
+              description: URL to get the result
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              schema:
+                type: string
+              style: simple
+            NVCF-REQID:
+              description: Invocation Request Id
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              schema:
+                type: string
+              style: simple
+        '402':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: Cloud credits expired for public functions. Please contact NVIDIA representatives.
+        '403':
+          content:
+            '*/*':
+              schema:
+                properties:
+                  char:
+                    type: string
+                  direct:
+                    type: boolean
+                  double:
+                    format: double
+                    type: number
+                  float:
+                    format: float
+                    type: number
+                  int:
+                    format: int32
+                    type: integer
+                  long:
+                    format: int64
+                    type: integer
+                  readOnly:
+                    type: boolean
+                  short:
+                    format: int32
+                    type: integer
+                type: object
+          description: |
+            Either missing scope in the auth(JWT / ApiKey) token and/or missing resource entry
+             in the ApiKey for the function.
+      summary: Poll For Result Using Function Invocation Request
+      tags:
+        - Function Invocation
+  /v2/nvcf/tokens/functions:
+    post:
+      description: 'Issues an assertion token from Notary Service for specified functionIds and/or functionVersionIds '
+      operationId: issueMultiFunctionsInvocationToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultiFunctionsInvocationTokenRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: Invocation assertion token is issued
+        '403':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: |
+            Either missing scope in the auth(JWT / ApiKey) token and/or missing resource entry
+             in the ApiKey for the function.
+        '429':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: Client is doing too many requests per second and should slow down request rate.
+      summary: Issue Function Invocation Token
+      tags:
+        - Function Invocation Assertion Token
+      parameters: []
+  /v2/nvcf/tokens/functions/{function_id}:
+    post:
+      description: 'Issues an assertion token from Notary Service for a specific functionId and/or functionVersionId '
+      operationId: issueInvocationToken_1
+      parameters:
+        - in: path
+          name: function_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvocationTokenRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: Invocation assertion token is issued
+        '403':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: |
+            Either missing scope in the auth(JWT / ApiKey) token and/or missing resource entry
+             in the ApiKey for the function.
+        '429':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: Client is doing too many requests per second and should slow down request rate.
+      summary: Issue Function Invocation Token
+      tags:
+        - Function Invocation Assertion Token
+  /v2/nvcf/tokens/functions/{function_id}/versions/{function_version_id}:
+    post:
+      description: 'Issues an assertion token from Notary Service for a specific functionId and/or functionVersionId '
+      operationId: issueInvocationToken
+      parameters:
+        - in: path
+          name: function_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+        - description: Function version id
+          in: path
+          name: function_version_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvocationTokenRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: Invocation assertion token is issued
+        '403':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: |
+            Either missing scope in the auth(JWT / ApiKey) token and/or missing resource entry
+             in the ApiKey for the function.
+        '429':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/InvocationTokenResponse'
+          description: Client is doing too many requests per second and should slow down request rate.
+      summary: Issue Function Invocation Token
+      tags:
+        - Function Invocation Assertion Token
 components:
   schemas:
-    MultiFunctionsInvocationTokenRequest:
-      type: object
-      description: Request body for issuing a function invocation token
-      properties:
-        functions:
-          type: array
-          description: Functions to invoke
-          items:
-            $ref: '#/components/schemas/BasicFunctionDto'
-          maxItems: 4
-          minItems: 0
-        clientId:
-          type: string
-          format: UTF-8
-          description: >-
-            ClientId for client to pass in to track who will eventually use the
-            token
-          maxLength: 262144
-          minLength: 1
-      required:
-        - clientId
-        - functions
-    InvocationTokenResponse:
-      type: object
-      description: Function invocation token response
-      properties:
-        access_token:
-          type: string
-          format: UTF-8
-          description: Token issued by Notary Service
-          maxLength: 262144
-          minLength: 0
-        expires_in:
-          type: integer
-          format: int32
-          description: Token expiration time in seconds
-          maximum: 2147483647
-          minimum: -2147483648
-    InvocationTokenRequest:
-      type: object
-      description: Request body for issuing a function invocation token
-      properties:
-        clientId:
-          type: string
-          format: UTF-8
-          description: >-
-            ClientId for client to pass in to track who will eventually use the
-            token
-          maxLength: 262144
-          minLength: 1
-      required:
-        - clientId
     ListAssetsResponse:
-      type: object
       description: Response body containing list of assets of the current nca id
       properties:
         assets:
-          type: array
           description: List of assets uploaded for the nca id
           items:
             $ref: '#/components/schemas/AssetDto'
           maxItems: 2147483647
           minItems: 0
-    CreateAssetRequest:
+          type: array
+      required:
+        - assets
       type: object
-      description: >-
-        Request payload to create an asset-id and the corresponding pre-signed
-        URL to upload an asset of specified content-type to AWS S3 bucket.
+    CreateAssetRequest:
+      description: Request payload to create an asset-id and the corresponding pre-signed URL to upload an asset of specified content-type to AWS S3 bucket.
       properties:
         contentType:
-          type: string
-          format: UTF-8
           description: Content type of the asset such image/png, image/jpeg, etc.
-          maxLength: 262144
-          minLength: 0
-        description:
-          type: string
           format: UTF-8
-          description: Asset description
           maxLength: 262144
           minLength: 0
+          type: string
+        description:
+          description: Asset description
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
       required:
         - contentType
         - description
-    CreateAssetResponse:
       type: object
-      description: >-
-        Response body containing asset-id and the corresponding pre-signed URL
-        to upload an asset of specified content-type to AWS S3 bucket.
+    CreateAssetResponse:
+      description: Response body containing asset-id and the corresponding pre-signed URL to upload an asset of specified content-type to AWS S3 bucket.
       properties:
         assetId:
-          type: string
-          format: uuid
           description: Unique id of the asset to be uploaded to AWS S3 bucket
+          format: uuid
           maxLength: 36
           minLength: 36
-        uploadUrl:
           type: string
-          format: url
-          description: Pre-signed upload URL to upload asset
         contentType:
-          type: string
-          format: UTF-8
           description: Content type of the asset such image/png, image/jpeg, etc.
-          maxLength: 262144
-          minLength: 0
-        description:
-          type: string
           format: UTF-8
-          description: Asset description to be used when uploading the asset
           maxLength: 262144
-          minLength: 0
-    AssetResponse:
+          minLength: 1
+          type: string
+        description:
+          description: Asset description to be used when uploading the asset
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        uploadUrl:
+          description: Pre-signed upload URL to upload asset
+          format: url
+          type: string
+      required:
+        - assetId
+        - contentType
+        - description
+        - uploadUrl
       type: object
+    AssetResponse:
       properties:
         asset:
           $ref: '#/components/schemas/AssetDto'
       required:
         - asset
-    BasicFunctionDto:
       type: object
-      description: Basic Data Transfer Object (DTO) representing a function
+    MultiFunctionsInvocationTokenRequest:
+      description: Request body for issuing a function invocation token
       properties:
-        functionId:
+        clientId:
+          description: ClientId for client to pass in to track who will eventually use the token
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
           type: string
-          format: uuid
-          description: Unique function id
-          maxLength: 36
-          minLength: 36
-        functionVersionId:
-          type: string
-          format: uuid
-          description: Unique function version id
-          maxLength: 36
-          minLength: 36
+        functions:
+          description: Functions to invoke
+          items:
+            $ref: '#/components/schemas/BasicFunctionDto'
+          maxItems: 4
+          minItems: 0
+          type: array
       required:
-        - functionId
-    AssetDto:
+        - clientId
+        - functions
       type: object
+    InvocationTokenResponse:
+      description: Function invocation token response
+      properties:
+        access_token:
+          description: Token issued by Notary Service
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        expires_in:
+          description: Token expiration time in seconds
+          format: int32
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+      type: object
+    InvocationTokenRequest:
+      description: Request body for issuing a function invocation token
+      properties:
+        clientId:
+          description: ClientId for client to pass in to track who will eventually use the token
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+      required:
+        - clientId
+      type: object
+    AssetDto:
       description: Data Transfer Object(DTO) representing an asset
       properties:
         assetId:
-          type: string
-          format: uuid
           description: Asset id
+          format: uuid
           maxLength: 36
           minLength: 36
-        description:
           type: string
-          format: UTF-8
-          description: Description specified when creating the asset
-          maxLength: 262144
-          minLength: 0
         contentType:
-          type: string
-          format: UTF-8
           description: Content-type specified when creating the asset
+          format: UTF-8
           maxLength: 262144
           minLength: 0
-        createdAt:
           type: string
-          format: date-time
+          nullable: true
+        createdAt:
           description: Timestamp specified when creating the asset
+          format: date-time
           maxLength: 30
           minLength: 8
+          type: string
+          nullable: true
+        description:
+          description: Description specified when creating the asset
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+      type: object
+    BasicFunctionDto:
+      description: Basic Data Transfer Object (DTO) representing a function
+      properties:
+        functionId:
+          description: Unique function id
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+        functionVersionId:
+          description: Unique function version id
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+          nullable: true
+      required:
+        - functionId
+      type: object
 servers:
   - url: https://api.nvcf.nvidia.com
-    description: Generated server url

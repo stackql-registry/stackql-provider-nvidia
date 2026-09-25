@@ -1,9 +1,30 @@
 {
-  "orgs": "NGC organizations, teams, users, role grants, invitations and the current user (source: ngc_kas)",
-  "registry": "NGC private registry - org-scoped artifact metadata: models, resources, recipes, helm chart versions, collections, shares, encryption keys (source: ngc_models, org-scoped families)",
-  "catalog": "NGC public catalog - guest artifact metadata reads plus the GPU and CSP catalogs; the zero-setup surface (source: ngc_models, guest families)",
-  "nvcf_functions": "NVCF functions, versions, metadata, authorizations (function sharing grants), secrets and rate limits (source: nvcf)",
-  "nvcf_deployments": "NVCF deployments, GPU specifications, cluster groups and GPUs, registry credentials, telemetries (source: nvcf)",
-  "nvcf_queues": "NVCF queue details and queue position (source: nvcf)",
-  "nvcf_invocation": "NVCF HTTP-polling invocation (pexec + status), assets and invocation assertion tokens (source: nvcf)"
+  "orgs": {
+    "title": "NVIDIA NGC Organizations",
+    "description": "NGC organizations, teams, users and team members, role grants, invitations and the current user (source: the NGC API definition harvested from the API explorer)."
+  },
+  "private_registry": {
+    "title": "NVIDIA NGC Private Registry",
+    "description": "Org-scoped artifact metadata in the NGC private registry: models, resources, recipes, generic artifacts (containers, helm charts), versions and files, collections, shares, deployment parameters, encryption keys and workflows. Team-scoped twins are mapped as *_by_team methods (source: the Private Artifacts (Models) API definition, responses from the ngcsdk data classes)."
+  },
+  "catalog": {
+    "title": "NVIDIA NGC Catalog",
+    "description": "The public NGC catalog: guest reads of models, resources, recipes, helm charts, collections and generic artifacts, plus the GPU and cloud service provider catalogs (no organization scope; public artifacts read without credentials)."
+  },
+  "nvcf_functions": {
+    "title": "NVIDIA Cloud Functions - Functions",
+    "description": "NVCF functions and versions, function metadata, authorizations (function sharing grants), secrets and rate limits (source: the published NVCF OpenAPI specification; management operations served from api.ngc.nvidia.com)."
+  },
+  "nvcf_deployments": {
+    "title": "NVIDIA Cloud Functions - Deployments",
+    "description": "NVCF deployments and GPU specifications, cluster groups and GPU inventory, registry credentials and telemetry endpoints (source: the published NVCF OpenAPI specification; served from api.ngc.nvidia.com)."
+  },
+  "nvcf_queues": {
+    "title": "NVIDIA Cloud Functions - Queues",
+    "description": "NVCF request queue details per function and version, and queue position per request (served from api.nvcf.nvidia.com)."
+  },
+  "nvcf_invocation": {
+    "title": "NVIDIA Cloud Functions - Invocation",
+    "description": "NVCF HTTP-polling invocation (pexec and status), assets and invocation assertion tokens (served from api.nvcf.nvidia.com)."
+  }
 }

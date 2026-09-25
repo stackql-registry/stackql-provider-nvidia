@@ -8,13 +8,13 @@
   "sources": {
     "nvcf_openapi.json": {
       "url": "https://api.nvcf.nvidia.com/v3/openapi",
-      "fetched": "2026-07-14",
-      "sha256": "b79060bfb9f6ff7295286f46d7c8e422f36d4ac94588183cc623f6acf3489efd",
-      "bytes": 112602,
+      "fetched": "2026-09-25",
+      "sha256": "53dd383860098a19d6ddb796988fd3d3d166f71f34f82f2f849aed8c725d9eea",
+      "bytes": 198423,
       "docsPage": "https://docs.nvidia.com/nvcf/api",
       "openapi": "3.1.0",
       "title": "Cloud Functions",
-      "specVersion": "2.245.1",
+      "specVersion": "2.256.0",
       "decision": {
         "canonicalSource": "The OpenAPI Spec link on the NVCF API documentation page (docsPage) resolves to this URL, served by the NVCF API itself. A companion Postman collection is referenced from the same documentation set.",
         "hostSplit": "The spec declares a single server (https://api.nvcf.nvidia.com) but the NVCF documentation (cloud-functions user guide, API page) states the primary domain for function management is api.ngc.nvidia.com and the NVCF domain for function invocation and queue details is api.nvcf.nvidia.com. Hosts are carried per operation group; the per-operation assignment with evidence is recorded in endpoint_inventory.csv.",
@@ -23,9 +23,9 @@
     },
     "ngc_models.json": {
       "url": "https://models.ngc.nvidia.com/v3/openapi",
-      "fetched": "2026-07-14",
-      "sha256": "7541d8f6cbd983e41fda42a171ce4fd4f6c0367eceb65c188e79202b90a73d91",
-      "bytes": 614601,
+      "fetched": "2026-09-25",
+      "sha256": "60e0eb9a9f7344e5f43ba3ede8dd5cab20ab41cc47bad9ae780031868e06b529",
+      "bytes": 1435979,
       "explorer": "https://docs.ngc.nvidia.com/api/",
       "explorerName": "Private Artifacts (Models) API",
       "openapi": "3.1.0",
@@ -33,15 +33,25 @@
       "specVersion": "0.0.1-SNAPSHOT"
     },
     "ngc_kas.json": {
-      "url": "https://api-internal.ngc.nvidia.com/v3/api-docs",
-      "fetched": "2026-07-14",
-      "sha256": "dcaf78b003e94318b6e1e41ab9157f81ddc464b8455545ce16d33f378eebf987",
-      "bytes": 294470,
+      "url": "https://api.ngc.nvidia.com/v3/api-docs",
+      "fetched": "2026-09-25",
+      "sha256": "9a4550a50fed4b4a7337c5bd67d71858d13fcdbe7c72505aa1b245382e9be53c",
+      "bytes": 618658,
       "explorer": "https://docs.ngc.nvidia.com/api/",
       "explorerName": "KASv1 API (Deprecated)",
       "openapi": "3.0.1",
       "title": "NGC API Documentation",
-      "specVersion": "v3.249.6"
+      "specVersion": "v3.249.17"
     }
+  },
+  "ngcSdk": {
+    "package": "ngcsdk",
+    "version": "4.36.6",
+    "url": "https://files.pythonhosted.org/packages/3c/cf/e4901fd5a50621d3f058d0ba4f732651a86d672fb76b7a404473b2b23ac1/ngcsdk-4.36.6-py3-none-any.whl",
+    "sha256": "8cf4ce3bd071b3d2e24d40f2c66abc2c2b49022b53d400a2eb9fe6018fe3f343",
+    "derived": "ngc_sdk_schemas.json",
+    "derivedSha256": "faa443aa2e6394370b18bab2a7368f8e85a72e56a4f9a87b5d1d41b5337ca3ea",
+    "classes": 149,
+    "fetched": "2026-09-25"
   }
 }

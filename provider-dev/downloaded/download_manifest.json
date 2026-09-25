@@ -6,7 +6,7 @@
         "docsPage": "https://docs.nvidia.com/nvcf/api",
         "openapi": "3.1.0",
         "title": "Cloud Functions",
-        "specVersion": "2.245.1"
+        "specVersion": "2.256.0"
       }
     },
     "ngc_models.json": {
@@ -20,42 +20,60 @@
       }
     },
     "ngc_kas.json": {
-      "url": "https://api-internal.ngc.nvidia.com/v3/api-docs",
+      "url": "https://api.ngc.nvidia.com/v3/api-docs",
       "info": {
         "explorer": "https://docs.ngc.nvidia.com/api/",
         "explorerName": "KASv1 API (Deprecated)",
         "openapi": "3.0.1",
         "title": "NGC API Documentation",
-        "specVersion": "v3.249.6"
+        "specVersion": "v3.249.17"
       }
     }
   },
   "ngcHarvest": {
     "explorer": "https://docs.ngc.nvidia.com/api/",
-    "bundle": "https://docs.ngc.nvidia.com/api/static/js/main.543e7576.js",
+    "catalogue": "pinned in harvest_ngc_spec.mjs (the explorer moved to a hosted documentation platform after 2026-07-14 and no longer publishes its definition list; the definition URLs it declared still serve)",
     "entries": {
+      "KASv1 API (Deprecated)": {
+        "url": "https://api.ngc.nvidia.com/v3/api-docs",
+        "status": "fetched",
+        "file": "ngc_kas.json",
+        "note": "the NGC API Documentation definition (orgs, teams, users) - the explorer labelled it KASv1 (Deprecated); deprecation is handled per path in mapping; served by the public gateway"
+      },
       "Private Artifacts (Models) API": {
         "url": "https://models.ngc.nvidia.com/v3/openapi",
         "status": "fetched",
         "file": "ngc_models.json",
-        "note": "registry artifact metadata (models, resources, containers, helm charts)"
+        "note": "registry artifact metadata (models, resources, containers, helm charts); declared on /v1 paths that the public gateway serves under /v2 (clean_specs gateway-v2-path-prefix)"
       },
-      "Metadata API": {
-        "url": "https://meta.ngc.nvidia.com/v3/api-docs",
+      "Org Mgmt Service API": {
+        "url": "https://oms.ngc.nvidia.com/v3/openapi",
         "status": "unreachable",
-        "error": "fetch failed",
-        "note": "artifact metadata"
+        "error": "https://oms.ngc.nvidia.com/v3/openapi: fetch failed",
+        "note": "organization management"
+      },
+      "User IAM Sevice API": {
+        "url": "https://uis.ngc.nvidia.com/v3/openapi",
+        "status": "unreachable",
+        "error": "https://uis.ngc.nvidia.com/v3/openapi: fetch failed",
+        "note": "user identity and access management (name spelled sic in the explorer)"
       },
       "Search API": {
         "url": "https://search.ngc.nvidia.com/v3/api-docs",
         "status": "unreachable",
-        "error": "fetch failed",
+        "error": "https://search.ngc.nvidia.com/v3/api-docs: fetch failed; https://api.ngc.nvidia.com/v3/search/api-docs: HTTP 401",
         "note": "catalog/registry search"
+      },
+      "Metadata API": {
+        "url": "https://meta.ngc.nvidia.com/v3/api-docs",
+        "status": "unreachable",
+        "error": "https://meta.ngc.nvidia.com/v3/api-docs: fetch failed; https://api.ngc.nvidia.com/v3/meta/api-docs: HTTP 401",
+        "note": "artifact metadata"
       },
       "Publishing API": {
         "url": "https://publishing.ngc.nvidia.com/v3/api-docs",
         "status": "unreachable",
-        "error": "fetch failed",
+        "error": "https://publishing.ngc.nvidia.com/v3/api-docs: fetch failed",
         "note": "artifact publishing"
       },
       "Fleet Command API": {
@@ -68,12 +86,6 @@
         "status": "out-of-scope",
         "note": "Base Command batch jobs, out of scope"
       },
-      "User IAM Sevice API": {
-        "url": "https://uis.ngc.nvidia.com/v3/openapi",
-        "status": "unreachable",
-        "error": "fetch failed",
-        "note": "user identity and access management (name spelled sic in the explorer)"
-      },
       "Subscription Service API": {
         "url": "https://subscription.ngc.nvidia.com/v3/openapi",
         "status": "out-of-scope",
@@ -83,19 +95,19 @@
         "url": "https://notification.ngc.nvidia.com/v3/openapi",
         "status": "out-of-scope",
         "note": "notification delivery, out of scope"
-      },
-      "Org Mgmt Service API": {
-        "url": "https://oms.ngc.nvidia.com/v3/openapi",
-        "status": "unreachable",
-        "error": "fetch failed",
-        "note": "organization management"
-      },
-      "KASv1 API (Deprecated)": {
-        "url": "https://api-internal.ngc.nvidia.com/v3/api-docs",
-        "status": "fetched",
-        "file": "ngc_kas.json",
-        "note": "the NGC API Documentation definition (orgs, teams, users) - explorer labels it KASv1 (Deprecated); deprecation is handled per path in mapping"
       }
     }
+  },
+  "ngcSdk": {
+    "package": "ngcsdk",
+    "version": "4.36.6",
+    "url": "https://files.pythonhosted.org/packages/3c/cf/e4901fd5a50621d3f058d0ba4f732651a86d672fb76b7a404473b2b23ac1/ngcsdk-4.36.6-py3-none-any.whl",
+    "sha256": "8cf4ce3bd071b3d2e24d40f2c66abc2c2b49022b53d400a2eb9fe6018fe3f343",
+    "derived": "ngc_sdk_schemas.json",
+    "packages": [
+      "registry/data/model/"
+    ],
+    "classes": 149,
+    "note": "response schemas for the registry/catalog surface: the harvested models definition declares no 2xx responses on most operations; the SDK data classes are the pinned response-side source (archetype-2 fallback, response side only)"
   }
 }

@@ -1,143 +1,80 @@
 openapi: 3.1.0
 info:
-  title: nvcf_deployments API
-  description: nvidia nvcf_deployments API
-  version: 2.245.1
+  title: NVIDIA Cloud Functions - Deployments
+  description: 'NVCF deployments and GPU specifications, cluster groups and GPU inventory, registry credentials and telemetry endpoints (source: the published NVCF OpenAPI specification; served from api.ngc.nvidia.com).'
+  version: 2.256.0
 paths:
-  /v2/nvcf/secrets/telemetries/{telemetryId}:
-    put:
-      tags:
-        - User Secret Management
-      summary: Update secret for a specific Telemetry Id
-      description: >-
-        Updates secret for the specific telemetry Id within NVIDIA Cloud
-        Account. This endpoint requires a bearer token with 'update_secrets'
-        scope in the HTTP Authorization header. 
-      operationId: updateTelemetrySecret
-      parameters:
-        - name: telemetryId
-          in: path
-          description: NVIDIA Cloud Account Id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateTelemetrySecretRequest'
-        required: true
-      responses:
-        '204':
-          description: No Content
-  /v2/nvcf/deployments/functions/{functionId}/versions/{functionVersionId}:
+  /v2/nvcf/clusterGroups:
     get:
+      deprecated: true
+      description: 'Lists Cluster Groups for the current account. The response includes cluster  groups defined specifically in the current account and publicly available  cluster groups such as GFN, OCI, etc. Requires a bearer token with ''list_cluster_groups'' scope in HTTP Authorization header. '
+      operationId: getClusterGroups
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterGroupsResponse'
+          description: OK
+      summary: List Cluster Groups
       tags:
-        - Function Deployment
-      summary: Get Function Deployment Details
-      description: >-
-        Allows Account Admins to retrieve the deployment details of the
-        specified  function version. Access to this endpoint mandates a bearer
-        token with 'deploy_function' scope in the  HTTP Authorization header. 
+        - Cluster Groups and GPUs
+      parameters: []
+  /v2/nvcf/deployments/functions/{function_id}/versions/{function_version_id}:
+    get:
+      description: 'Allows Account Admins to retrieve the deployment details of the specified  function version. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
       operationId: getFunctionDeployment
       parameters:
-        - name: functionId
+        - description: Function id
           in: path
-          description: Function id
+          name: function_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
-        - name: functionVersionId
+            type: string
+        - description: Function version id
           in: path
-          description: Function version id
+          name: function_version_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeploymentResponse'
-    put:
+          description: OK
+      summary: Get Function Deployment Details
       tags:
         - Function Deployment
-      summary: Update Function Deployment
-      description: ' Deprecated and will be removed soon. Use a single GPU specification update  method instead.  Updates the deployment specs of the specified function version. It''s important  to note that GPU type and backend configurations cannot be modified through  this endpoint. If the specified function is public, then Account Admin cannot  perform this operation. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
-      operationId: updateFunctionDeployment
-      parameters:
-        - name: functionId
-          in: path
-          description: Function id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-        - name: functionVersionId
-          in: path
-          description: Function version id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateFunctionDeploymentRequest'
-        required: true
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeploymentResponse'
-      deprecated: true
     post:
-      tags:
-        - Function Deployment
-      summary: Deploy Function
-      description: >-
-        Initiates deployment for the specified function version. Upon invocation
-        of  this endpoint, the function's status transitions to 'DEPLOYING'. If
-        the  specified function version is public, then Account Admin cannot
-        perform this  operation. Access to this endpoint mandates a bearer token
-        with 'deploy_function' scope in the  HTTP Authorization header. 
+      description: 'Initiates deployment for the specified function version. Upon invocation of  this endpoint, the function''s status transitions to ''DEPLOYING''. If the  specified function version is public, then Account Admin cannot perform this  operation. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
       operationId: createFunctionDeployment
       parameters:
-        - name: functionId
+        - description: Function id
           in: path
-          description: Function id
+          name: function_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
-        - name: functionVersionId
+            type: string
+        - description: Function version id
           in: path
-          description: Function version id
+          name: function_version_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
       requestBody:
         content:
           application/json:
@@ -146,170 +83,233 @@ paths:
         required: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeploymentResponse'
-    delete:
+          description: OK
+      summary: Deploy Function
       tags:
         - Function Deployment
-      summary: Delete Function Deployment
-      description: >-
-        Deletes the deployment associated with the specified function. Upon 
-        deletion, any active instances will be terminated, and the function's
-        status  will transition to 'INACTIVE'. To undeploy a function version
-        gracefully,  specify 'graceful=true' query parameter, allowing current
-        tasks to complete  before terminating the instances. If the specified
-        function version is public,  then Account Admin cannot perform this
-        operation. Access to this endpoint mandates a bearer token with
-        'deploy_function' scope in the  HTTP Authorization header. 
-      operationId: deleteFunctionDeployment
+    put:
+      deprecated: true
+      description: ' Deprecated and will be removed soon. Use a single GPU specification update  method instead.  Updates the deployment specs of the specified function version. It''s important  to note that GPU type and backend configurations cannot be modified through  this endpoint. If the specified function is public, then Account Admin cannot  perform this operation. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
+      operationId: updateFunctionDeployment
       parameters:
-        - name: functionId
+        - description: Function id
           in: path
-          description: Function id
+          name: function_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
-        - name: functionVersionId
+            type: string
+        - description: Function version id
           in: path
-          description: Function version id
+          name: function_version_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
-        - name: graceful
-          in: query
-          description: Query param to deactivate function for graceful shutdown
-          required: false
-          schema:
-            type: boolean
-            default: false
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FunctionResponse'
-  /v2/nvcf/telemetries:
-    get:
-      tags:
-        - Telemetry Management
-      summary: List Telemetries
-      description: >-
-        Retrieves telemetry configurations for a specific NVIDIA Cloud Account. 
-        requires a bearer token with 'manage_telemetries' scope in the HTTP 
-        Authorization header. 
-      operationId: getTelemetriesByAccount
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListTelemetryResponse'
-    post:
-      tags:
-        - Telemetry Management
-      summary: Create Telemetry
-      description: >-
-        Creates telemetry endpoints for NVIDIA Cloud Accounts.  requires a
-        bearer token with 'manage_telemetries' scope in the HTTP  Authorization
-        header. 
-      operationId: createTelemetry
+            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TelemetryRequest'
+              $ref: '#/components/schemas/UpdateFunctionDeploymentRequest'
         required: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TelemetryResponse'
-  /v2/nvcf/registry-credentials:
-    get:
+                $ref: '#/components/schemas/DeploymentResponse'
+          description: OK
+      summary: Update Function Deployment
       tags:
-        - Registry Credential Management
-      summary: List Registry Credentials
-      description: >-
-        Lists all the registry credentials associated with the authenticated 
-        NVIDIA Cloud Account. Requires a bearer token in the HTTP Authorization
-        header with 'manage_registries' scope. 
-      operationId: listRegistryCredentialDetails
+        - Function Deployment
+    delete:
+      description: 'Deletes the deployment associated with the specified function. Upon  deletion, any active instances will be terminated, and the function''s status  will transition to ''INACTIVE''. To undeploy a function version gracefully,  specify ''graceful=true'' query parameter, allowing current tasks to complete  before terminating the instances. If the specified function version is public,  then Account Admin cannot perform this operation. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
+      operationId: deleteFunctionDeployment
       parameters:
-        - name: artifactType
+        - description: Function id
+          in: path
+          name: function_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+        - description: Function version id
+          in: path
+          name: function_version_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+        - description: Query param to deactivate function for graceful shutdown
           in: query
-          description: >
-            Filters registry credentials using the specified 'artifactType'
-            query param.
+          name: graceful
           required: false
           schema:
-            type: array
+            default: false
+            type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionResponse'
+          description: OK
+      summary: Delete Function Deployment
+      tags:
+        - Function Deployment
+  /v2/nvcf/deployments/{deployment_id}:
+    get:
+      description: 'Allows Account Admins to retrieve the deployment details of the specified  deployment id. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
+      operationId: getFunctionDeployment_1
+      parameters:
+        - description: Deployment id
+          in: path
+          name: deployment_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentResponse'
+          description: OK
+      summary: Get Function Deployment Details
+      tags:
+        - Function Deployment
+  /v2/nvcf/deployments/{deployment_id}/gpu-specifications/{gpu_spec_id}:
+    patch:
+      description: ' Updates the GPU specification of the specified function version''s deployment.  It''s important to note that GPU type and backend configurations cannot be  modified through this endpoint. If the specified function is public,  then Account Admin cannot perform this operation. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
+      operationId: updateGpuSpecification
+      parameters:
+        - description: Deployment id
+          in: path
+          name: deployment_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+        - description: GPU Specification id
+          in: path
+          name: gpu_spec_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGpuSpecificationRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGpuSpecificationResponse'
+          description: OK
+      summary: Update the specified GPU specification under the specified deployment
+      tags:
+        - Function Deployment
+  /v2/nvcf/recognized-registries:
+    get:
+      description: 'Lists all the registries that are recognized by NVCF. Only when a registry  is recognized by NVCF that the users can add its credential to their account  and then use it to create functions. Requires a bearer token in the HTTP Authorization header with ''manage_registries'' scope. '
+      operationId: getRecognizedRegistries
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognizedRegistriesResponse'
+          description: OK
+      summary: List Recognized Registries
+      tags:
+        - Registry Credential Management
+      parameters: []
+  /v2/nvcf/registry-credentials:
+    get:
+      description: 'Lists all the registry credentials associated with the authenticated  NVIDIA Cloud Account. Requires a bearer token in the HTTP Authorization header with ''manage_registries'' scope. '
+      operationId: listRegistryCredentialDetails
+      parameters:
+        - description: |
+            Filters registry credentials using the specified 'artifactType' query param.
+          in: query
+          name: artifactType
+          required: false
+          schema:
             default:
               - CONTAINER
               - HELM
               - MODEL
               - RESOURCE
             items:
-              type: string
-              format: UTF-8
               enum:
                 - CONTAINER
                 - HELM
                 - MODEL
                 - RESOURCE
+              format: UTF-8
               maxLength: 262144
               minLength: 0
+              type: string
             maxItems: 2147483647
             minItems: 0
+            type: array
             uniqueItems: true
-        - name: provisionedBy
+        - description: |
+            Filters registry credentials using the specified 'provisionedBy' query param.
           in: query
-          description: >
-            Filters registry credentials using the specified 'provisionedBy'
-            query param.
+          name: provisionedBy
           required: false
           schema:
-            type: array
             default:
               - SYSTEM
               - USER
             items:
-              type: string
-              format: UTF-8
               enum:
                 - SYSTEM
                 - USER
+              format: UTF-8
               maxLength: 262144
               minLength: 0
+              type: string
             maxItems: 2147483647
             minItems: 0
+            type: array
             uniqueItems: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListRegistryCredentialDetailsResponse'
-    post:
+          description: OK
+      summary: List Registry Credentials
       tags:
         - Registry Credential Management
-      summary: Add new registry credential to the account
-      description: >-
-        Adds a new registry credential to the account. Requires a bearer token
-        in the HTTP Authorization header with 'manage_registries' scope. 
+    post:
+      description: 'Adds a new registry credential to the account. Requires a bearer token in the HTTP Authorization header with ''manage_registries'' scope. '
       operationId: addRegistryCredential
       requestBody:
         content:
@@ -319,82 +319,52 @@ paths:
         required: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegistryCredentialDetailsResponse'
-  /v2/nvcf/registry-credentials/{registryCredentialId}:
-    get:
+          description: OK
+      summary: Add new registry credential to the account
       tags:
         - Registry Credential Management
-      summary: Get Registry Credential Details
-      description: >-
-        Retrieves detailed information of the specified registry credential 
-        associated with the authenticated NVIDIA Cloud Account. Requires a
-        bearer token in the HTTP Authorization header with 'manage_registries'
-        scope. 
+      parameters: []
+  /v2/nvcf/registry-credentials/{registry_credential_id}:
+    get:
+      description: 'Retrieves detailed information of the specified registry credential  associated with the authenticated NVIDIA Cloud Account. Requires a bearer token in the HTTP Authorization header with ''manage_registries'' scope. '
       operationId: getRegistryCredentialDetails
       parameters:
-        - name: registryCredentialId
+        - description: Registry Credential id
           in: path
-          description: Registry Credential id
+          name: registry_credential_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegistryCredentialDetailsResponse'
-    delete:
+          description: OK
+      summary: Get Registry Credential Details
       tags:
         - Registry Credential Management
-      summary: Delete Registry Credential
-      description: >-
-        Deletes the specified registry credential associated with the
-        authenticated  NVIDIA Cloud Account. Requires a bearer token in the HTTP
-        Authorization header with 'manage_registries' scope. 
-      operationId: deleteRegistryCredential
-      parameters:
-        - name: registryCredentialId
-          in: path
-          description: Registry Credential id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      responses:
-        '204':
-          description: No Content
     patch:
-      tags:
-        - Registry Credential Management
-      summary: Update registry credential
-      description: >-
-        Updates the secret and/or the artifact types associated with the
-        specified  registry credential. Artifact types specified in the request
-        body are  added to the set of artifact types that already exist for the
-        specified  registry credential. Requires a bearer token in the HTTP
-        Authorization header with 'manage_registries' scope. 
+      description: 'Updates the secret and/or the artifact types associated with the specified  registry credential. Artifact types specified in the request body are  added to the set of artifact types that already exist for the specified  registry credential. Requires a bearer token in the HTTP Authorization header with ''manage_registries'' scope. '
       operationId: updateRegistryCredential
       parameters:
-        - name: registryCredentialId
+        - description: Registry Credential id
           in: path
-          description: Registry Credential id
+          name: registry_credential_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
       requestBody:
         content:
           application/json:
@@ -403,215 +373,149 @@ paths:
         required: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegistryCredentialDetailsResponse'
-  /v2/nvcf/deployments/{deploymentId}/gpu-specifications/{gpuSpecId}:
-    patch:
+          description: OK
+      summary: Update registry credential
       tags:
-        - Function Deployment
-      summary: Update the specified GPU specification under the specified deployment
-      description: ' Updates the GPU specification of the specified function version''s deployment.  It''s important to note that GPU type and backend configurations cannot be  modified through this endpoint. If the specified function is public,  then Account Admin cannot perform this operation. Access to this endpoint mandates a bearer token with ''deploy_function'' scope in the  HTTP Authorization header. '
-      operationId: updateGpuSpecification
+        - Registry Credential Management
+    delete:
+      description: 'Deletes the specified registry credential associated with the authenticated  NVIDIA Cloud Account. Requires a bearer token in the HTTP Authorization header with ''manage_registries'' scope. '
+      operationId: deleteRegistryCredential
       parameters:
-        - name: deploymentId
+        - description: Registry Credential id
           in: path
-          description: Deployment id
+          name: registry_credential_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
-        - name: gpuSpecId
+            type: string
+      responses:
+        '204':
+          description: No Content
+      summary: Delete Registry Credential
+      tags:
+        - Registry Credential Management
+  /v2/nvcf/secrets/telemetries/{telemetry_id}:
+    put:
+      description: 'Updates secret for the specific telemetry Id within NVIDIA Cloud Account. This endpoint requires a bearer token with ''update_secrets'' scope in the HTTP Authorization header. '
+      operationId: updateTelemetrySecret
+      parameters:
+        - description: NVIDIA Cloud Account Id
           in: path
-          description: GPU Specification id
+          name: telemetry_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateGpuSpecificationRequest'
+              $ref: '#/components/schemas/UpdateTelemetrySecretRequest'
         required: true
       responses:
+        '204':
+          description: No Content
+      summary: Update secret for a specific Telemetry Id
+      tags:
+        - User Secret Management
+  /v2/nvcf/telemetries:
+    get:
+      description: 'Retrieves telemetry configurations for a specific NVIDIA Cloud Account.  requires a bearer token with ''manage_telemetries'' scope in the HTTP  Authorization header. '
+      operationId: getTelemetriesByAccount
+      responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdateGpuSpecificationResponse'
-  /v2/nvcf/telemetries/{telemetryId}:
-    get:
+                $ref: '#/components/schemas/ListTelemetryResponse'
+          description: OK
+      summary: List Telemetries
       tags:
         - Telemetry Management
-      summary: Get Telemetry Details
-      description: >-
-        Retrieves the details of a specific telemetry configuration by its ID. 
-        requires a bearer token with 'manage_telemetries' scope in the HTTP 
-        Authorization header. 
-      operationId: getTelemetry
-      parameters:
-        - name: telemetryId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
+      parameters: []
+    post:
+      description: 'Creates telemetry endpoints for NVIDIA Cloud Accounts.  requires a bearer token with ''manage_telemetries'' scope in the HTTP  Authorization header. '
+      operationId: createTelemetry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryRequest'
+        required: true
       responses:
         '200':
-          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TelemetryResponse'
-    delete:
+          description: OK
+      summary: Create Telemetry
       tags:
         - Telemetry Management
-      summary: Delete Telemetry
-      description: >-
-        Deletes a specific telemetry configuration for a NVIDIA Cloud Account. 
-        requires a bearer token with 'manage_telemetries' scope in the HTTP 
-        Authorization header. If there any functions that are dependent on the 
-        Telemetry that is being deleted, then response with 400 status code
-        will  be returned. 
-      operationId: deleteTelemetry
+      parameters: []
+  /v2/nvcf/telemetries/{telemetry_id}:
+    get:
+      description: 'Retrieves the details of a specific telemetry configuration by its ID.  requires a bearer token with ''manage_telemetries'' scope in the HTTP  Authorization header. '
+      operationId: getTelemetry
       parameters:
-        - name: telemetryId
-          in: path
+        - in: path
+          name: telemetry_id
           required: true
           schema:
-            type: string
             format: uuid
             maxLength: 36
             minLength: 36
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryResponse'
+          description: OK
+      summary: Get Telemetry Details
+      tags:
+        - Telemetry Management
+    delete:
+      description: 'Deletes a specific telemetry configuration for a NVIDIA Cloud Account.  requires a bearer token with ''manage_telemetries'' scope in the HTTP  Authorization header. If there any functions that are dependent on the  Telemetry that is being deleted, then response with 400 status code will  be returned. '
+      operationId: deleteTelemetry
+      parameters:
+        - in: path
+          name: telemetry_id
+          required: true
+          schema:
+            format: uuid
+            maxLength: 36
+            minLength: 36
+            type: string
       responses:
         '204':
           description: No Content
         '400':
           description: Cannot be deleted till Functions depend on it
-  /v2/nvcf/recognized-registries:
-    get:
+      summary: Delete Telemetry
       tags:
-        - Registry Credential Management
-      summary: List Recognized Registries
-      description: >-
-        Lists all the registries that are recognized by NVCF. Only when a
-        registry  is recognized by NVCF that the users can add its credential to
-        their account  and then use it to create functions. Requires a bearer
-        token in the HTTP Authorization header with 'manage_registries' scope. 
-      operationId: getRecognizedRegistries
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RecognizedRegistriesResponse'
-  /v2/nvcf/deployments/{deploymentId}:
-    get:
-      tags:
-        - Function Deployment
-      summary: Get Function Deployment Details
-      description: >-
-        Allows Account Admins to retrieve the deployment details of the
-        specified  deployment id. Access to this endpoint mandates a bearer
-        token with 'deploy_function' scope in the  HTTP Authorization header. 
-      operationId: getFunctionDeployment_1
-      parameters:
-        - name: deploymentId
-          in: path
-          description: Deployment id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            maxLength: 36
-            minLength: 36
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeploymentResponse'
-  /v2/nvcf/clusterGroups:
-    get:
-      tags:
-        - Cluster Groups and GPUs
-      summary: List Cluster Groups
-      description: >-
-        Lists Cluster Groups for the current account. The response includes
-        cluster  groups defined specifically in the current account and publicly
-        available  cluster groups such as GFN, OCI, etc. Requires a bearer token
-        with 'list_cluster_groups' scope in HTTP Authorization header. 
-      operationId: getClusterGroups
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClusterGroupsResponse'
-      deprecated: true
+        - Telemetry Management
 components:
   schemas:
-    UpdateTelemetrySecretRequest:
-      type: object
-      description: Request payload to update secret
+    ClusterGroupsResponse:
       properties:
-        secret:
-          $ref: '#/components/schemas/SecretDto'
-          description: Telemetry secret
-      required:
-        - secret
-    DeploymentResponse:
-      type: object
-      description: Function Deployment Response
-      properties:
-        deployment:
-          $ref: '#/components/schemas/FunctionDeploymentDto'
-          description: Deployment details
-      required:
-        - deployment
-    UpdateFunctionDeploymentRequest:
-      type: object
-      description: Request to update function deployment spec
-      properties:
-        deploymentSpecifications:
-          type: array
-          description: >-
-            Deployment specs with GPU, instance-type, etc. details for update
-            request
+        clusterGroups:
           items:
-            $ref: '#/components/schemas/UpdateGpuSpecificationDto'
+            $ref: '#/components/schemas/ClusterGroup'
           maxItems: 2147483647
-          minItems: 1
-      required:
-        - deploymentSpecifications
-    FunctionDeploymentRequest:
-      type: object
-      description: Request to deploy a function
-      properties:
-        deploymentSpecifications:
+          minItems: 0
           type: array
-          description: GPU specs with GPU, instance-type, clusters etc. details
-          items:
-            $ref: '#/components/schemas/GpuSpecificationDto'
-          maxItems: 2147483647
-          minItems: 1
-      required:
-        - deploymentSpecifications
+      type: object
     FunctionResponse:
-      type: object
       description: Response body with function details
       properties:
         function:
@@ -619,39 +523,225 @@ components:
           description: Function details
       required:
         - function
-    ListTelemetryResponse:
       type: object
+    DeploymentResponse:
+      description: Function Deployment Response
+      properties:
+        deployment:
+          $ref: '#/components/schemas/FunctionDeploymentDto'
+          description: Deployment details
+      required:
+        - deployment
+      type: object
+    FunctionDeploymentRequest:
+      description: Request to deploy a function
+      properties:
+        deploymentSpecifications:
+          description: GPU specs with GPU, instance-type, clusters etc. details
+          items:
+            $ref: '#/components/schemas/GpuSpecificationDto'
+          maxItems: 2147483647
+          minItems: 1
+          type: array
+      required:
+        - deploymentSpecifications
+      type: object
+    UpdateFunctionDeploymentRequest:
+      description: Request to update function deployment spec
+      properties:
+        deploymentSpecifications:
+          description: Deployment specs with GPU, instance-type, etc. details for update request
+          items:
+            $ref: '#/components/schemas/UpdateGpuSpecificationDto'
+          maxItems: 2147483647
+          minItems: 1
+          type: array
+      required:
+        - deploymentSpecifications
+      type: object
+    UpdateGpuSpecificationRequest:
+      description: Request to update single function deployment GPU Specification
+      properties:
+        autoscalingConfiguration:
+          $ref: '#/components/schemas/AutoscalingConfigurationDto'
+          description: Customizable Autoscaling configuration
+        autoscalingConfigurationPolicy:
+          description: 'Autoscaling configuration policy. CUSTOM_CONFIGURATION (default): use the provided autoscalingConfig. PLATFORM_CONFIGURATION: remove custom config and use platform defaults.'
+          enum:
+            - CUSTOM_CONFIGURATION
+            - PLATFORM_CONFIGURATION
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        maxInstances:
+          description: Maximum number of instances for the deployment
+          format: int32
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+          nullable: true
+        minInstances:
+          description: Minimum number of instances for the deployment
+          format: int32
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+          nullable: true
+      type: object
+    UpdateGpuSpecificationResponse:
+      description: Update GPU Specification Response
+      properties:
+        gpuSpecification:
+          $ref: '#/components/schemas/GpuSpecificationDto'
+          description: GPU Specification details
+      required:
+        - gpuSpecification
+      type: object
+    RecognizedRegistriesResponse:
+      description: Response body for recognized registries endpoint
+      properties:
+        recognizedRegistries:
+          additionalProperties:
+            items:
+              additionalProperties:
+                type: string
+              type: object
+            type: array
+          description: Recognized registries
+          type: object
+      type: object
+    ListRegistryCredentialDetailsResponse:
+      description: Response body containing list of registry credentials
+      properties:
+        registryCredentials:
+          description: List of registry credentials
+          items:
+            $ref: '#/components/schemas/RegistryCredentialDetailsDto'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+      required:
+        - registryCredentials
+      type: object
+    AddRegistryCredentialRequest:
+      description: Request body to add a registry credential to an account
+      properties:
+        artifactTypes:
+          description: Artifact types that can be retrieved using this credential
+          items:
+            enum:
+              - CONTAINER
+              - HELM
+              - MODEL
+              - RESOURCE
+            type: string
+          maxItems: 2147483647
+          minItems: 1
+          type: array
+          uniqueItems: true
+        description:
+          description: Optional registry credential description
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        registryHostname:
+          description: Registry hostname
+          format: UTF-8
+          maxLength: 255
+          minLength: 1
+          pattern: (?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z0-9]{2,63}$)
+          type: string
+        secret:
+          $ref: '#/components/schemas/SecretDto'
+          description: Registry credential - secret value must be base64 encoded string in username:password format
+        tags:
+          description: Optional set of tags
+          items:
+            pattern: '[a-zA-Z0-9\-_:=]+'
+            type: string
+          maxItems: 64
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+      required:
+        - artifactTypes
+        - registryHostname
+        - secret
+      type: object
+    RegistryCredentialDetailsResponse:
+      description: Response body for Registry Credential operations
+      properties:
+        registryCredential:
+          $ref: '#/components/schemas/RegistryCredentialDetailsDto'
+          description: Registry credential details
+      required:
+        - registryCredential
+      type: object
+    UpdateRegistryCredentialRequest:
+      description: Request body to update registry credential
+      properties:
+        artifactTypeEnums:
+          description: Optional artifact types to be added to the existing ones
+          items:
+            enum:
+              - CONTAINER
+              - HELM
+              - MODEL
+              - RESOURCE
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+        secret:
+          $ref: '#/components/schemas/SecretDto'
+          description: Registry credential - secret value must be base64 encoded string in username:password format
+      type: object
+    UpdateTelemetrySecretRequest:
+      description: Request payload to update secret
+      properties:
+        secret:
+          $ref: '#/components/schemas/SecretDto'
+          description: Telemetry secret
+      required:
+        - secret
+      type: object
+    ListTelemetryResponse:
       description: Response containing a list of telemetry configurations.
       properties:
         telemetries:
-          type: array
           description: List of telemetry configurations.
           items:
             $ref: '#/components/schemas/TelemetryDto'
           maxItems: 2147483647
           minItems: 0
-    TelemetryRequest:
+          type: array
       type: object
+    TelemetryRequest:
       description: Data Transfer Object (DTO) representing a telemetry request
       properties:
         endpoint:
-          type: string
-          format: UTF-8
           description: Telemetry endpoint URL
+          format: UTF-8
           maxLength: 262144
           minLength: 1
-        protocol:
           type: string
-          format: UTF-8
+        protocol:
           description: Protocol used for communication
           enum:
             - HTTP
             - GRPC
+          format: UTF-8
           maxLength: 262144
           minLength: 0
-        provider:
           type: string
-          format: UTF-8
+        provider:
           description: Telemetry provider
           enum:
             - PROMETHEUS
@@ -665,244 +755,232 @@ components:
             - VICTORIAMETRICS
             - AZURE_MONITOR
             - OTEL_COLLECTOR
+          format: UTF-8
           maxLength: 262144
           minLength: 0
+          type: string
+        secret:
+          $ref: '#/components/schemas/SecretDto'
+          description: Single secret associated with the telemetry configuration
         types:
-          type: array
           description: Set of telemetry data types
           items:
-            type: string
             enum:
               - LOGS
               - METRICS
               - TRACES
+            type: string
           maxItems: 2147483647
           minItems: 1
+          type: array
           uniqueItems: true
-        secret:
-          $ref: '#/components/schemas/SecretDto'
-          description: Single secret associated with the telemetry configuration
       required:
         - endpoint
         - protocol
         - provider
         - secret
         - types
-    TelemetryResponse:
       type: object
+    TelemetryResponse:
       description: Data Transfer Object (DTO) representing a telemetry response
       properties:
         telemetry:
           $ref: '#/components/schemas/TelemetryDto'
           description: Telemetry details
-    ListRegistryCredentialDetailsResponse:
       type: object
-      description: Response body containing list of registry credentials
+    ClusterGroup:
       properties:
-        registryCredentials:
-          type: array
-          description: List of registry credentials
-          items:
-            $ref: '#/components/schemas/RegistryCredentialDetailsDto'
-          maxItems: 2147483647
-          minItems: 0
-      required:
-        - registryCredentials
-    AddRegistryCredentialRequest:
-      type: object
-      description: Request body to add a registry credential to an account
-      properties:
-        registryHostname:
-          type: string
-          format: UTF-8
-          description: Registry hostname
-          maxLength: 255
-          minLength: 1
-          pattern: >-
-            (?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z0-9]{2,63}$)
-        secret:
-          $ref: '#/components/schemas/SecretDto'
-          description: >-
-            Registry credential - secret value must be base64 encoded string in
-            username:password format
-        artifactTypes:
-          type: array
-          description: Artifact types that can be retrieved using this credential
+        authorizedNcaIds:
           items:
             type: string
-            enum:
-              - CONTAINER
-              - HELM
-              - MODEL
-              - RESOURCE
           maxItems: 2147483647
-          minItems: 1
-          uniqueItems: true
-        tags:
-          type: array
-          description: Optional set of tags
-          items:
-            type: string
-            pattern: '[a-zA-Z0-9\-_:=]+'
-          maxItems: 64
           minItems: 0
-          uniqueItems: true
-        description:
+          type: array
+        clusters:
+          items:
+            $ref: '#/components/schemas/Cluster'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+        gpus:
+          items:
+            $ref: '#/components/schemas/Gpu'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+        id:
+          format: uuid
+          maxLength: 36
+          minLength: 36
           type: string
-          format: UTF-8
-          description: Optional registry credential description
-          maxLength: 262144
-          minLength: 0
-      required:
-        - artifactTypes
-        - registryHostname
-        - secret
-    RegistryCredentialDetailsResponse:
-      type: object
-      description: Response body for Registry Credential operations
-      properties:
-        registryCredential:
-          $ref: '#/components/schemas/RegistryCredentialDetailsDto'
-          description: Registry credential details
-      required:
-        - registryCredential
-    UpdateRegistryCredentialRequest:
-      type: object
-      description: Request body to update registry credential
-      properties:
-        secret:
-          $ref: '#/components/schemas/SecretDto'
-          description: >-
-            Registry credential - secret value must be base64 encoded string in
-            username:password format
-        artifactTypeEnums:
-          type: array
-          description: Optional artifact types to be added to the existing ones
-          items:
-            type: string
-            enum:
-              - CONTAINER
-              - HELM
-              - MODEL
-              - RESOURCE
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
-    UpdateGpuSpecificationRequest:
-      type: object
-      description: Request to update single function deployment GPU Specification
-      properties:
-        maxInstances:
-          type: integer
-          format: int32
-          description: Maximum number of instances for the deployment
-          maximum: 2147483647
-          minimum: -2147483648
-        minInstances:
-          type: integer
-          format: int32
-          description: Minimum number of instances for the deployment
-          maximum: 2147483647
-          minimum: -2147483648
-        autoscalingConfiguration:
-          $ref: '#/components/schemas/AutoscalingConfigurationDto'
-          description: Customizable Autoscaling configuration
-        autoscalingConfigurationPolicy:
-          type: string
-          format: UTF-8
-          description: >-
-            Autoscaling configuration policy. CUSTOM_CONFIGURATION (default):
-            use the provided autoscalingConfig. PLATFORM_CONFIGURATION: remove
-            custom config and use platform defaults.
-          enum:
-            - CUSTOM_CONFIGURATION
-            - PLATFORM_CONFIGURATION
-          maxLength: 262144
-          minLength: 0
-    UpdateGpuSpecificationResponse:
-      type: object
-      description: Update GPU Specification Response
-      properties:
-        gpuSpecification:
-          $ref: '#/components/schemas/GpuSpecificationDto'
-          description: GPU Specification details
-      required:
-        - gpuSpecification
-    RecognizedRegistriesResponse:
-      type: object
-      description: Response body for recognized registries endpoint
-      properties:
-        recognizedRegistries:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: string
-          description: Recognized registries
-    ClusterGroupsResponse:
-      type: object
-      properties:
-        clusterGroups:
-          type: array
-          items:
-            $ref: '#/components/schemas/ClusterGroup'
-          maxItems: 2147483647
-          minItems: 0
-    SecretDto:
-      type: object
-      description: Data Transfer Object(DTO) representing secret name/value pair
-      properties:
         name:
-          type: string
           format: UTF-8
-          description: Secret name
-          maxLength: 48
-          minLength: 1
-          pattern: ^[a-z0-9A-Z][a-z0-9A-Z\_\.\-]*$
-        value:
-          $ref: '#/components/schemas/JsonNode'
-          description: Secret value must be 1 - 32768 chars long
-      required:
-        - name
-    FunctionDeploymentDto:
-      type: object
-      description: Function deployment response
-      properties:
-        functionId:
-          type: string
-          format: uuid
-          description: Function id
-          maxLength: 36
-          minLength: 36
-        functionVersionId:
-          type: string
-          format: uuid
-          description: Function version id
-          maxLength: 36
-          minLength: 36
-        deploymentId:
-          type: string
-          format: uuid
-          description: Last deployment id
-          maxLength: 36
-          minLength: 36
-        functionName:
-          type: string
-          format: UTF-8
-          description: Function name
           maxLength: 262144
-          minLength: 1
+          minLength: 0
+          type: string
         ncaId:
-          type: string
           format: UTF-8
-          description: NVIDIA Cloud Account Id
           maxLength: 262144
-          minLength: 1
-        functionStatus:
+          minLength: 0
           type: string
+      type: object
+    FunctionDto:
+      description: Data Transfer Object (DTO) representing a function
+      properties:
+        activeInstances:
+          description: List of active instances for this function.
+          items:
+            $ref: '#/components/schemas/InstanceDto'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          nullable: true
+        apiBodyFormat:
+          description: Invocation request body format
+          enum:
+            - PREDICT_V2
+            - CUSTOM
           format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        containerArgs:
+          description: Args used to launch the container
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        containerEnvironment:
+          description: Environment settings used to launch the container
+          items:
+            $ref: '#/components/schemas/ContainerEnvironmentEntryDto'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          nullable: true
+        containerImage:
+          description: Optional custom container
+          format: uri
+          type: string
+          nullable: true
+        createdAt:
+          description: Function creation timestamp
+          format: date-time
+          maxLength: 30
+          minLength: 8
+          type: string
+        description:
+          description: Function/version description
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        functionType:
+          description: Used to indicate a STREAMING function. Defaults to DEFAULT.
+          enum:
+            - DEFAULT
+            - STREAMING
+            - LLM
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        health:
+          $ref: '#/components/schemas/HealthDto'
+          description: Function health configuration
+        healthUri:
+          deprecated: true
+          description: Health endpoint for the container or helmChart. Deprecated, use health.uri instead.
+          format: uri
+          type: string
+        helmChart:
+          description: Optional Helm Chart
+          format: uri
+          type: string
+          nullable: true
+        helmChartServiceName:
+          description: |
+            Helm Chart Service Name specified only when helmChart property is specified
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        id:
+          description: Unique function id
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+        inferencePort:
+          description: Optional port number where the inference listener is running - defaults to 8000 for Triton
+          format: int32
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          nullable: true
+        inferenceUrl:
+          description: Entrypoint for invoking the container to process requests
+          format: uri
+          type: string
+          nullable: true
+        llmInvocationConfig:
+          $ref: '#/components/schemas/LlmInvocationConfigDto'
+          description: Optional function-level LLM invocation configuration.
+        models:
+          description: Optional list of models
+          items:
+            $ref: '#/components/schemas/FunctionModelDto'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          nullable: true
+        name:
+          description: Function name
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        ownedByDifferentAccount:
+          description: |
+            Indicates whether the function is owned by another account. If the account
+             that is being used to lookup functions happens to be authorized to invoke/list
+             this function which is owned by a different account, then this field is set
+             to true and ncaId will contain the id of the account that owns the function.
+             Otherwise, this field is not set as it defaults to false.
+          type: boolean
+          nullable: true
+        rateLimit:
+          $ref: '#/components/schemas/RateLimitDto'
+          description: Optional rate limit policy
+        resources:
+          description: Optional set of resources.
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+        secrets:
+          description: Optional secret names
+          items:
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+        status:
           description: Function status
           enum:
             - ACTIVE
@@ -912,37 +990,114 @@ components:
             - DELETED
             - DEGRADED
             - DEGRADING
+          format: UTF-8
           maxLength: 262144
           minLength: 0
-        healthInfo:
-          type: array
-          description: >
-            Health info for a deployment specification is included only if there
-            are any
-             issues/errors.
+          type: string
+        tags:
+          description: Optional set of tags. Maximum allowed number of tags per function is 64. Maximum length of each tag is 128 chars.
           items:
-            $ref: '#/components/schemas/DeploymentHealthDto'
+            type: string
           maxItems: 2147483647
           minItems: 0
-        deploymentSpecifications:
           type: array
+          uniqueItems: true
+          nullable: true
+        telemetries:
+          $ref: '#/components/schemas/TelemetriesDto'
+          description: Optional telemetry configuration for the function
+        versionId:
+          description: Unique function version id
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+      required:
+        - createdAt
+        - functionType
+        - healthUri
+        - id
+        - name
+        - ncaId
+        - status
+        - versionId
+      type: object
+    FunctionDeploymentDto:
+      description: Function deployment response
+      properties:
+        createdAt:
+          description: Function deployment creation timestamp
+          format: date-time
+          maxLength: 30
+          minLength: 8
+          type: string
+        deploymentId:
+          description: Last deployment id
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+        deploymentSpecifications:
           description: Function deployment details
           items:
             $ref: '#/components/schemas/GpuSpecificationDto'
           maxItems: 2147483647
           minItems: 0
-        createdAt:
+          type: array
+        functionId:
+          description: Function id
+          format: uuid
+          maxLength: 36
+          minLength: 36
           type: string
-          format: date-time
-          description: Function deployment creation timestamp
-          maxLength: 30
-          minLength: 8
+        functionName:
+          description: Function name
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        functionStatus:
+          description: Function status
+          enum:
+            - ACTIVE
+            - DEPLOYING
+            - ERROR
+            - INACTIVE
+            - DELETED
+            - DEGRADED
+            - DEGRADING
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        functionVersionId:
+          description: Function version id
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+        healthInfo:
+          description: |
+            Health info for a deployment specification is included only if there are any
+             issues/errors.
+          items:
+            $ref: '#/components/schemas/DeploymentHealthDto'
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          nullable: true
         lastUpdatedAt:
-          type: string
-          format: date-time
           description: Function deployment modification timestamp
+          format: date-time
           maxLength: 30
           minLength: 8
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
       required:
         - createdAt
         - deploymentId
@@ -953,448 +1108,386 @@ components:
         - functionVersionId
         - lastUpdatedAt
         - ncaId
-    UpdateGpuSpecificationDto:
       type: object
-      description: >-
-        Data Transfer Object (DTO) representing GPU specification for Deployment
-        Update case.
-      properties:
-        gpuSpecificationId:
-          type: string
-          format: uuid
-          description: GPU specification id
-          maxLength: 36
-          minLength: 36
-        gpu:
-          type: string
-          format: UTF-8
-          description: >-
-            GPU name from the cluster. Deprecated: this is read-only field,
-            should not be specified in update request.
-          maxLength: 262144
-          minLength: 0
-        backend:
-          type: string
-          format: UTF-8
-          description: >
-            Backend/CSP where the GPU powered instance has been launched. The
-            original value
-
-            would not be updated and it should be the same as original. The
-            field is required
-
-            only for validation.
-          maxLength: 262144
-          minLength: 0
-        clusters:
-          type: array
-          description: >
-            Specific clusters within instance or worker node powered by the
-            selected
-
-            instance-type to deploy function. The original value would not be
-            updated and it
-
-            should be the same as original. The field is required only for
-            validation.
-          items:
-            type: string
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
-        maxInstances:
-          type: integer
-          format: int32
-          description: Maximum number of instances for the deployment
-          maximum: 2147483647
-          minimum: -2147483648
-        minInstances:
-          type: integer
-          format: int32
-          description: Minimum number of instances for the deployment
-          maximum: 2147483647
-          minimum: -2147483648
-        instanceType:
-          type: string
-          format: UTF-8
-          description: >-
-            Instance type, based on GPU, assigned to a Worker. Deprecated: this
-            is read-only field, should not be specified in update request.
-          maxLength: 262144
-          minLength: 0
-        maxRequestConcurrency:
-          type: integer
-          format: int32
-          description: Max request concurrency between 1 (default) and 16384.
-          maximum: 16384
-          minimum: 1
-      required:
-        - maxInstances
-        - minInstances
     GpuSpecificationDto:
-      type: object
       description: Data Transfer Object(DTO) representing GPU specification.
       properties:
-        gpuSpecificationId:
-          type: string
-          format: uuid
-          description: GPU specification id
-          maxLength: 36
-          minLength: 36
-        gpu:
-          type: string
-          format: UTF-8
-          description: GPU name from the cluster
-          maxLength: 262144
-          minLength: 1
-        backend:
-          type: string
-          format: UTF-8
-          description: >-
-            Use clusters instead of this property. Legacy property typically
-            used when deploying a function to GFN.
-          maxLength: 262144
-          minLength: 0
-        maxInstances:
-          type: integer
-          format: int32
-          description: Maximum number of instances for the deployment
-          maximum: 2147483647
-          minimum: -2147483648
-        minInstances:
-          type: integer
-          format: int32
-          description: Minimum number of instances for the deployment
-          maximum: 2147483647
-          minimum: -2147483648
-        instanceType:
-          type: string
-          format: UTF-8
-          description: Instance type, based on GPU, assigned to a Worker
-          maxLength: 262144
-          minLength: 1
-        availabilityZones:
-          type: array
-          description: List of availability-zones(or clusters) in the cluster group
-          items:
-            type: string
-          maxItems: 2147483647
-          minItems: 0
-        maxRequestConcurrency:
-          type: integer
-          format: int32
-          description: Max request concurrency between 1 (default) and 16384.
-          maximum: 16384
-          minimum: 1
-        configuration:
-          type: object
-          description: >
-            Typically used when the function is based on Helm Charts to
-            substitute
-             placeholders in values yaml.
-        clusters:
-          type: array
-          description: >
-            Specific clusters powered by the selected instance-type to deploy
-            function.
-          items:
-            type: string
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
-        regions:
-          type: array
-          description: >
-            List of regions allowed to deploy. The instance or worker node will
-            be in one of
-
-            the specified geographical regions.
-          items:
-            type: string
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
         attributes:
-          type: array
-          description: >
-            Specific cluster attributes/capabilities to deploy functions. For
-            example,
-
+          description: |
+            Specific cluster attributes/capabilities to deploy functions. For example,
             HIPPA Compliant, Confidential Compute Compliant, etc.
           items:
             type: string
           maxItems: 2147483647
           minItems: 0
+          type: array
           uniqueItems: true
-        cpuArch:
-          type: string
-          format: UTF-8
-          description: CPU Architecture details
-          maxLength: 262144
-          minLength: 0
-        os:
-          type: string
-          format: UTF-8
-          description: Operating System details
-          maxLength: 262144
-          minLength: 0
-        driverVersion:
-          type: string
-          format: UTF-8
-          description: GPU driver version
-          maxLength: 262144
-          minLength: 0
-        storage:
-          type: string
-          format: UTF-8
-          description: Amount of available storage, e.g. 80G
-          maxLength: 262144
-          minLength: 0
-        systemMemory:
-          type: string
-          format: UTF-8
-          description: Amount of RAM
-          maxLength: 262144
-          minLength: 0
-        gpuMemory:
-          type: string
-          format: UTF-8
-          description: Amount of GPU memory
-          maxLength: 262144
-          minLength: 0
+          nullable: true
         autoscalingConfiguration:
           $ref: '#/components/schemas/AutoscalingConfigurationDto'
           description: Customizable autoscaling configuration
+        availabilityZones:
+          description: List of availability-zones(or clusters) in the cluster group
+          items:
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          nullable: true
+        backend:
+          description: Use clusters instead of this property. Legacy property typically used when deploying a function to GFN.
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        clusters:
+          description: |
+            Specific clusters powered by the selected instance-type to deploy function.
+          items:
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+        configuration:
+          additionalProperties: true
+          description: |
+            Typically used when the function is based on Helm Charts to substitute
+             placeholders in values yaml.
+          type: object
+        cpuArch:
+          description: CPU Architecture details
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        driverVersion:
+          description: GPU driver version
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        gpu:
+          description: GPU name from the cluster
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        gpuMemory:
+          description: Amount of GPU memory
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        gpuSpecificationId:
+          description: GPU specification id
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+          nullable: true
         helmValidationPolicy:
           $ref: '#/components/schemas/HelmValidationPolicyDto'
           description: Helm validation policy
+        instanceType:
+          description: Instance type, based on GPU, assigned to a Worker
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        maxInstances:
+          description: Maximum number of instances for the deployment
+          format: int32
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+        maxRequestConcurrency:
+          description: Max request concurrency between 1 (default) and 16384.
+          format: int32
+          maximum: 16384
+          minimum: 1
+          type: integer
+          nullable: true
+        minInstances:
+          description: Minimum number of instances for the deployment
+          format: int32
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+        os:
+          description: Operating System details
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        regions:
+          description: |
+            List of regions allowed to deploy. The instance or worker node will be in one of
+            the specified geographical regions.
+          items:
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+        storage:
+          description: Amount of available storage, e.g. 80G
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        systemMemory:
+          description: Amount of RAM
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
       required:
         - gpu
         - instanceType
         - maxInstances
         - minInstances
-    FunctionDto:
       type: object
-      description: Data Transfer Object (DTO) representing a function
+    UpdateGpuSpecificationDto:
+      description: Data Transfer Object (DTO) representing GPU specification for Deployment Update case.
       properties:
-        id:
+        backend:
+          description: |
+            Backend/CSP where the GPU powered instance has been launched. The original value
+            would not be updated and it should be the same as original. The field is required
+            only for validation.
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
           type: string
+          nullable: true
+        clusters:
+          description: |
+            Specific clusters within instance or worker node powered by the selected
+            instance-type to deploy function. The original value would not be updated and it
+            should be the same as original. The field is required only for validation.
+          items:
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+        gpu:
+          description: 'GPU name from the cluster. Deprecated: this is read-only field, should not be specified in update request.'
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        gpuSpecificationId:
+          description: GPU specification id
           format: uuid
-          description: Unique function id
           maxLength: 36
           minLength: 36
-        ncaId:
           type: string
+          nullable: true
+        instanceType:
+          description: 'Instance type, based on GPU, assigned to a Worker. Deprecated: this is read-only field, should not be specified in update request.'
           format: UTF-8
-          description: NVIDIA Cloud Account Id
           maxLength: 262144
           minLength: 0
-        versionId:
           type: string
-          format: uuid
-          description: Unique function version id
-          maxLength: 36
-          minLength: 36
-        name:
-          type: string
-          format: UTF-8
-          description: Function name
-          maxLength: 262144
-          minLength: 0
-        status:
-          type: string
-          format: UTF-8
-          description: Function status
-          enum:
-            - ACTIVE
-            - DEPLOYING
-            - ERROR
-            - INACTIVE
-            - DELETED
-            - DEGRADED
-            - DEGRADING
-          maxLength: 262144
-          minLength: 0
-        inferenceUrl:
-          type: string
-          format: uri
-          description: Entrypoint for invoking the container to process requests
-        ownedByDifferentAccount:
-          type: boolean
-          description: >
-            Indicates whether the function is owned by another account. If the
-            account
-             that is being used to lookup functions happens to be authorized to invoke/list
-             this function which is owned by a different account, then this field is set
-             to true and ncaId will contain the id of the account that owns the function.
-             Otherwise, this field is not set as it defaults to false.
-        inferencePort:
-          type: integer
+          nullable: true
+        maxInstances:
+          description: Maximum number of instances for the deployment
           format: int32
-          description: >-
-            Optional port number where the inference listener is running -
-            defaults to 8000 for Triton
           maximum: 2147483647
-          minimum: -2147483648
-        containerArgs:
-          type: string
-          format: UTF-8
-          description: Args used to launch the container
-          maxLength: 262144
-          minLength: 0
-        containerEnvironment:
-          type: array
-          description: Environment settings used to launch the container
+          minimum: 0
+          type: integer
+        maxRequestConcurrency:
+          description: Max request concurrency between 1 (default) and 16384.
+          format: int32
+          maximum: 16384
+          minimum: 1
+          type: integer
+          nullable: true
+        minInstances:
+          description: Minimum number of instances for the deployment
+          format: int32
+          maximum: 2147483647
+          minimum: 0
+          type: integer
+      required:
+        - maxInstances
+        - minInstances
+      type: object
+    AutoscalingConfigurationDto:
+      description: Data Transfer Object(DTO) representing autoscaling configuration
+      properties:
+        scaleDownDetails:
+          $ref: '#/components/schemas/ScalingDetails'
+          description: Configuration for scaling down
+        scaleUpDetails:
+          $ref: '#/components/schemas/ScalingDetails'
+          description: Configuration for scaling up
+      type: object
+    RegistryCredentialDetailsDto:
+      description: DTO representing a registry credential
+      properties:
+        artifactTypes:
+          description: Registry type
           items:
-            $ref: '#/components/schemas/ContainerEnvironmentEntryDto'
+            enum:
+              - CONTAINER
+              - HELM
+              - MODEL
+              - RESOURCE
+            type: string
           maxItems: 2147483647
-          minItems: 0
-        models:
+          minItems: 1
           type: array
-          description: Optional list of models
-          items:
-            $ref: '#/components/schemas/FunctionModelDto'
-          maxItems: 2147483647
-          minItems: 0
-        containerImage:
-          type: string
-          format: uri
-          description: Optional custom container
-        apiBodyFormat:
-          type: string
-          format: UTF-8
-          description: Invocation request body format
-          enum:
-            - PREDICT_V2
-            - CUSTOM
-          maxLength: 262144
-          minLength: 0
-        helmChart:
-          type: string
-          format: uri
-          description: Optional Helm Chart
-        helmChartServiceName:
-          type: string
-          format: UTF-8
-          description: >
-            Helm Chart Service Name specified only when helmChart property is
-            specified
-          maxLength: 262144
-          minLength: 0
-        healthUri:
-          type: string
-          format: uri
-          deprecated: true
-          description: >-
-            Health endpoint for the container or helmChart. Deprecated, use
-            health.uri instead.
+          uniqueItems: true
         createdAt:
-          type: string
+          description: Timestamp for registry credential creation
           format: date-time
-          description: Function creation timestamp
           maxLength: 30
           minLength: 8
-        activeInstances:
-          type: array
-          description: List of active instances for this function.
-          items:
-            $ref: '#/components/schemas/InstanceDto'
-          maxItems: 2147483647
-          minItems: 0
-        resources:
-          type: array
-          description: Optional set of resources.
-          items:
-            $ref: '#/components/schemas/ArtifactDto'
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
-        tags:
-          type: array
-          description: >-
-            Optional set of tags. Maximum allowed number of tags per function is
-            64. Maximum length of each tag is 128 chars.
-          items:
-            type: string
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
+          type: string
         description:
-          type: string
+          description: Registry credential description
           format: UTF-8
-          description: Function/version description
           maxLength: 262144
           minLength: 0
-        health:
-          $ref: '#/components/schemas/HealthDto'
-          description: Function health configuration
-        functionType:
           type: string
+          nullable: true
+        keyType:
+          description: Optional registry credential key type
           format: UTF-8
-          description: Used to indicate a STREAMING function. Defaults to DEFAULT.
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        lastUpdatedAt:
+          description: Timestamp for last registry credential update
+          format: date-time
+          maxLength: 30
+          minLength: 8
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id owning the Registry Credential
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        provisionedBy:
+          description: Registry credential provisioned by system or user
           enum:
-            - DEFAULT
-            - STREAMING
-            - LLM
+            - SYSTEM
+            - USER
+          format: UTF-8
           maxLength: 262144
           minLength: 0
-        secrets:
-          type: array
-          description: Optional secret names
-          items:
-            type: string
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
-        rateLimit:
-          $ref: '#/components/schemas/RateLimitDto'
-          description: Optional rate limit policy
-        telemetries:
-          $ref: '#/components/schemas/TelemetriesDto'
-          description: Optional telemetry configuration for the function
-      required:
-        - createdAt
-        - functionType
-        - healthUri
-        - id
-        - name
-        - ncaId
-        - status
-        - versionId
-    TelemetryDto:
-      type: object
-      description: Data Transfer Object (DTO) for Telemetry configurations
-      properties:
-        telemetryId:
           type: string
+        registryCredentialId:
+          description: Registry Credential Id
           format: uuid
-          description: Unique telemetry ID
           maxLength: 36
           minLength: 36
+          type: string
+        registryCredentialName:
+          description: Registry Credential name
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        registryHostname:
+          description: Registry hostname
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        registryName:
+          description: Recognized registry name
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        tags:
+          description: Optional set of tags
+          items:
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
+          uniqueItems: true
+          nullable: true
+      required:
+        - artifactTypes
+        - createdAt
+        - lastUpdatedAt
+        - ncaId
+        - provisionedBy
+        - registryCredentialId
+        - registryCredentialName
+        - registryHostname
+        - registryName
+      type: object
+    SecretDto:
+      description: Data Transfer Object(DTO) representing secret name/value pair
+      properties:
         name:
-          type: string
+          description: Secret name
           format: UTF-8
-          description: Telemetry name
-          maxLength: 262144
+          maxLength: 48
           minLength: 1
+          pattern: ^[a-z0-9A-Z][a-z0-9A-Z\_\.\-]*$
+          type: string
+        value:
+          description: Secret value must be a string or JSON object and 1 - 32768 chars long
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+      required:
+        - name
+        - value
+      type: object
+    TelemetryDto:
+      description: Data Transfer Object (DTO) for Telemetry configurations
+      properties:
+        createdAt:
+          description: Telemetry creation timestamp
+          format: date-time
+          maxLength: 30
+          minLength: 8
+          type: string
         endpoint:
-          type: string
-          format: UTF-8
           description: URL for the telemetry endpoint
+          format: UTF-8
           maxLength: 262144
           minLength: 1
-        protocol:
           type: string
+        name:
+          description: Telemetry name
           format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        protocol:
           description: Protocol used for communication
           enum:
             - HTTP
             - GRPC
+          format: UTF-8
           maxLength: 262144
           minLength: 0
-        provider:
           type: string
-          format: UTF-8
+        provider:
           description: Telemetry provider
           enum:
             - PROMETHEUS
@@ -1408,26 +1501,28 @@ components:
             - VICTORIAMETRICS
             - AZURE_MONITOR
             - OTEL_COLLECTOR
+          format: UTF-8
           maxLength: 262144
           minLength: 0
+          type: string
+        telemetryId:
+          description: Unique telemetry ID
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
         types:
-          type: array
           description: Set of telemetry data types
           items:
-            type: string
             enum:
               - LOGS
               - METRICS
               - TRACES
+            type: string
           maxItems: 2147483647
           minItems: 1
+          type: array
           uniqueItems: true
-        createdAt:
-          type: string
-          format: date-time
-          description: Telemetry creation timestamp
-          maxLength: 30
-          minLength: 8
       required:
         - createdAt
         - endpoint
@@ -1436,291 +1531,85 @@ components:
         - provider
         - telemetryId
         - types
-    RegistryCredentialDetailsDto:
       type: object
-      description: DTO representing a registry credential
-      properties:
-        registryCredentialId:
-          type: string
-          format: uuid
-          description: Registry Credential Id
-          maxLength: 36
-          minLength: 36
-        ncaId:
-          type: string
-          format: UTF-8
-          description: NVIDIA Cloud Account Id owning the Registry Credential
-          maxLength: 262144
-          minLength: 1
-        registryCredentialName:
-          type: string
-          format: UTF-8
-          description: Registry Credential name
-          maxLength: 262144
-          minLength: 1
-        registryName:
-          type: string
-          format: UTF-8
-          description: Recognized registry name
-          maxLength: 262144
-          minLength: 1
-        registryHostname:
-          type: string
-          format: UTF-8
-          description: Registry hostname
-          maxLength: 262144
-          minLength: 1
-        artifactTypes:
-          type: array
-          description: Registry type
-          items:
-            type: string
-            enum:
-              - CONTAINER
-              - HELM
-              - MODEL
-              - RESOURCE
-          maxItems: 2147483647
-          minItems: 1
-          uniqueItems: true
-        tags:
-          type: array
-          description: Optional set of tags
-          items:
-            type: string
-          maxItems: 2147483647
-          minItems: 0
-          uniqueItems: true
-        description:
-          type: string
-          format: UTF-8
-          description: Registry credential description
-          maxLength: 262144
-          minLength: 0
-        provisionedBy:
-          type: string
-          format: UTF-8
-          description: Registry credential provisioned by system or user
-          enum:
-            - SYSTEM
-            - USER
-          maxLength: 262144
-          minLength: 0
-        lastUpdatedAt:
-          type: string
-          format: date-time
-          description: Timestamp for last registry credential update
-          maxLength: 30
-          minLength: 8
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp for registry credential creation
-          maxLength: 30
-          minLength: 8
-      required:
-        - artifactTypes
-        - createdAt
-        - lastUpdatedAt
-        - ncaId
-        - provisionedBy
-        - registryCredentialId
-        - registryCredentialName
-        - registryHostname
-        - registryName
-    AutoscalingConfigurationDto:
-      type: object
-      description: Data Transfer Object(DTO) representing autoscaling configuration
-      properties:
-        scaleUpDetails:
-          $ref: '#/components/schemas/ScalingDetails'
-          description: Configuration for scaling up
-        scaleDownDetails:
-          $ref: '#/components/schemas/ScalingDetails'
-          description: Configuration for scaling down
-    ClusterGroup:
-      type: object
+    Cluster:
       properties:
         id:
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
           type: string
-          format: uuid
-          maxLength: 36
-          minLength: 36
+        k8sVersion:
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
         name:
-          type: string
           format: UTF-8
           maxLength: 262144
           minLength: 0
-        ncaId:
           type: string
-          format: UTF-8
-          maxLength: 262144
-          minLength: 0
-        authorizedNcaIds:
-          type: array
+      type: object
+    Gpu:
+      properties:
+        instanceTypes:
           items:
-            type: string
+            $ref: '#/components/schemas/InstanceType'
           maxItems: 2147483647
           minItems: 0
-        gpus:
           type: array
-          items:
-            $ref: '#/components/schemas/Gpu'
-          maxItems: 2147483647
-          minItems: 0
-        clusters:
-          type: array
-          items:
-            $ref: '#/components/schemas/Cluster'
-          maxItems: 2147483647
-          minItems: 0
-    JsonNode: {}
-    DeploymentHealthDto:
-      type: object
-      description: Data Transfer Object(DTO) representing deployment error
-      properties:
-        icmsRequestId:
-          type: string
-          format: uuid
-          description: ICMS Request ID
-          maxLength: 36
-          minLength: 36
-        gpu:
-          type: string
-          format: UTF-8
-          description: GPU Type as per SDD
-          maxLength: 262144
-          minLength: 1
-        backend:
-          type: string
-          format: UTF-8
-          description: Backend/CSP where the GPU powered instance will be launched
-          maxLength: 262144
-          minLength: 1
-        instanceType:
-          type: string
-          format: UTF-8
-          description: Instance type
-          maxLength: 262144
-          minLength: 0
-        error:
-          type: string
-          format: UTF-8
-          description: Deployment error
-          maxLength: 262144
-          minLength: 1
-      required:
-        - backend
-        - error
-        - gpu
-        - icmsRequestId
-    HelmValidationPolicyDto:
-      type: object
-      description: Data Transfer Object(DTO) representing Helm validation policy
-      properties:
         name:
-          type: string
           format: UTF-8
-          description: Helm validation policy name.
-          enum:
-            - Default
-            - Unrestricted
           maxLength: 262144
           minLength: 0
-        extraKubernetesTypes:
-          type: array
-          description: >
-            An API Group in Kubernetes is a collection of related functionality.
-
-            When present, must contain at least one entry; each entry must be a
-            valid
-
-            KubernetesType (group, version, kind).
-          items:
-            $ref: '#/components/schemas/KubernetesType'
-          maxItems: 2147483647
-          minItems: 1
-      required:
-        - name
-    ContainerEnvironmentEntryDto:
+          type: string
       type: object
-      description: Data Transfer Object(DTO) representing a container environment entry
-      properties:
-        key:
-          type: string
-          format: UTF-8
-          description: Container environment key
-          maxLength: 262144
-          minLength: 0
-        value:
-          type: string
-          format: UTF-8
-          description: Container environment value
-          maxLength: 262144
-          minLength: 0
-      required:
-        - key
-        - value
-    FunctionModelDto:
-      type: object
-      description: >-
-        Model associated with a function, including optional LLM routing
-        metadata
-      properties:
-        name:
-          type: string
-          format: UTF-8
-          description: Model name
-          maxLength: 262144
-          minLength: 0
-        version:
-          type: string
-          format: UTF-8
-          description: Model version. Optional for LLM-type functions.
-          maxLength: 262144
-          minLength: 0
-        uri:
-          type: string
-          format: uri
-          description: Model URI. Optional for LLM-type functions.
-        llmConfig:
-          $ref: '#/components/schemas/LlmConfigDto'
-          description: >-
-            LLM-specific configuration for this model. Only relevant for
-            LLM-type functions.
-      required:
-        - name
     InstanceDto:
-      type: object
       description: Data Transfer Object(DTO) representing an instance
       properties:
-        instanceId:
-          type: string
+        backend:
+          description: Backend where the instance is running
           format: UTF-8
-          description: Unique id of the instance
           maxLength: 262144
           minLength: 0
+          type: string
         functionId:
-          type: string
-          format: uuid
           description: Function executing on the instance
-          maxLength: 36
-          minLength: 36
-        functionVersionId:
-          type: string
           format: uuid
-          description: Function version executing on the instance
           maxLength: 36
           minLength: 36
-        instanceType:
           type: string
+        functionVersionId:
+          description: Function version executing on the instance
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+        gpu:
+          description: GPU name powering the instance
           format: UTF-8
-          description: GPU instance-type powering the instance
           maxLength: 262144
           minLength: 0
-        instanceStatus:
           type: string
+        icmsRequestId:
+          description: ICMS request-id used to launch this instance
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+        instanceCreatedAt:
+          description: Instance creation timestamp
+          format: date-time
+          maxLength: 30
+          minLength: 8
+          type: string
+        instanceId:
+          description: Unique id of the instance
           format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        instanceStatus:
           description: Instance status
           enum:
             - ACTIVE
@@ -1730,330 +1619,416 @@ components:
             - PREEMPTED
             - DELETED
             - TERMINATED
-          maxLength: 262144
-          minLength: 0
-        icmsRequestId:
-          type: string
-          format: uuid
-          description: ICMS request-id used to launch this instance
-          maxLength: 36
-          minLength: 36
-        ncaId:
-          type: string
           format: UTF-8
-          description: >-
-            NVIDIA Cloud Account Id that owns the function running on the
-            instance
           maxLength: 262144
           minLength: 0
-        gpu:
           type: string
+        instanceType:
+          description: GPU instance-type powering the instance
           format: UTF-8
-          description: GPU name powering the instance
           maxLength: 262144
           minLength: 0
-        backend:
           type: string
-          format: UTF-8
-          description: Backend where the instance is running
-          maxLength: 262144
-          minLength: 0
-        location:
-          type: string
-          format: UTF-8
-          description: Location such as zone name or region where the instance is running
-          maxLength: 262144
-          minLength: 0
-        instanceCreatedAt:
-          type: string
-          format: date-time
-          description: Instance creation timestamp
-          maxLength: 30
-          minLength: 8
         instanceUpdatedAt:
-          type: string
-          format: date-time
           description: Instance's last updated timestamp
+          format: date-time
           maxLength: 30
           minLength: 8
-    ArtifactDto:
+          type: string
+        location:
+          description: Location such as zone name or region where the instance is running
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id that owns the function running on the instance
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
       type: object
-      description: Data Transfer Object(DTO) representing an artifact
+    ContainerEnvironmentEntryDto:
+      description: Data Transfer Object(DTO) representing a container environment entry
       properties:
-        name:
-          type: string
+        key:
+          description: Container environment key
           format: UTF-8
-          description: Artifact name
           maxLength: 262144
           minLength: 0
-        version:
           type: string
+        value:
+          description: Container environment value
           format: UTF-8
-          description: Artifact version
           maxLength: 262144
           minLength: 0
-        uri:
           type: string
-          format: uri
-          description: Artifact URI
       required:
-        - name
-        - uri
-        - version
-    HealthDto:
+        - key
+        - value
       type: object
-      description: Data Transfer Object(DTO) representing a function ne
+    HealthDto:
+      description: Data Transfer Object(DTO) representing a function's health configuration
       properties:
+        expectedStatusCode:
+          description: Expected return status code considered as successful.
+          format: int32
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+        port:
+          description: Port number where the health listener is running
+          format: int32
+          maximum: 2147483647
+          minimum: 0
+          type: integer
         protocol:
-          type: string
-          format: UTF-8
           description: HTTP/gPRC protocol type for health endpoint
           enum:
             - HTTP
             - gRPC
+          format: UTF-8
           maxLength: 262144
           minLength: 0
-        uri:
           type: string
-          format: uri
-          description: Health endpoint for the container or the helmChart
-        port:
-          type: integer
-          format: int32
-          description: Port number where the health listener is running
-          maximum: 2147483647
-          minimum: -2147483648
         timeout:
-          type: string
-          format: duration
           description: ISO 8601 duration string in PnDTnHnMn.nS format
           example: PT10S
-        expectedStatusCode:
-          type: integer
-          format: int32
-          description: Expected return status code considered as successful.
-          maximum: 2147483647
-          minimum: -2147483648
+          format: duration
+          type: string
+        uri:
+          description: Health endpoint for the container or the helmChart
+          format: uri
+          type: string
       required:
         - expectedStatusCode
         - port
         - protocol
         - timeout
         - uri
-    RateLimitDto:
       type: object
-      description: Data Transfer Object(DTO) representing Rate limit config
+    LlmInvocationConfigDto:
+      description: Function-level LLM invocation configuration.
       properties:
-        rateLimit:
-          type: string
+        priority:
+          $ref: '#/components/schemas/PriorityDto'
+          description: Function-level request priority configuration.
+      type: object
+    FunctionModelDto:
+      description: Model associated with a function, including optional LLM routing metadata
+      properties:
+        llmConfig:
+          $ref: '#/components/schemas/LlmConfigDto'
+          description: LLM-specific configuration for this model. Only relevant for LLM-type functions.
+        name:
+          description: Model name
           format: UTF-8
-          description: Rate
           maxLength: 262144
           minLength: 0
-          pattern: ^(?!.*-([SMHD]).*-\1)[1-9]\d*-[SMHD](,\s*[1-9]\d*-[SMHD])*$
+          type: string
+        uri:
+          description: Model URI. Optional for LLM-type functions.
+          format: uri
+          type: string
+          nullable: true
+        version:
+          description: Model version. Optional for LLM-type functions.
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+      required:
+        - name
+      type: object
+    RateLimitDto:
+      description: Data Transfer Object(DTO) representing Rate limit config
+      properties:
         exemptedNcaIds:
-          type: array
           description: NCA ID Exemptions
           items:
             type: string
           maxItems: 32
           minItems: 0
+          type: array
           uniqueItems: true
+          nullable: true
         perNcaIdRate:
-          type: object
           additionalProperties:
             type: string
           description: Per NCA ID Rate
-        syncCheck:
-          type: boolean
-          description: Sync check. Defaults to false
+          type: object
+          nullable: true
         perUserRate:
-          type: string
+          description: Per-user rate, intended for traffic authenticated with an invocation delegation token (InvocationToken). When set, this single rate is enforced individually against every unique caller identity, in addition to the NCA-tier limit.
           format: UTF-8
-          description: >-
-            Per-user rate, intended for traffic authenticated with an invocation
-            delegation token (InvocationToken). When set, this single rate is
-            enforced individually against every unique caller identity, in
-            addition to the NCA-tier limit.
           maxLength: 262144
           minLength: 0
           pattern: ^(?!.*-([SMHD]).*-\1)[1-9]\d*-[SMHD](,\s*[1-9]\d*-[SMHD])*$
-    TelemetriesDto:
+          type: string
+          nullable: true
+        rateLimit:
+          description: Rate
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          pattern: ^(?!.*-([SMHD]).*-\1)[1-9]\d*-[SMHD](,\s*[1-9]\d*-[SMHD])*$
+          type: string
+          nullable: true
+        syncCheck:
+          description: Sync check. Defaults to false
+          type: boolean
+          nullable: true
       type: object
+    ArtifactDto:
+      description: Data Transfer Object(DTO) representing an artifact
+      properties:
+        name:
+          description: Artifact name
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+        uri:
+          description: Artifact URI
+          format: uri
+          type: string
+        version:
+          description: Artifact version
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+      required:
+        - name
+        - uri
+        - version
+      type: object
+    TelemetriesDto:
       description: Telemetry configuration for logs, metrics, and traces.
       properties:
         logsTelemetryId:
-          type: string
-          format: uuid
           description: UUID representing the logs telemetry.
+          format: uuid
           maxLength: 36
           minLength: 36
+          type: string
+          nullable: true
         metricsTelemetryId:
-          type: string
-          format: uuid
           description: UUID representing the metrics telemetry.
-          maxLength: 36
-          minLength: 36
-        tracesTelemetryId:
-          type: string
           format: uuid
-          description: UUID representing the traces telemetry.
           maxLength: 36
           minLength: 36
-    ScalingDetails:
-      type: object
-      properties:
-        metric:
           type: string
+          nullable: true
+        tracesTelemetryId:
+          description: UUID representing the traces telemetry.
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+          nullable: true
+      type: object
+    DeploymentHealthDto:
+      description: Data Transfer Object(DTO) representing deployment error
+      properties:
+        backend:
+          description: Backend/CSP where the GPU powered instance will be launched
           format: UTF-8
-          description: Scaling metric
+          maxLength: 262144
+          minLength: 1
+          type: string
+        error:
+          description: Deployment error
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        gpu:
+          description: GPU Type as per SDD
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        icmsRequestId:
+          description: ICMS Request ID
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          type: string
+        instanceType:
+          description: Instance type
+          format: UTF-8
           maxLength: 262144
           minLength: 0
+          type: string
+          nullable: true
+      required:
+        - backend
+        - error
+        - gpu
+        - icmsRequestId
+      type: object
+    HelmValidationPolicyDto:
+      description: Data Transfer Object(DTO) representing Helm validation policy
+      properties:
+        extraKubernetesTypes:
+          description: |
+            An API Group in Kubernetes is a collection of related functionality.
+            When present, must contain at least one entry; each entry must be a valid
+            KubernetesType (group, version, kind).
+          items:
+            $ref: '#/components/schemas/KubernetesType'
+          maxItems: 2147483647
+          minItems: 1
+          type: array
+          nullable: true
+        name:
+          description: Helm validation policy name.
+          enum:
+            - Default
+            - Unrestricted
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+      required:
+        - name
+      type: object
+    ScalingDetails:
+      properties:
         factor:
-          type: number
+          description: Scaling factor must be greater-than 1.0 for scale up and less-than 1.0 for scale down. This factor is used to multiply the currentinstance count when specified threshold is met.
           format: float
-          description: >-
-            Scaling factor must be greater-than 1.0 for scale up and less-than
-            1.0 for scale down. This factor is used to multiply the
-            currentinstance count when specified threshold is met.
-        threshold:
-          type: integer
-          format: int32
-          description: >-
-            Scaling threshold (0-100) as a percentage of utilizationupon which
-            the number of current instances are multiplied with thespecified
-            factor.
-          maximum: 2147483647
-          minimum: -2147483648
+          minimum: 0
+          type: number
+        metric:
+          description: Scaling metric
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
         stickiness:
           $ref: '#/components/schemas/StickinessWindow'
           description: Stickiness window configuration
+        threshold:
+          description: Scaling threshold (0-100) as a percentage of utilizationupon which the number of current instances are multiplied with thespecified factor.
+          format: int32
+          maximum: 100
+          minimum: 0
+          type: integer
       required:
         - factor
         - threshold
-    Gpu:
       type: object
+    InstanceType:
       properties:
+        default:
+          type: boolean
+        description:
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
         name:
-          type: string
           format: UTF-8
           maxLength: 262144
           minLength: 0
-        instanceTypes:
-          type: array
-          items:
-            $ref: '#/components/schemas/InstanceType'
-          maxItems: 2147483647
-          minItems: 0
-    Cluster:
+          type: string
       type: object
+    PriorityDto:
+      description: Function-level request priority. Lower value is higher priority, 0 is highest.
       properties:
-        k8sVersion:
-          type: string
-          format: UTF-8
-          maxLength: 262144
-          minLength: 0
-        id:
-          type: string
-          format: UTF-8
-          maxLength: 262144
-          minLength: 0
-        name:
-          type: string
-          format: UTF-8
-          maxLength: 262144
-          minLength: 0
-    KubernetesType:
+        defaultPriority:
+          description: Default priority.
+          format: int64
+          maximum: 4294967295
+          minimum: 0
+          type: integer
+          nullable: true
+        perAccountPriority:
+          additionalProperties:
+            format: int64
+            type: integer
+          description: Per-account priority overrides, keyed by account ID.
+          type: object
+          nullable: true
       type: object
-      properties:
-        group:
-          type: string
-          format: UTF-8
-          description: Name of API Group
-          maxLength: 262144
-          minLength: 1
-        version:
-          type: string
-          format: UTF-8
-          description: Version of API Group
-          maxLength: 262144
-          minLength: 1
-        kind:
-          type: string
-          format: UTF-8
-          description: API Group resource or Kind
-          maxLength: 262144
-          minLength: 1
-      required:
-        - group
-        - kind
-        - version
     LlmConfigDto:
-      type: object
       description: LLM-specific configuration for a model
       properties:
+        routingMethod:
+          description: Routing method for this model.
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        tokenRateLimit:
+          description: Token-level rate limit for this model.
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        tokenizer:
+          description: Tokenizer identifier for this model.
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
         uris:
-          type: array
-          description: >-
-            OpenAI-compatible URIs supported by this model (e.g.
-            /v1/chat/completions). Required for LLM models.
+          description: OpenAI-compatible URIs supported by this model (e.g. /v1/chat/completions). Required for LLM models.
           items:
             type: string
           maxItems: 2147483647
           minItems: 1
-        tokenRateLimit:
-          type: string
-          format: UTF-8
-          description: Token-level rate limit for this model.
-          maxLength: 262144
-          minLength: 0
-        tokenizer:
-          type: string
-          format: UTF-8
-          description: Tokenizer identifier for this model.
-          maxLength: 262144
-          minLength: 0
-        routingMethod:
-          type: string
-          format: UTF-8
-          description: Routing method for this model.
-          maxLength: 262144
-          minLength: 0
+          type: array
       required:
         - uris
-    StickinessWindow:
       type: object
+    KubernetesType:
+      properties:
+        group:
+          description: Name of API Group
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        kind:
+          description: API Group resource or Kind
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+        version:
+          description: Version of API Group
+          format: UTF-8
+          maxLength: 262144
+          minLength: 1
+          type: string
+      required:
+        - group
+        - kind
+        - version
+      type: object
+    StickinessWindow:
       properties:
         size:
-          type: string
-          format: duration
-          description: >-
-            Window size must be less than or equal to PT1H and will berounded to
-            the nearest minute
+          description: Window size must be less than or equal to PT1H and will berounded to the nearest minute
           example: PT30M
-        threshold:
-          type: string
           format: duration
+          type: string
+        threshold:
           description: Window threshold must be less than size
           example: PT5M
+          format: duration
+          type: string
       required:
         - size
         - threshold
-    InstanceType:
       type: object
-      properties:
-        name:
-          type: string
-          format: UTF-8
-          maxLength: 262144
-          minLength: 0
-        description:
-          type: string
-          format: UTF-8
-          maxLength: 262144
-          minLength: 0
-        default:
-          type: boolean
 servers:
-  - url: https://api.nvcf.nvidia.com
-    description: Generated server url
+  - url: https://api.ngc.nvidia.com

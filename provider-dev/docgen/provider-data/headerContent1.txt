@@ -1,0 +1,24 @@
+---
+title: nvidia
+hide_title: false
+hide_table_of_contents: false
+keywords:
+  - nvidia
+  - ngc
+  - nvcf
+  - nvidia cloud functions
+  - ngc private registry
+  - gpu inventory
+  - stackql
+  - infrastructure-as-code
+  - configuration-as-data
+  - cloud inventory
+description: Query, provision and manage the NVIDIA NGC control plane using SQL - NVIDIA Cloud Functions (functions, versions, deployments, cluster groups and GPUs, sharing grants), the NGC private registry and public catalog (models, resources, helm charts, collections), and NGC organizations, teams and users
+custom_edit_url: null
+image: /img/stackql-nvidia-provider-featured-image.png
+id: 'provider-intro'
+---
+
+import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+
+Query, provision and operate the NVIDIA NGC control plane using SQL - NVIDIA Cloud Functions (NVCF: functions and versions, deployments and GPU specifications, cluster groups and GPU inventory, request queues, function sharing grants, HTTP-polling invocation), the NGC private registry (models, resources, recipes, containers and helm charts as metadata, collections, shares, encryption keys), the public NGC catalog (artifact metadata, the GPU and cloud service provider catalogs - readable without an account) and NGC organizations, teams, users, roles and invitations. GPU capacity by cluster group, NVCF function fleet state by deployment specification, function sharing audits and registry estate reports are the queries this provider exists for.

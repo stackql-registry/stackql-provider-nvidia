@@ -60,6 +60,36 @@ for (const [file, meta] of Object.entries(manifest.files || {})) {
   };
 }
 
+// the ngcsdk wheel (response schemas for the registry surface) is pinned by
+// version + sha256 in harvest_ngc_sdk_schemas.mjs; the derived
+// ngc_sdk_schemas.json is pinned here by content hash like the specs
+if (manifest.ngcSdk) {
+  const derived = path.join(downloadDir, manifest.ngcSdk.derived);
+  if (!fs.existsSync(derived)) {
+    errors.push(`${manifest.ngcSdk.derived}: listed in the manifest but not present`);
+  } else {
+    const hash = sha256(derived);
+    const existing = pin.ngcSdk;
+    if (checkMode) {
+      if (!existing) errors.push(`${manifest.ngcSdk.derived}: derived but has no recorded pin`);
+      else if (existing.derivedSha256 !== hash) errors.push(`${manifest.ngcSdk.derived}: sha256 drift (pinned ${existing.derivedSha256.slice(0, 12)}..., current ${hash.slice(0, 12)}...)`);
+      else if (existing.sha256 !== manifest.ngcSdk.sha256 || existing.version !== manifest.ngcSdk.version) errors.push(`ngcsdk: pinned ${existing.version} (${existing.sha256.slice(0, 12)}...), harvested ${manifest.ngcSdk.version} (${manifest.ngcSdk.sha256.slice(0, 12)}...)`);
+    } else {
+      pin.ngcSdk = {
+        ...(existing || {}),
+        package: manifest.ngcSdk.package,
+        version: manifest.ngcSdk.version,
+        url: manifest.ngcSdk.url,
+        sha256: manifest.ngcSdk.sha256,
+        derived: manifest.ngcSdk.derived,
+        derivedSha256: hash,
+        classes: manifest.ngcSdk.classes,
+        fetched: today
+      };
+    }
+  }
+}
+
 if (checkMode) {
   for (const file of Object.keys(pin.sources)) {
     if (!(manifest.files || {})[file]) {
