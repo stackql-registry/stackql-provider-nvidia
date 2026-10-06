@@ -28,6 +28,7 @@ Query, provision and operate the NVIDIA NGC control plane using SQL - NVIDIA Clo
 
 total services: __7__  
 total resources: __83__  
+source project: __[stackql-provider-nvidia](https://github.com/stackql-registry/stackql-provider-nvidia)__  
 
 :::
 
@@ -46,7 +47,7 @@ REGISTRY PULL nvidia;
 
 ## Scope
 
-This provider covers the NGC control plane served from `https://api.ngc.nvidia.com` and, for queue details and invocation, `https://api.nvcf.nvidia.com`: NVIDIA Cloud Functions management (`nvcf_functions`, `nvcf_deployments`, `nvcf_queues`, `nvcf_invocation`), the NGC private registry (`private_registry`), the public catalog (`catalog`) and organization administration (`orgs`). Registry artifacts are surfaced as metadata; binary push and pull of artifact files is the registry data plane and is not mapped. Streaming and gRPC function invocation are not mapped; the HTTP-polling form is. NVIDIA's official Terraform provider (`NVIDIA/terraform-provider-ngc`) covers NVCF functions and telemetry endpoints; the surface here is generated mechanically from the published NVCF OpenAPI document and the NGC API definitions behind the NGC API explorer (338 operations across 7 services and 83 resources), with response schemas for the registry taken from the `ngcsdk` Python SDK's data classes.
+This provider covers the NGC control plane served from `https://api.ngc.nvidia.com` and, for queue details and invocation, `https://api.nvcf.nvidia.com`: NVIDIA Cloud Functions management (`nvcf_functions`, `nvcf_deployments`, `nvcf_queues`, `nvcf_invocation`), the NGC private registry (`private_registry`), the public catalog (`catalog`) and organization administration (`orgs`). Registry artifacts are surfaced as metadata; binary push and pull of artifact files is the registry data plane and is not mapped. Streaming and gRPC function invocation are not mapped; the HTTP-polling form is. NVIDIA's official Terraform provider (`NVIDIA/terraform-provider-ngc`) covers NVCF functions and telemetry endpoints; the surface here is generated mechanically from the published NVCF OpenAPI document and the NGC API definitions behind the NGC API explorer (342 operations across 7 services and 83 resources), with response schemas for the registry taken from the `ngcsdk` Python SDK's data classes.
 
 ## Authentication
 
