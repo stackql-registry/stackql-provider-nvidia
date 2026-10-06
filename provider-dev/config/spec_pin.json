@@ -1,0 +1,57 @@
+{
+  "ngcCoreDecision": {
+    "outcome": "harvest-usable",
+    "date": "2026-07-14",
+    "evidence": "The explorer at docs.ngc.nvidia.com/api/ is a swagger-ui over 11 displayed per-service definitions (list extracted from its JS bundle, recorded in download_manifest.json). Two in-scope definitions are publicly retrievable and validate clean after deterministic repairs: ngc_kas.json (NGC API Documentation v3.249.6 - orgs, teams, users, invitations; repaired relative server to api.ngc.nvidia.com) and ngc_models.json (Models API - registry artifact metadata; info.version is a 0.0.1-SNAPSHOT placeholder, noted in clean_report.json). Five in-scope definitions (Org Mgmt, User IAM, Search, Metadata, Publishing) are served from *.ngc.nvidia.com hosts that resolve in DNS but refuse public connections - recorded as unreachable in download_manifest.json. Gateway probes api.ngc.nvidia.com/v3/openapi, /v3/search/api-docs and /v3/meta/api-docs return 401 unauthenticated; re-probe with a bearer key is a phase-1 task-4 follow-up.",
+    "fallback": "The archetype-2 fallback (derive the NGC core spec from the ngcsdk Python SDK) is NOT invoked: the harvested kas + models definitions cover the in-scope NGC core surface (orgs/users/teams and registry artifact metadata). Revisit only if the inventory shows a required resource absent from both harvested definitions and the authenticated gateway probes."
+  },
+  "sources": {
+    "nvcf_openapi.json": {
+      "url": "https://api.nvcf.nvidia.com/v3/openapi",
+      "fetched": "2026-09-25",
+      "sha256": "53dd383860098a19d6ddb796988fd3d3d166f71f34f82f2f849aed8c725d9eea",
+      "bytes": 198423,
+      "docsPage": "https://docs.nvidia.com/nvcf/api",
+      "openapi": "3.1.0",
+      "title": "Cloud Functions",
+      "specVersion": "2.256.0",
+      "decision": {
+        "canonicalSource": "The OpenAPI Spec link on the NVCF API documentation page (docsPage) resolves to this URL, served by the NVCF API itself. A companion Postman collection is referenced from the same documentation set.",
+        "hostSplit": "The spec declares a single server (https://api.nvcf.nvidia.com) but the NVCF documentation (cloud-functions user guide, API page) states the primary domain for function management is api.ngc.nvidia.com and the NVCF domain for function invocation and queue details is api.nvcf.nvidia.com. Hosts are carried per operation group; the per-operation assignment with evidence is recorded in endpoint_inventory.csv.",
+        "validation": "swagger-parser 12.1.0 validate: clean, no repairs required"
+      }
+    },
+    "ngc_models.json": {
+      "url": "https://models.ngc.nvidia.com/v3/openapi",
+      "fetched": "2026-09-25",
+      "sha256": "60e0eb9a9f7344e5f43ba3ede8dd5cab20ab41cc47bad9ae780031868e06b529",
+      "bytes": 1435979,
+      "explorer": "https://docs.ngc.nvidia.com/api/",
+      "explorerName": "Private Artifacts (Models) API",
+      "openapi": "3.1.0",
+      "title": "Models API",
+      "specVersion": "0.0.1-SNAPSHOT"
+    },
+    "ngc_kas.json": {
+      "url": "https://api.ngc.nvidia.com/v3/api-docs",
+      "fetched": "2026-09-25",
+      "sha256": "9a4550a50fed4b4a7337c5bd67d71858d13fcdbe7c72505aa1b245382e9be53c",
+      "bytes": 618658,
+      "explorer": "https://docs.ngc.nvidia.com/api/",
+      "explorerName": "KASv1 API (Deprecated)",
+      "openapi": "3.0.1",
+      "title": "NGC API Documentation",
+      "specVersion": "v3.249.17"
+    }
+  },
+  "ngcSdk": {
+    "package": "ngcsdk",
+    "version": "4.36.6",
+    "url": "https://files.pythonhosted.org/packages/3c/cf/e4901fd5a50621d3f058d0ba4f732651a86d672fb76b7a404473b2b23ac1/ngcsdk-4.36.6-py3-none-any.whl",
+    "sha256": "8cf4ce3bd071b3d2e24d40f2c66abc2c2b49022b53d400a2eb9fe6018fe3f343",
+    "derived": "ngc_sdk_schemas.json",
+    "derivedSha256": "faa443aa2e6394370b18bab2a7368f8e85a72e56a4f9a87b5d1d41b5337ca3ea",
+    "classes": 149,
+    "fetched": "2026-09-25"
+  }
+}

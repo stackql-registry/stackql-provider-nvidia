@@ -1,0 +1,86 @@
+{
+  "generated": "2026-09-25",
+  "sources": {
+    "ngc_kas.json": {
+      "openapi": "3.0.1",
+      "title": "NGC API Documentation",
+      "version": "v3.249.17",
+      "servers": [
+        "https://api.ngc.nvidia.com"
+      ],
+      "paths": 77,
+      "fixes": [
+        {
+          "rule": "repair-relative-server",
+          "note": "servers [{\"url\":\"/\"}] is relative/absent; set to https://api.ngc.nvidia.com (the host the definition is served from)"
+        },
+        {
+          "rule": "snake-case-path-params",
+          "note": "48 path key(s) and 124 path parameter name(s) converted to snake_case"
+        },
+        {
+          "rule": "repair-path-param-names",
+          "note": "29 path parameter name(s) renamed to their template token, 1 stray path parameter(s) dropped (/v2/admin/entitlements: \"org_name\" dropped (no template token); /v2/admin/org/{org_name}/team/{team_name}/users/{id}: \"user_id_or_b64encoded_email\" -> id; /v2/admin/org/{org_name}/team/{team_name}/users/{id}/add-role: \"user_id_or_b64encoded_email\" -> id; /v2/admin/org/{org_name}/team/{team_name}/users/{id}/remove-role: \"user_id_or_b64encoded_email\" -> id; +22 more)"
+        },
+        {
+          "rule": "drop-cookie-params",
+          "note": "24 cookie parameter(s) dropped (any-sdk supports path, query, header and body parameters only): /v2/admin/org/{org_name}/team/{team_name}/users: ncid; /v2/admin/org/{org_name}/team/{team_name}/users: VisitorID; /v2/admin/org/{org_name}/team/{team_name}/users/{id}: ncid; /v2/admin/org/{org_name}/team/{team_name}/users/{id}: VisitorID; /v2/admin/org/{org_name}/users: ncid; /v2/admin/org/{org_name}/users: VisitorID; ..."
+        },
+        {
+          "rule": "drop-prose-query-params",
+          "note": "16 query parameter(s) with prose names dropped (wire names unknown): /v2/admin/org: \"Filter using org display name\"; /v2/admin/org: \"Filter using org owner name\"; /v2/admin/org: \"Filter using org owner email. Email should be base-64-encoded.\"; /v2/admin/org/{org_name}/team/{team_name}/users/{id}: \"user role, defaults to REGISTRY_READ\"; /v2/admin/org/{org_name}/users/{id}: \"user role, defaults to REGISTRY_READ\"; /v2/org/{org_name}/team/{team_name}/users/{id}: \"user role\"; ..."
+        }
+      ],
+      "notes": [],
+      "validation": "clean"
+    },
+    "ngc_models.json": {
+      "openapi": "3.1.0",
+      "title": "Models API",
+      "version": "0.0.1-SNAPSHOT",
+      "servers": [
+        "https://api.ngc.nvidia.com"
+      ],
+      "paths": 232,
+      "fixes": [
+        {
+          "rule": "gateway-v2-path-prefix",
+          "note": "229 path(s) rewritten /v1/ -> /v2/; servers [{\"description\":\"Generated server url - production\",\"url\":\"https://models.ngc.nvidia.com\",\"x-internal\":true}] -> https://api.ngc.nvidia.com (the public gateway serving the definition)"
+        },
+        {
+          "rule": "snake-case-path-params",
+          "note": "209 path key(s) and 986 path parameter name(s) converted to snake_case"
+        },
+        {
+          "rule": "inject-sdk-operations",
+          "note": "4 SDK-documented operation(s) injected: DELETE /v2/org/{org_name}/models/{model_name} (deleteModelInOrg); DELETE /v2/org/{org_name}/team/{team_name}/models/{model_name} (deleteModelInTeam); DELETE /v2/org/{org_name}/resources/{recipe_name} (deleteResourceInOrg); DELETE /v2/org/{org_name}/team/{team_name}/resources/{recipe_name} (deleteResourceInTeam)"
+        },
+        {
+          "rule": "inject-sdk-responses",
+          "note": "27 SDK data classes added to components.schemas (ngcsdk 4.36.6); 200 responses injected on 0 response-less operations (0 of them declared an untyped 2xx; 0 on the bare Response envelope): "
+        }
+      ],
+      "notes": [
+        "info.version is a placeholder (0.0.1-SNAPSHOT); left as-is"
+      ],
+      "validation": "clean"
+    },
+    "nvcf_openapi.json": {
+      "openapi": "3.1.0",
+      "title": "Cloud Functions",
+      "version": "2.256.0",
+      "servers": [
+        "https://api.nvcf.nvidia.com"
+      ],
+      "paths": 36,
+      "fixes": [
+        {
+          "rule": "snake-case-path-params",
+          "note": "26 path key(s) and 61 path parameter name(s) converted to snake_case"
+        }
+      ],
+      "notes": [],
+      "validation": "clean"
+    }
+  }
+}

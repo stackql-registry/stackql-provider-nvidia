@@ -1,0 +1,4852 @@
+{
+  "package": "ngcsdk",
+  "version": "4.36.6",
+  "wheel": "ngcsdk-4.36.6-py3-none-any.whl",
+  "url": "https://files.pythonhosted.org/packages/3c/cf/e4901fd5a50621d3f058d0ba4f732651a86d672fb76b7a404473b2b23ac1/ngcsdk-4.36.6-py3-none-any.whl",
+  "sha256": "8cf4ce3bd071b3d2e24d40f2c66abc2c2b49022b53d400a2eb9fe6018fe3f343",
+  "packages": [
+    "registry/data/model/"
+  ],
+  "classes": 149,
+  "enumModulesSkipped": [
+    "AccessTypeEnum",
+    "ApplicationType",
+    "ArtifactFileCommitType",
+    "ArtifactTypeEnum",
+    "AssetCdnProviderTypeEnum",
+    "AssetStatusTypeEnum",
+    "AssetStorageTypeEnum",
+    "CollectionCategoryType",
+    "CollectionOperationType",
+    "FrameworkType",
+    "MalwareScanStatusEnum",
+    "ModelFormatType",
+    "PolicyEnum",
+    "PrecisionType",
+    "ReleaseTypeEnum",
+    "SortOrderEnum",
+    "StatusCode",
+    "VersionStatusEnum"
+  ],
+  "schemas": {
+    "AIFoundationModel": {
+      "type": "object",
+      "description": "Get AI Playground Response",
+      "properties": {
+        "artifactName": {
+          "type": "string",
+          "description": "Unique name of the model"
+        },
+        "attributes": {
+          "type": "string",
+          "description": "Metadata json string"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "org/team of the model"
+        },
+        "nvcfFunctionId": {
+          "type": "string",
+          "description": "NVCF function id for the model playground"
+        },
+        "openAPISpec": {
+          "type": "string",
+          "description": "OpenAPI specification for this model"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "AIPlaygroundCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new AI Playground config",
+      "properties": {
+        "artifactName": {
+          "type": "string",
+          "description": "Unique name of the model"
+        },
+        "attributes": {
+          "type": "string",
+          "description": "Metadata json string"
+        },
+        "nvcfFunctionId": {
+          "type": "string",
+          "description": "NVCF function id for the model playground"
+        },
+        "openAPISpec": {
+          "type": "string",
+          "description": "OpenAPI specification for this model"
+        }
+      }
+    },
+    "AIPlaygroundResponse": {
+      "type": "object",
+      "description": "Request to fetch an AI Playground config",
+      "properties": {
+        "artifactName": {
+          "type": "string",
+          "description": "Unique name of the model"
+        },
+        "artifactType": {
+          "type": "string",
+          "description": "ArtifactTypeEnum of the artifact"
+        },
+        "attributes": {
+          "type": "string",
+          "description": "Metadata json string"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "org/team of the model"
+        },
+        "nvcfFunctionId": {
+          "type": "string",
+          "description": "NVCF function id for the model playground"
+        },
+        "openAPISpec": {
+          "type": "string",
+          "description": "OpenAPI specification for this model"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "AIPlaygroundUpdateRequest": {
+      "type": "object",
+      "description": "Request to update an AI Playground config",
+      "properties": {
+        "attributes": {
+          "type": "string",
+          "description": "Metadata json string"
+        },
+        "nvcfFunctionId": {
+          "type": "string",
+          "description": "NVCF function id for the model playground"
+        },
+        "openAPISpec": {
+          "type": "string",
+          "description": "OpenAPI specification for this model"
+        }
+      }
+    },
+    "AcceptArtifactLicenseRequest": {
+      "type": "object",
+      "description": "Request body to accept an org-scoped artifact license.",
+      "properties": {
+        "licenseId": {
+          "type": "string",
+          "description": "License identifier to accept (must match a licenseId from the \n        artifact's published licenseTerms)."
+        },
+        "licenseVersion": {
+          "type": "string",
+          "description": "License version to accept (must match licenseVersion for that \n        license on the artifact)."
+        }
+      }
+    },
+    "Artifact": {
+      "type": "object",
+      "description": "Artifact object",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "bias": {
+          "type": "string",
+          "description": "Text describing bias in the artifact"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "Organization that built the helm chart"
+        },
+        "canGuestDownload": {
+          "type": "boolean",
+          "description": "Indicates if a guest user can download"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the helm chart"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "encryptionKeyId": {
+          "type": "string",
+          "description": "ID of the customer managed encryption key associated with this\n         artifact"
+        },
+        "explainability": {
+          "type": "string",
+          "description": "Text describing the explainability for this artifact"
+        },
+        "hasSignedVersion": {
+          "type": "boolean",
+          "description": "Indicates if the artifact has any signed versions"
+        },
+        "isFavourite": {
+          "type": "boolean",
+          "description": "Flag indicating if helm chart is user's favorite"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Determines if this helm chart is publicly accessible"
+        },
+        "isReadOnly": {
+          "type": "boolean",
+          "description": "indicate if current user has read only permissions"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "latestVersionId": {
+          "type": "string",
+          "description": "ID of the latest version"
+        },
+        "latestVersionSizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size of the latest version in bytes"
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the helm chart"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the helm chart belongs to"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this version"
+        },
+        "policyLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "list of policy labels on the artifact"
+        },
+        "privacy": {
+          "type": "string",
+          "description": "Text describing the privacy for this artifact"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "Organization that published this helm chart"
+        },
+        "safetyAndSecurity": {
+          "type": "string",
+          "description": "Text for describing the safety and security in the artifact"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the helm chart"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the helm chart belongs to"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "ArtifactAttribute": {
+      "type": "object",
+      "description": "Attribute on the artifact",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "ArtifactCatalogFlags": {
+      "type": "object",
+      "description": "Artifact Catalog Flags object",
+      "properties": {
+        "canGuestDownload": {
+          "type": "boolean",
+          "description": "Indicates if a guest user can download"
+        },
+        "isListedToPublic": {
+          "type": "boolean",
+          "description": "Flag indicating if artifact is listed and searchable"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Determines if this artifact is publicly accessible"
+        }
+      }
+    },
+    "ArtifactCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new artifact",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "bias": {
+          "type": "string",
+          "description": "Text describing bias in the model"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the artifact"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the artifact"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "explainability": {
+          "type": "string",
+          "description": "Text describing explainability for this model"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the artifact"
+        },
+        "privacy": {
+          "type": "string",
+          "description": "Text describing the privacy for this model"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the artifact"
+        },
+        "safetyAndSecurity": {
+          "type": "string",
+          "description": "Text for describing the safety and security in the model"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the artifact"
+        }
+      }
+    },
+    "ArtifactDeploymentParameters": {
+      "type": "object",
+      "description": "Artifact Deployment Parameters object",
+      "properties": {
+        "container": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParameters",
+          "x-description": "Deployment CPU Parameters object"
+        },
+        "csp": {
+          "type": "string",
+          "description": "Cloud Service Provider name"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParameters",
+          "x-description": "Deployment GPU Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParameters",
+          "x-description": "Deployment Memory Parameters object"
+        },
+        "model": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "resource": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParameters",
+          "x-description": "Deployment Storage Parameters object"
+        }
+      }
+    },
+    "ArtifactDownloadAllRequest": {
+      "type": "object",
+      "description": "Request to download all files of an artifact",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Type of artifact"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the artifact"
+        },
+        "version": {
+          "type": "string",
+          "description": "Artifact version"
+        }
+      }
+    },
+    "ArtifactDownloadAllResponse": {
+      "type": "object",
+      "description": "Response body to download all files of an artifact",
+      "properties": {
+        "filepath": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "All of the filepath of the artifact"
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        },
+        "sha256_base64": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of base64 encoded sha256 hash of the files"
+        },
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of presigned urls of  download"
+        }
+      }
+    },
+    "ArtifactDownloadRequest": {
+      "type": "object",
+      "description": "Request to download a single file of an artifact",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Type of artifact"
+        },
+        "filePath": {
+          "type": "string",
+          "description": "The file path of the artifact"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the artifact"
+        },
+        "version": {
+          "type": "string",
+          "description": "Artifact version"
+        }
+      }
+    },
+    "ArtifactDownloadResponse": {
+      "type": "object",
+      "description": "Response body to download a single file of an artifact",
+      "properties": {
+        "filepath": {
+          "type": "string",
+          "description": "The filepath of the artifact"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        },
+        "url": {
+          "type": "string",
+          "description": "Presigned url for single file download"
+        }
+      }
+    },
+    "ArtifactEvent": {
+      "type": "object",
+      "description": "This event in the topic means that some change happened to the artifact",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "Artifact event type"
+        },
+        "name": {
+          "type": "string",
+          "description": "Artifact name"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Artifact namespace"
+        }
+      }
+    },
+    "ArtifactFileChecksumToValidate": {
+      "type": "object",
+      "description": "Artifact file checksum object in request to validate artifact file chec\n    ksum exists or not",
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the artifact file"
+        }
+      }
+    },
+    "ArtifactFileChecksumValidated": {
+      "type": "object",
+      "properties": {
+        "exists": {
+          "type": "boolean",
+          "description": "Boolean to indicate whether sha256 exists or not"
+        },
+        "sha256": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the artifact file"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size of the artifact file"
+        }
+      }
+    },
+    "ArtifactFileCommitMetadata": {
+      "type": "object",
+      "properties": {
+        "commitType": {
+          "type": "string"
+        },
+        "filePath": {
+          "type": "string",
+          "description": "Artifact file path"
+        },
+        "sha256": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the artifact file. Required for \n        addition and not required for deletion"
+        }
+      }
+    },
+    "ArtifactFilesChecksumExistsRequest": {
+      "type": "object",
+      "description": "Request to check if files exist by checksum",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactFileChecksumToValidate"
+          },
+          "description": "An array of file checksums"
+        }
+      }
+    },
+    "ArtifactFilesChecksumExistsResponse": {
+      "type": "object",
+      "description": "Request to check if file exists by checksum",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactFileChecksumValidated"
+          },
+          "description": "An array of file checksums and checksum metadata"
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ArtifactFilesCommitRequest": {
+      "type": "object",
+      "description": "Request to commit the artifact files metadata to database",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type - could be either model or resource"
+        },
+        "baseVersion": {
+          "type": "string",
+          "description": "Artifact version that the commit is based on"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactFileCommitMetadata"
+          },
+          "description": "An array of artifact files identified by their base64 encoded\n         SHA256 hash"
+        },
+        "name": {
+          "type": "string",
+          "description": "Artifact name"
+        },
+        "version": {
+          "type": "string",
+          "description": "Artifact version"
+        }
+      }
+    },
+    "ArtifactItem": {
+      "type": "object",
+      "description": "Artifact item with name and description",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the artifact"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the artifact"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the artifact"
+        }
+      }
+    },
+    "ArtifactListResponse": {
+      "type": "object",
+      "description": "Response to list artifacts request",
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Artifact"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ArtifactOwnerDetails": {
+      "type": "object",
+      "properties": {
+        "createdDate": {
+          "type": "string",
+          "description": "Version pushed date in ISO-8601 format"
+        },
+        "creatorUserEmail": {
+          "type": "string",
+          "description": "Email address of account used to create"
+        },
+        "orgAlternateContact": {
+          "type": "string",
+          "description": "Email address of alternate contact for organization the image \n        was pushed to"
+        },
+        "orgOwnersEmails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Email addresses of all owners of organization the image was p\n        ushed to"
+        },
+        "pushedByUserEmail": {
+          "type": "string",
+          "description": "Email address of account used to create the Version"
+        },
+        "repositoryName": {
+          "type": "string",
+          "description": "The repository name"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Version update date in ISO-8601 format"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version"
+        }
+      }
+    },
+    "ArtifactPublishRequest": {
+      "type": "object",
+      "description": "Request to publish an artifact",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "canGuestPull": {
+          "type": "boolean"
+        },
+        "canPublicList": {
+          "type": "boolean"
+        },
+        "isPublic": {
+          "type": "boolean"
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        }
+      }
+    },
+    "ArtifactResponse": {
+      "type": "object",
+      "description": "Response to artifact request",
+      "properties": {
+        "artifact": {
+          "$ref": "#/components/schemas/Artifact",
+          "x-description": "Artifact object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ArtifactUpdateRequest": {
+      "type": "object",
+      "description": "Request to update a artifact",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "bias": {
+          "type": "string",
+          "description": "Text describing bias in the model"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the artifact"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the artifact"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "explainability": {
+          "type": "string",
+          "description": "Text describing explainability for this model"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "privacy": {
+          "type": "string",
+          "description": "Text describing the privacy for this model"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the artifact"
+        },
+        "safetyAndSecurity": {
+          "type": "string",
+          "description": "Text for describing the safety and security in the model"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the artifact"
+        }
+      }
+    },
+    "ArtifactVersion": {
+      "type": "object",
+      "description": "Artifact version object",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "createdByUser": {
+          "type": "string",
+          "description": "Id of the user who created this version"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetricGroup"
+          },
+          "description": "Custom Metrics key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the version"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique ID of the version"
+        },
+        "isSigned": {
+          "type": "boolean",
+          "description": "Indicates if the version is signed"
+        },
+        "malwareScanDate": {
+          "type": "string",
+          "description": "Scan date in ISO-8601 format"
+        },
+        "malwareScanStatus": {
+          "type": "string",
+          "description": "Malware scan status"
+        },
+        "policy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Policy label to be added to a specific version"
+        },
+        "releaseType": {
+          "type": "string",
+          "description": "Release type enum for the artifact version in the \n        product lifecycle."
+        },
+        "status": {
+          "type": "string",
+          "description": "Version status"
+        },
+        "storageVersion": {
+          "type": "string",
+          "description": "The storage version i.e. the format the file and their content\n        s are persisted in in object store. Possible values include V1\n         - for legacy artifact versions with files, V2 - for new artifact vers\n        ions with blob registry, `` - for artifact versions without any files."
+        },
+        "totalFileCount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total file count"
+        },
+        "totalSizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total size of the version in bytes"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "ArtifactVersionCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new artifact version",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the artifact version"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique ID of the version"
+        }
+      }
+    },
+    "ArtifactVersionFileListResponse": {
+      "type": "object",
+      "description": "Response to list files for artifact version request",
+      "properties": {
+        "artifact": {
+          "$ref": "#/components/schemas/Artifact",
+          "x-description": "Artifact object"
+        },
+        "artifactFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/File"
+          }
+        },
+        "artifactVersion": {
+          "$ref": "#/components/schemas/ArtifactVersion",
+          "x-description": "Artifact version object"
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ArtifactVersionListResponse": {
+      "type": "object",
+      "description": "Response to list artifact versions request",
+      "properties": {
+        "artifact": {
+          "$ref": "#/components/schemas/Artifact",
+          "x-description": "Artifact object"
+        },
+        "artifactVersions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactVersion"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ArtifactVersionResponse": {
+      "type": "object",
+      "description": "Response to artifact version request",
+      "properties": {
+        "artifact": {
+          "$ref": "#/components/schemas/Artifact",
+          "x-description": "Artifact object"
+        },
+        "artifactVersion": {
+          "$ref": "#/components/schemas/ArtifactVersion",
+          "x-description": "Artifact version object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ArtifactVersionUpdateRequest": {
+      "type": "object",
+      "description": "Request to create a new artifact version",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the artifact version"
+        },
+        "status": {
+          "type": "string",
+          "description": "Version status"
+        }
+      }
+    },
+    "Asset": {
+      "type": "object",
+      "description": "Asset object",
+      "properties": {
+        "artifactName": {
+          "type": "string",
+          "description": "Artifact name that asset belongs to"
+        },
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "cdnProvider": {
+          "type": "string",
+          "description": "Asset content delivery network provider t\n        ype"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Asset file name"
+        },
+        "hostedAt": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "URLs where the asset is hosted"
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "Asset mime type"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the asset"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the collection belongs to"
+        },
+        "originUrl": {
+          "type": "string",
+          "description": "Asset origin URL"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this version"
+        },
+        "sizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size in bytes"
+        },
+        "status": {
+          "type": "string",
+          "description": "Asset status type"
+        },
+        "storageProvider": {
+          "type": "string",
+          "description": "Asset storage provider type"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the collection belongs to"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        },
+        "uploadUrl": {
+          "type": "string",
+          "description": "Asset upload URL"
+        }
+      }
+    },
+    "AssetResponse": {
+      "type": "object",
+      "description": "Response to asset request",
+      "properties": {
+        "asset": {
+          "$ref": "#/components/schemas/Asset",
+          "x-description": "Asset object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "AssetSimplified": {
+      "type": "object",
+      "description": "Asset object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique name of the asset"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the asset belongs to"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the asset belongs to"
+        }
+      }
+    },
+    "AssetStorageEvent": {
+      "type": "object",
+      "description": "This event in the topic means that some change happened to the asset st\n    orage object",
+      "properties": {
+        "asset": {
+          "$ref": "#/components/schemas/Asset",
+          "x-description": "Asset object"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "Asset storage event type"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp in ISO-8601 format"
+        }
+      }
+    },
+    "AssetUpdateRequest": {
+      "type": "object",
+      "description": "Request to update an asset",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Asset file name"
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type"
+        },
+        "originUrl": {
+          "type": "string",
+          "description": "Asset origin URL"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner of asset"
+        },
+        "sizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size in bytes"
+        }
+      }
+    },
+    "AsyncCloneArtifactVersionFilesRequest": {
+      "type": "object",
+      "description": "Request to asynchronously clone artifact version files. Artifact type, \n    target artifact name, version, org, and team are provided via URL path\n     parameters.",
+      "properties": {
+        "sourceArtifact": {
+          "$ref": "#/components/schemas/CloneableArtifact",
+          "x-description": "Cloneable Artifact Parameters object"
+        },
+        "uploadPending": {
+          "type": "boolean",
+          "description": "Allow the cloned model version to continue to be updated with\n         files. A follow up commit is needed to update status to 'Uplo\n        ad Complete'."
+        }
+      }
+    },
+    "BlobMetadata": {
+      "type": "object",
+      "description": "Blob metadata - its size, dek-metadata (if applicable)",
+      "properties": {
+        "blobSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "BLOB size"
+        },
+        "dekMetadata": {
+          "type": "string",
+          "description": "DEK metadata of the blob"
+        }
+      }
+    },
+    "CatalogArtifactMetadata": {
+      "type": "object",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "canGuestPull": {
+          "type": "boolean",
+          "description": "Guest users can download from the Catalog registry"
+        },
+        "canPublicList": {
+          "type": "boolean",
+          "description": "Publicly listed/searchable in the Catalog registry"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Publicly available in the Catalog registry"
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CatalogLicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        },
+        "releaseType": {
+          "type": "string",
+          "description": "Release type enum for the artifact version in the \n        product lifecycle."
+        }
+      }
+    },
+    "CatalogArtifactVersionMetadata": {
+      "type": "object",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "canGuestPull": {
+          "type": "boolean",
+          "description": "Guest users can download from the Catalog registry"
+        },
+        "canPublicList": {
+          "type": "boolean",
+          "description": "Publicly listed/searchable in the Catalog registry"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Publicly available in the Catalog registry"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        },
+        "releaseType": {
+          "type": "string",
+          "description": "Release type enum for the artifact version in the \n        product lifecycle."
+        }
+      }
+    },
+    "CatalogLicenseMetadata": {
+      "type": "object",
+      "description": "License information for the artifact",
+      "properties": {
+        "licenseId": {
+          "type": "string",
+          "description": "License ID"
+        },
+        "licenseVersion": {
+          "type": "string",
+          "description": "License version ID"
+        },
+        "needsAcceptance": {
+          "type": "boolean",
+          "description": "Indicator if user needs to accept this license"
+        }
+      }
+    },
+    "CloneArtifactFilesStatusResponse": {
+      "type": "object",
+      "description": "Progress of cloning artifact version files",
+      "properties": {
+        "filesCopied": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of files copied"
+        },
+        "percentageCloned": {
+          "type": "number",
+          "description": "Percentage of files cloned"
+        },
+        "sizeCopied": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Combined file size copied"
+        },
+        "totalFiles": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total files at source"
+        },
+        "totalSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Combined file size at source"
+        }
+      }
+    },
+    "CloneArtifactVersionFilesRequest": {
+      "type": "object",
+      "description": "Request to clone artifact version files",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type"
+        },
+        "sourceArtifact": {
+          "$ref": "#/components/schemas/CloneableArtifact",
+          "x-description": "Cloneable Artifact Parameters object"
+        },
+        "targetArtifact": {
+          "$ref": "#/components/schemas/CloneableArtifact",
+          "x-description": "Cloneable Artifact Parameters object"
+        },
+        "uploadPending": {
+          "type": "boolean",
+          "description": "Allow the cloned model version to continue to be updated with\n         files. A follow up commit is needed to update status to 'Uplo\n        ad Complete'."
+        }
+      }
+    },
+    "CloneStatus": {
+      "type": "object",
+      "description": "Progress of cloning artifact version files",
+      "properties": {
+        "filesCopied": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of files copied"
+        },
+        "internalCheckpointStateCleanup": {
+          "type": "string",
+          "description": "Internal-only: When the async c\n        lone workflow is completed, this field shows if the internal c\n        heckpoint files were successfully cleaned up in the storage - CLEAN if\n         no objects remain (cleanup succeeded or unused), NOT_EMPTY if objects\n         remain, ERROR if verification could not be performed. Omitted when no\n        t applicable."
+        },
+        "percentageFilesCloned": {
+          "type": "number",
+          "description": "Percentage of files cloned"
+        },
+        "sizeCopied": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Combined file size copied"
+        },
+        "totalFiles": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total files at source"
+        },
+        "totalSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Combined file size at source"
+        }
+      }
+    },
+    "CloneableArtifact": {
+      "type": "object",
+      "description": "Cloneable Artifact Parameters object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique name of the artifact"
+        },
+        "org": {
+          "type": "string",
+          "description": "Name of the org that the artifact belongs to"
+        },
+        "team": {
+          "type": "string",
+          "description": "Name of the team that the artifact belongs to"
+        },
+        "version": {
+          "type": "string",
+          "description": "ID of the version or tag"
+        }
+      }
+    },
+    "CloudServiceProvider": {
+      "type": "object",
+      "description": "Cloud Service Provider object",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the Cloud Service Provider"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the Cloud Service Provider"
+        },
+        "isDeployable": {
+          "type": "boolean",
+          "description": "Determines if this Cloud Service Provider can be used to depl\n        oy artifacts"
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "description": "Determines if this Cloud Service Provider is enabled"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Labels that are associated with the Cloud Service Provider"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the Cloud Service Provider"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "CloudServiceProviderCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new Cloud Service Provider",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the Cloud Service Provider"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the Cloud Service Provider"
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "description": "Determines if this Cloud Service Provider is enabled"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Labels that are associated with the Cloud Service Provider"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the Cloud Service Provider"
+        }
+      }
+    },
+    "CloudServiceProviderListResponse": {
+      "type": "object",
+      "description": "Response to list Cloud Service Providers request",
+      "properties": {
+        "cloudServiceProviders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CloudServiceProvider"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "CloudServiceProviderUpdateRequest": {
+      "type": "object",
+      "description": "Request to update existing Cloud Service Provider",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the Cloud Service Provider"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the Cloud Service Provider"
+        },
+        "isEnabled": {
+          "type": "boolean",
+          "description": "Determines if this Cloud Service Provider is enabled"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Labels that are associated with the Cloud Service Provider"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        }
+      }
+    },
+    "Collection": {
+      "type": "object",
+      "description": "Collection object",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "Organization that built the collection"
+        },
+        "canGuestDownload": {
+          "type": "boolean",
+          "description": "Indicates if a guest user can download"
+        },
+        "category": {
+          "type": "string"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the collection"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Determines if this collection is publicly accessible"
+        },
+        "isReadOnly": {
+          "type": "boolean",
+          "description": "indicate if current user has read only permissions"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the collection"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the collection belongs to"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this version"
+        },
+        "policyLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "list of policy labels on the collection"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "Organization that published this collection"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the collection"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total count of collection items"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the collection belongs to"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "CollectionCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new collection",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the collection"
+        },
+        "category": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the collection"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the collection"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this collection"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the collection"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the collection"
+        }
+      }
+    },
+    "CollectionListResponse": {
+      "type": "object",
+      "description": "Response to list collections request",
+      "properties": {
+        "collections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Collection"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "CollectionOperation": {
+      "type": "object",
+      "description": "Collection operation object",
+      "properties": {
+        "operation": {
+          "type": "string",
+          "description": "Collection operation"
+        },
+        "path": {
+          "type": "string",
+          "description": "Path to a collection item in a scoped format"
+        }
+      }
+    },
+    "CollectionPatchRequest": {
+      "type": "object",
+      "description": "Request to patch a collection",
+      "properties": {
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CollectionOperation"
+          }
+        }
+      }
+    },
+    "CollectionPublishRequest": {
+      "type": "object",
+      "description": "Request to publish a collection",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "canGuestPull": {
+          "type": "boolean"
+        },
+        "canPublicList": {
+          "type": "boolean"
+        },
+        "isPublic": {
+          "type": "boolean"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        }
+      }
+    },
+    "CollectionResponse": {
+      "type": "object",
+      "description": "Response to create collection request",
+      "properties": {
+        "collection": {
+          "$ref": "#/components/schemas/Collection",
+          "x-description": "Collection object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "CollectionSimplified": {
+      "type": "object",
+      "description": "Collection object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique name of the collection"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the collection belongs to"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the collection belongs to"
+        }
+      }
+    },
+    "CollectionUpdateRequest": {
+      "type": "object",
+      "description": "Request to update a collection",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "Attribute key/value pairs"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the collection"
+        },
+        "category": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the collection"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this collection"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the collection"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the collection"
+        }
+      }
+    },
+    "ConfiguredLicenseTerm": {
+      "type": "object",
+      "description": "License information for the artifact",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type"
+        },
+        "generatedHtml": {
+          "type": "string",
+          "description": "Generated html"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseTag"
+          }
+        }
+      }
+    },
+    "ConfiguredLicenseTerms": {
+      "type": "object",
+      "description": "License information for the artifact",
+      "properties": {
+        "download": {
+          "$ref": "#/components/schemas/ConfiguredLicenseTerm",
+          "x-description": "License information for the artifact"
+        },
+        "hosting": {
+          "$ref": "#/components/schemas/ConfiguredLicenseTerm",
+          "x-description": "License information for the artifact"
+        }
+      }
+    },
+    "CountableResource": {
+      "type": "object",
+      "description": "Countable Resource object",
+      "properties": {
+        "defaultValue": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Deprecated: Default value. Please use actual CloudServiceProv\n        ider values instead"
+        },
+        "maxValue": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Maximum value"
+        },
+        "minValue": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Minimum value"
+        }
+      }
+    },
+    "CustomMetric": {
+      "type": "object",
+      "description": "Custom metrics",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomMetricGroup": {
+      "type": "object",
+      "description": "Defines the group of custom metrics.",
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetric"
+          },
+          "description": "Custom Metric key/value pairs"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "Dataset": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string",
+          "description": "License of the dataset"
+        },
+        "link": {
+          "type": "string",
+          "description": "Link to the dataset"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the dataset"
+        }
+      }
+    },
+    "DeploymentArtifactParameters": {
+      "type": "object",
+      "description": "Deployment Artifact Parameters object",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Artifact type"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the artifact"
+        },
+        "filePath": {
+          "type": "string",
+          "description": "Path to a file in an artifact version"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the artifact"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the artifact belongs to"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the artifact belongs to"
+        },
+        "versionId": {
+          "type": "string",
+          "description": "ID of the version or tag"
+        }
+      }
+    },
+    "DeploymentCpuParameters": {
+      "type": "object",
+      "description": "Deployment CPU Parameters object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total count of CPUs"
+        }
+      }
+    },
+    "DeploymentCpuParametersMeta": {
+      "type": "object",
+      "description": "Cloud Service Provider Deployment CPU Parameters object",
+      "properties": {
+        "count": {
+          "$ref": "#/components/schemas/CountableResource",
+          "x-description": "Countable Resource object"
+        }
+      }
+    },
+    "DeploymentGpuParameters": {
+      "type": "object",
+      "description": "Deployment GPU Parameters object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total count of GPUs"
+        },
+        "type": {
+          "type": "string",
+          "description": "GPU Type"
+        }
+      }
+    },
+    "DeploymentGpuParametersMeta": {
+      "type": "object",
+      "description": "Cloud Service Provider Deployment GPU Parameters object",
+      "properties": {
+        "count": {
+          "$ref": "#/components/schemas/CountableResource",
+          "x-description": "Countable Resource object"
+        },
+        "type": {
+          "$ref": "#/components/schemas/EnumerableResource",
+          "x-description": "Enumerable Resource object"
+        }
+      }
+    },
+    "DeploymentMemoryParameters": {
+      "type": "object",
+      "description": "Deployment Memory Parameters object",
+      "properties": {
+        "capacityInGB": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Capacity in GB"
+        }
+      }
+    },
+    "DeploymentMemoryParametersMeta": {
+      "type": "object",
+      "description": "Cloud Service Provider Deployment Memory Parameters object",
+      "properties": {
+        "capacityInGB": {
+          "$ref": "#/components/schemas/CountableResource",
+          "x-description": "Countable Resource object"
+        }
+      }
+    },
+    "DeploymentParameters": {
+      "type": "object",
+      "description": "Deployment Artifact Parameters object",
+      "properties": {
+        "container": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParameters",
+          "x-description": "Deployment CPU Parameters object"
+        },
+        "csp": {
+          "type": "string",
+          "description": "Cloud Service Provider name"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParameters",
+          "x-description": "Deployment GPU Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParameters",
+          "x-description": "Deployment Memory Parameters object"
+        },
+        "model": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "resource": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParameters",
+          "x-description": "Deployment Storage Parameters object"
+        }
+      }
+    },
+    "DeploymentParametersCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new deployment parameters",
+      "properties": {
+        "container": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParameters",
+          "x-description": "Deployment CPU Parameters object"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParameters",
+          "x-description": "Deployment GPU Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParameters",
+          "x-description": "Deployment Memory Parameters object"
+        },
+        "model": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "resource": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParameters",
+          "x-description": "Deployment Storage Parameters object"
+        }
+      }
+    },
+    "DeploymentParametersListResponse": {
+      "type": "object",
+      "description": "Response to list deployment parameters request",
+      "properties": {
+        "artifact": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "csp": {
+          "type": "string",
+          "description": "Cloud Service Provider name"
+        },
+        "deploymentParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/DeploymentParameters"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "DeploymentParametersMeta": {
+      "type": "object",
+      "description": "Cloud Service Provider Deployment Parameters object",
+      "properties": {
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParametersMeta",
+          "x-description": "Cloud Service Provider Deployment CPU \n        Parameters object"
+        },
+        "csp": {
+          "type": "string",
+          "description": "Cloud Service Provider name"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParametersMeta",
+          "x-description": "Cloud Service Provider Deployment GPU \n        Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParametersMeta",
+          "x-description": "Cloud Service Provider Deployment M\n        emory Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParametersMeta",
+          "x-description": "Cloud Service Provider Deployment \n        Storage Parameters object"
+        }
+      }
+    },
+    "DeploymentParametersMetaCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new Cloud Service Provider deployment parameters",
+      "properties": {
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParametersMeta",
+          "x-description": "Cloud Service Provider Deployment CPU \n        Parameters object"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParametersMeta",
+          "x-description": "Cloud Service Provider Deployment GPU \n        Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParametersMeta",
+          "x-description": "Cloud Service Provider Deployment M\n        emory Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParametersMeta",
+          "x-description": "Cloud Service Provider Deployment \n        Storage Parameters object"
+        }
+      }
+    },
+    "DeploymentParametersMetaListResponse": {
+      "type": "object",
+      "description": "Response to list deployment parameters metadata request",
+      "properties": {
+        "csp": {
+          "type": "string",
+          "description": "Cloud Service Provider name"
+        },
+        "deploymentParametersMetas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/DeploymentParametersMeta"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "DeploymentParametersMetaUpdateRequest": {
+      "type": "object",
+      "description": "Request to create a new Cloud Service Provider deployment parameters me\n    tadata",
+      "properties": {
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParametersMeta",
+          "x-description": "Cloud Service Provider Deployment CPU \n        Parameters object"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParametersMeta",
+          "x-description": "Cloud Service Provider Deployment GPU \n        Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParametersMeta",
+          "x-description": "Cloud Service Provider Deployment M\n        emory Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParametersMeta",
+          "x-description": "Cloud Service Provider Deployment \n        Storage Parameters object"
+        }
+      }
+    },
+    "DeploymentParametersUpdateRequest": {
+      "type": "object",
+      "description": "Request to update existing deployment parameters",
+      "properties": {
+        "container": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParameters",
+          "x-description": "Deployment CPU Parameters object"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParameters",
+          "x-description": "Deployment GPU Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParameters",
+          "x-description": "Deployment Memory Parameters object"
+        },
+        "model": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "resource": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParameters",
+          "x-description": "Deployment Storage Parameters object"
+        }
+      }
+    },
+    "DeploymentStorageParameters": {
+      "type": "object",
+      "description": "Deployment Storage Parameters object",
+      "properties": {
+        "capacityInGB": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Capacity in GB"
+        }
+      }
+    },
+    "DeploymentStorageParametersMeta": {
+      "type": "object",
+      "description": "Cloud Service Provider Deployment Storage Parameters object",
+      "properties": {
+        "capacityInGB": {
+          "$ref": "#/components/schemas/CountableResource",
+          "x-description": "Countable Resource object"
+        }
+      }
+    },
+    "DeploymentUrlCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new deployment url",
+      "properties": {
+        "container": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "cpu": {
+          "$ref": "#/components/schemas/DeploymentCpuParameters",
+          "x-description": "Deployment CPU Parameters object"
+        },
+        "gpu": {
+          "$ref": "#/components/schemas/DeploymentGpuParameters",
+          "x-description": "Deployment GPU Parameters object"
+        },
+        "memory": {
+          "$ref": "#/components/schemas/DeploymentMemoryParameters",
+          "x-description": "Deployment Memory Parameters object"
+        },
+        "model": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "resource": {
+          "$ref": "#/components/schemas/DeploymentArtifactParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "storage": {
+          "$ref": "#/components/schemas/DeploymentStorageParameters",
+          "x-description": "Deployment Storage Parameters object"
+        }
+      }
+    },
+    "DeploymentUrlResponse": {
+      "type": "object",
+      "description": "Response to create a new deployment url",
+      "properties": {
+        "csp": {
+          "type": "string",
+          "description": "Cloud Service Provider name"
+        },
+        "deploymentParameters": {
+          "$ref": "#/components/schemas/DeploymentParameters",
+          "x-description": "Deployment Artifact Parameters object"
+        },
+        "deploymentUrl": {
+          "type": "string",
+          "description": "Deployment URL"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "EncryptionKey": {
+      "type": "object",
+      "description": "Customer Managed Key shard configuration for the model",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Description for a new customer key shard"
+        },
+        "encryptionKeyId": {
+          "type": "string",
+          "description": "ID of the existing customer key shard to use"
+        },
+        "useExistingKey": {
+          "type": "boolean",
+          "description": "Whether to use an existing customer key shard or should a new\n         one be created"
+        }
+      }
+    },
+    "EnumerableResource": {
+      "type": "object",
+      "description": "Enumerable Resource object",
+      "properties": {
+        "defaultItemName": {
+          "type": "string",
+          "description": "Deprecated: Default item name. Please use actual CloudServiceP\n        rovider values instead"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/EnumerableResourceItem"
+          }
+        }
+      }
+    },
+    "EnumerableResourceItem": {
+      "type": "object",
+      "description": "Enumerable Resource Item object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "logo": {
+          "type": "string",
+          "description": "Logo URL"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name"
+        }
+      }
+    },
+    "File": {
+      "type": "object",
+      "description": "File object",
+      "properties": {
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the file"
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative file path from the root of the object"
+        },
+        "sizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size of the file in bytes"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "GpuByPciCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new GPU by PCI ID mapping",
+      "properties": {
+        "cudaMajorVersion": {
+          "type": "string",
+          "description": "CUDA major version"
+        },
+        "cudaMinorVersion": {
+          "type": "string",
+          "description": "CUDA minor version"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name for the GPU"
+        },
+        "formFactor": {
+          "type": "string",
+          "description": "GPU form factor"
+        },
+        "gpuCounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Set of GPU counts (tinyint range)"
+        },
+        "labelName": {
+          "type": "string",
+          "description": "Label name for the GPU"
+        },
+        "memorySizeGb": {
+          "type": "integer",
+          "description": "Memory size in GB (smallint range)"
+        },
+        "pciDeviceId": {
+          "type": "string",
+          "description": "PCI Device ID"
+        },
+        "pciSubsystemDeviceId": {
+          "type": "string",
+          "description": "PCI Subsystem Device ID"
+        },
+        "pciVendorId": {
+          "type": "string",
+          "description": "PCI Vendor ID"
+        }
+      }
+    },
+    "GpuByPciResponse": {
+      "type": "object",
+      "description": "Response for GPU by PCI ID lookup",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "cudaMajorVersion": {
+          "type": "string",
+          "description": "CUDA major version"
+        },
+        "cudaMinorVersion": {
+          "type": "string",
+          "description": "CUDA minor version"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name for the GPU"
+        },
+        "formFactor": {
+          "type": "string",
+          "description": "GPU form factor"
+        },
+        "gpuCounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Set of GPU counts (tinyint range)"
+        },
+        "labelName": {
+          "type": "string",
+          "description": "Label name for the GPU"
+        },
+        "memorySizeGb": {
+          "type": "integer",
+          "description": "Memory size in GB (smallint range)"
+        },
+        "pciDeviceId": {
+          "type": "string",
+          "description": "PCI Device ID"
+        },
+        "pciSubsystemDeviceId": {
+          "type": "string",
+          "description": "PCI Subsystem Device ID"
+        },
+        "pciVendorId": {
+          "type": "string",
+          "description": "PCI Vendor ID"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      }
+    },
+    "GpuByPciUpdateRequest": {
+      "type": "object",
+      "description": "Request to update a GPU by PCI ID mapping",
+      "properties": {
+        "cudaMajorVersion": {
+          "type": "string",
+          "description": "CUDA major version"
+        },
+        "cudaMinorVersion": {
+          "type": "string",
+          "description": "CUDA minor version"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name for the GPU"
+        },
+        "formFactor": {
+          "type": "string",
+          "description": "GPU form factor"
+        },
+        "gpuCounts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Set of GPU counts (tinyint range)"
+        },
+        "labelName": {
+          "type": "string",
+          "description": "Label name for the GPU"
+        },
+        "memorySizeGb": {
+          "type": "integer",
+          "description": "Memory size in GB (smallint range)"
+        }
+      }
+    },
+    "Health": {
+      "type": "object",
+      "description": "object that describes health of the service",
+      "properties": {
+        "healthCode": {
+          "type": "string",
+          "description": "Enum that describes health of the service"
+        },
+        "healthCodeDescription": {
+          "type": "string",
+          "description": "Human readable description"
+        },
+        "metaData": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MetaData"
+          }
+        }
+      }
+    },
+    "HealthResponse": {
+      "type": "object",
+      "description": "This API is invoked by monitoring tools, other services and infrastruct\n    ure to retrieve health status the targeted service, this is unprotecte\n    d method",
+      "properties": {
+        "health": {
+          "$ref": "#/components/schemas/Health",
+          "x-description": "object that describes health of the service"
+        }
+      }
+    },
+    "HelmApiErrorResponse": {
+      "type": "object",
+      "description": "Helm API error response",
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "HelmChartDependency": {
+      "type": "object",
+      "description": "Helm chart dependency object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the chart (example: nginx)"
+        },
+        "repository": {
+          "type": "string",
+          "description": "The repository URL (example: https://example.com/charts)"
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the chart (example: 1.2.3)"
+        }
+      }
+    },
+    "HelmChartMaintainer": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The maintainer's email (optional for each maintainer)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The maintainer's name (required for each maintainer)"
+        },
+        "url": {
+          "type": "string",
+          "description": "A URL for the maintainer (optional for each maintainer)"
+        }
+      }
+    },
+    "HelmChartVersion": {
+      "type": "object",
+      "description": "Helm chart version object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "description": "The chart API version (required)"
+        },
+        "appVersion": {
+          "type": "string",
+          "description": "The version of the app that this contains (optional). This nee\n        dn't be SemVer."
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/HelmChartDependency"
+          },
+          "description": "A list of the chart requirements (optional)"
+        },
+        "deprecated": {
+          "type": "boolean",
+          "description": "Whether this chart is deprecated (optional, boolean)"
+        },
+        "description": {
+          "type": "string",
+          "description": "A single-sentence description of this project (optional)"
+        },
+        "home": {
+          "type": "string",
+          "description": "The URL of this project's home page (optional)"
+        },
+        "icon": {
+          "type": "string",
+          "description": "A URL to an SVG or PNG image to be used as an icon (optional)."
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of keywords about this project (optional)"
+        },
+        "kubeVersion": {
+          "type": "string",
+          "description": "A SemVer range of compatible Kubernetes versions (optional)"
+        },
+        "maintainers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/HelmChartMaintainer"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the chart (required)"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of URLs to source code for this project (optional)"
+        },
+        "type": {
+          "type": "string",
+          "description": "It is the type of chart (optional)"
+        },
+        "version": {
+          "type": "string",
+          "description": "A SemVer 2 version (required)"
+        }
+      }
+    },
+    "HelmChartVersionCreateResponse": {
+      "type": "object",
+      "description": "Helm chart version creation response",
+      "properties": {
+        "saved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "KeyArtifactListResponse": {
+      "type": "object",
+      "description": "Response containing a list of artifacts associated with a key",
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactItem"
+          },
+          "description": "List of artifacts associated with the key"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "KeyItem": {
+      "type": "object",
+      "description": "Key item with ID and create timestamp string",
+      "properties": {
+        "created": {
+          "type": "string",
+          "description": "The creation timestamp of the key item in ISO-8601 format. For\n        mat: YYYY-MM-DDTHH:mm:ss.sssZ."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the encryption key"
+        },
+        "encryptionKeyId": {
+          "type": "string",
+          "description": "The encryption key identifier in UUID format."
+        }
+      }
+    },
+    "KeyListResponse": {
+      "type": "object",
+      "description": "Response to list keys request",
+      "properties": {
+        "encryptionKeys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/KeyItem"
+          }
+        }
+      }
+    },
+    "LicenseMetadata": {
+      "type": "object",
+      "description": "License information for the artifact",
+      "properties": {
+        "configuredLicenseTerms": {
+          "$ref": "#/components/schemas/ConfiguredLicenseTerms",
+          "x-description": "License information for the artifact"
+        },
+        "governingTerms": {
+          "type": "string",
+          "description": "Comprehensive terms and links related to the license"
+        },
+        "licenseId": {
+          "type": "string",
+          "description": "License ID"
+        },
+        "licenseVersion": {
+          "type": "string",
+          "description": "License version ID"
+        },
+        "needsAcceptance": {
+          "type": "boolean",
+          "description": "Indicator if user needs to accept this license"
+        }
+      }
+    },
+    "LicenseTag": {
+      "type": "object",
+      "description": "License tag information for individual term",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Category of the tag"
+        },
+        "key": {
+          "type": "string",
+          "description": "Key identifier for the tag"
+        },
+        "label": {
+          "type": "string",
+          "description": "License Label"
+        },
+        "tag": {
+          "type": "string",
+          "description": "License tag name"
+        },
+        "url": {
+          "type": "string",
+          "description": "Link to the hosted license"
+        }
+      }
+    },
+    "MetaData": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "Model": {
+      "type": "object",
+      "description": "Model object",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "application": {
+          "type": "string",
+          "description": "Application of the model"
+        },
+        "bias": {
+          "type": "string",
+          "description": "Text describing bias in the model"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the repository"
+        },
+        "canGuestDownload": {
+          "type": "boolean",
+          "description": "Indicates if a guest user can download"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the model"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "encryptionKeyId": {
+          "type": "string",
+          "description": "ID of the customer managed encryption key associated with this\n         artifact"
+        },
+        "explainability": {
+          "type": "string",
+          "description": "Text describing explainability for this model"
+        },
+        "framework": {
+          "type": "string",
+          "description": "Framework used to train this model"
+        },
+        "hasPlayground": {
+          "type": "boolean",
+          "description": "indicate if the Model has AI Playground configured"
+        },
+        "hasSignedVersion": {
+          "type": "boolean",
+          "description": "Indicates if the model has any signed versions"
+        },
+        "isFavourite": {
+          "type": "boolean",
+          "description": "Flag indicating if model is user's favorite"
+        },
+        "isPlaygroundEnabled": {
+          "type": "boolean",
+          "description": "indicate if AI Playground is enabled in the catalog"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Determines if model is publicly accessible"
+        },
+        "isReadOnly": {
+          "type": "boolean",
+          "description": "indicate if current user has read only permissions"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "latestVersionGpuModel": {
+          "type": "string",
+          "description": "GPU model and memory used for the latest version"
+        },
+        "latestVersionId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Deprecated: Please use latestVersionIdStr instead. ID of the \n        latest version"
+        },
+        "latestVersionIdStr": {
+          "type": "string",
+          "description": "ID of the latest version"
+        },
+        "latestVersionSizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size of the latest version in bytes"
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "modelFormat": {
+          "type": "string",
+          "description": "Format of the model"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the model"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the model belongs to"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of model's owner"
+        },
+        "policyLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "list of policy labels on the artifact"
+        },
+        "precision": {
+          "type": "string",
+          "description": "Precision this model was trained with"
+        },
+        "privacy": {
+          "type": "string",
+          "description": "Text describing the privacy for this model"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        },
+        "publicDatasetUsed": {
+          "$ref": "#/components/schemas/Dataset"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the repository"
+        },
+        "safetyAndSecurity": {
+          "type": "string",
+          "description": "Text for describing the safety and security in the model"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the model"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the model belongs to"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ModelCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new model",
+      "properties": {
+        "application": {
+          "type": "string",
+          "description": "Application of the model"
+        },
+        "bias": {
+          "type": "string",
+          "description": "Text describing bias in the model"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the repository"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the model"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "encryptionKey": {
+          "$ref": "#/components/schemas/EncryptionKey",
+          "x-description": "Customer Managed Key shard configuration for the mod\n        el"
+        },
+        "explainability": {
+          "type": "string",
+          "description": "Text describing explainability for this model"
+        },
+        "framework": {
+          "type": "string",
+          "description": "Framework used to train this model"
+        },
+        "hasPlayground": {
+          "type": "boolean",
+          "description": "indicate if the Model has AI Playground configured"
+        },
+        "isPlaygroundEnabled": {
+          "type": "boolean",
+          "description": "indicate if AI Playground is enabled in the catalog"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "modelFormat": {
+          "type": "string",
+          "description": "Format of the model"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the model"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this model"
+        },
+        "precision": {
+          "type": "string",
+          "description": "Precision this model was trained with"
+        },
+        "privacy": {
+          "type": "string",
+          "description": "Text describing the privacy for this model"
+        },
+        "publicDatasetUsed": {
+          "$ref": "#/components/schemas/Dataset"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the repository"
+        },
+        "safetyAndSecurity": {
+          "type": "string",
+          "description": "Text for describing the safety and security in the model"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the model"
+        }
+      }
+    },
+    "ModelCreateResponse": {
+      "type": "object",
+      "description": "DEPRECATED - use ModelResponse schema",
+      "properties": {
+        "model": {
+          "$ref": "#/components/schemas/Model",
+          "x-description": "Model object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ModelFile": {
+      "type": "object",
+      "description": "Model file object",
+      "properties": {
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the file"
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative file path from the root of the model"
+        },
+        "sha256_base64": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the artifact file"
+        },
+        "sizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size of the file in bytes"
+        }
+      }
+    },
+    "ModelListResponse": {
+      "type": "object",
+      "description": "Response to list models request",
+      "properties": {
+        "models": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Model"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ModelResponse": {
+      "type": "object",
+      "description": "Response to create model request",
+      "properties": {
+        "model": {
+          "$ref": "#/components/schemas/Model",
+          "x-description": "Model object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ModelSimplified": {
+      "type": "object",
+      "description": "Model object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique name of the model"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the model belongs to"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the model belongs to"
+        }
+      }
+    },
+    "ModelUpdateRequest": {
+      "type": "object",
+      "description": "Request to create a new model",
+      "properties": {
+        "application": {
+          "type": "string",
+          "description": "Application of the model"
+        },
+        "bias": {
+          "type": "string",
+          "description": "Text describing bias in the model"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the repository"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the model"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "explainability": {
+          "type": "string",
+          "description": "Text describing explainability for this model"
+        },
+        "framework": {
+          "type": "string",
+          "description": "Framework used to train this model"
+        },
+        "hasPlayground": {
+          "type": "boolean",
+          "description": "indicate if the Model has AI Playground configured"
+        },
+        "isPlaygroundEnabled": {
+          "type": "boolean",
+          "description": "indicate if AI Playground is enabled in the catalog"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "modelFormat": {
+          "type": "string",
+          "description": "Format of the model"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this model"
+        },
+        "precision": {
+          "type": "string",
+          "description": "Precision this model was trained with"
+        },
+        "privacy": {
+          "type": "string",
+          "description": "Text describing the privacy for this model"
+        },
+        "publicDatasetUsed": {
+          "$ref": "#/components/schemas/Dataset"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the repository"
+        },
+        "safetyAndSecurity": {
+          "type": "string",
+          "description": "Text for describing the safety and security in the model"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the model"
+        }
+      }
+    },
+    "ModelVersion": {
+      "type": "object",
+      "description": "Model version object",
+      "properties": {
+        "accuracyReached": {
+          "type": "number",
+          "description": "Accuracy this model reached"
+        },
+        "batchSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Batch size this model was trained with"
+        },
+        "createdByUser": {
+          "type": "string",
+          "description": "Id of the user who created this model"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetricGroup"
+          },
+          "description": "Custom Metrics key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the model version"
+        },
+        "gpuModel": {
+          "type": "string",
+          "description": "GPU model and memory"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Deprecated: Please use versionId instead. Unique ID of the ve\n        rsion"
+        },
+        "isSigned": {
+          "type": "boolean",
+          "description": "Indicates if the version is signed"
+        },
+        "malwareScanDate": {
+          "type": "string",
+          "description": "Scan date in ISO-8601 format"
+        },
+        "malwareScanStatus": {
+          "type": "string",
+          "description": "Malware scan status"
+        },
+        "memoryFootprint": {
+          "type": "string",
+          "description": "Model size/memory footprint for inference"
+        },
+        "numberOfEpochs": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of epochs this model trained"
+        },
+        "nvcfContainerConfiguration": {
+          "$ref": "#/components/schemas/NvcfContainerConfiguration",
+          "x-description": "NVCF container configuration parameters"
+        },
+        "nvcfDeploymentSpecification": {
+          "$ref": "#/components/schemas/NvcfDeploymentSpecification",
+          "x-description": "NVCF deployment specification"
+        },
+        "otherContents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "List of external contents"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this version"
+        },
+        "policy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Policy label to be added to a specific version"
+        },
+        "releaseType": {
+          "type": "string",
+          "description": "Release type enum for the artifact version in the \n        product lifecycle."
+        },
+        "status": {
+          "type": "string",
+          "description": "Version status"
+        },
+        "storageVersion": {
+          "type": "string",
+          "description": "The storage version i.e. the format the file and their content\n        s are persisted in in object store. Possible values include V1\n         - for legacy artifact versions with files, V2 - for new artifact vers\n        ions with blob registry, `` - for artifact versions without any files."
+        },
+        "totalFileCount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total file count"
+        },
+        "totalSizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total size of the model in bytes"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        },
+        "versionId": {
+          "type": "string",
+          "description": "Unique version id. Please use this instead of 'id'"
+        }
+      }
+    },
+    "ModelVersionCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new model version",
+      "properties": {
+        "accuracyReached": {
+          "type": "number",
+          "description": "Accuracy this model reached"
+        },
+        "batchSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Batch size this model was trained with"
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetricGroup"
+          },
+          "description": "Custom Metrics key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the model version"
+        },
+        "gpuModel": {
+          "type": "string",
+          "description": "GPU model and memory"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Deprecated: Please use version instead. Unique ID of the vers\n        ion"
+        },
+        "memoryFootprint": {
+          "type": "string",
+          "description": "Model size/memory footprint for inference"
+        },
+        "numberOfEpochs": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of epochs this model trained"
+        },
+        "nvcfContainerConfiguration": {
+          "$ref": "#/components/schemas/NvcfContainerConfiguration",
+          "x-description": "NVCF container configuration parameters"
+        },
+        "nvcfDeploymentSpecification": {
+          "$ref": "#/components/schemas/NvcfDeploymentSpecification",
+          "x-description": "NVCF deployment specification"
+        },
+        "otherContents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "List of external contents"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this version"
+        },
+        "versionId": {
+          "type": "string",
+          "description": "Unique version id. Please use this instead of 'id'"
+        }
+      }
+    },
+    "ModelVersionCreateResponse": {
+      "type": "object",
+      "description": "DEPRECATED - use ModelVersionResponse",
+      "properties": {
+        "model": {
+          "$ref": "#/components/schemas/Model",
+          "x-description": "Model object"
+        },
+        "modelVersion": {
+          "$ref": "#/components/schemas/ModelVersion",
+          "x-description": "Model version object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ModelVersionFileListResponse": {
+      "type": "object",
+      "description": "Response to list files for model version request",
+      "properties": {
+        "model": {
+          "$ref": "#/components/schemas/Model",
+          "x-description": "Model object"
+        },
+        "modelFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ModelFile"
+          }
+        },
+        "modelVersion": {
+          "$ref": "#/components/schemas/ModelVersion",
+          "x-description": "Model version object"
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ModelVersionListResponse": {
+      "type": "object",
+      "description": "Response to list model versions request",
+      "properties": {
+        "model": {
+          "$ref": "#/components/schemas/Model",
+          "x-description": "Model object"
+        },
+        "modelVersions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ModelVersion"
+          }
+        },
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ModelVersionResponse": {
+      "type": "object",
+      "description": "Response to create a model version request",
+      "properties": {
+        "model": {
+          "$ref": "#/components/schemas/Model",
+          "x-description": "Model object"
+        },
+        "modelVersion": {
+          "$ref": "#/components/schemas/ModelVersion",
+          "x-description": "Model version object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "ModelVersionUpdateRequest": {
+      "type": "object",
+      "description": "Request to create a new model version",
+      "properties": {
+        "accuracyReached": {
+          "type": "number",
+          "description": "Accuracy this model reached"
+        },
+        "batchSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Batch size this model was trained with"
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetricGroup"
+          },
+          "description": "Custom Metrics key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the model version"
+        },
+        "gpuModel": {
+          "type": "string",
+          "description": "GPU model and memory"
+        },
+        "memoryFootprint": {
+          "type": "string",
+          "description": "Model size/memory footprint for inference"
+        },
+        "numberOfEpochs": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of epochs this model trained"
+        },
+        "nvcfContainerConfiguration": {
+          "$ref": "#/components/schemas/NvcfContainerConfiguration",
+          "x-description": "NVCF container configuration parameters"
+        },
+        "nvcfDeploymentSpecification": {
+          "$ref": "#/components/schemas/NvcfDeploymentSpecification",
+          "x-description": "NVCF deployment specification"
+        },
+        "otherContents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "List of external contents"
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Name of the user who owns this version"
+        },
+        "status": {
+          "type": "string",
+          "description": "Version status"
+        }
+      }
+    },
+    "MultipartUploadAbortRequest": {
+      "type": "object",
+      "description": "Request body for aborting a multipart upload for artifacts",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Type of artifact"
+        },
+        "filePath": {
+          "type": "string",
+          "description": "The file path for the artifact upload"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the artifact"
+        },
+        "uploadID": {
+          "type": "string",
+          "description": "The unique ID assigned for this multipart upload to associate \n        all upload parts. This is the basic base64 encoded data of the\n         MultipartUploadIDSchema"
+        },
+        "version": {
+          "type": "string",
+          "description": "Artifact version"
+        }
+      }
+    },
+    "MultipartUploadCompleteRequest": {
+      "type": "object",
+      "description": "Request body for completing a multipart upload for artifacts",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Type of artifact"
+        },
+        "filePath": {
+          "type": "string",
+          "description": "The file path for the artifact upload"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the artifact"
+        },
+        "sha256": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the entire file"
+        },
+        "uploadID": {
+          "type": "string",
+          "description": "The unique ID assigned for this multipart upload to associate \n        all upload parts. This is the basic base64 encoded data of the\n         MultipartUploadIDSchema"
+        },
+        "version": {
+          "type": "string",
+          "description": "Artifact version"
+        }
+      }
+    },
+    "MultipartUploadCreateRequest": {
+      "type": "object",
+      "description": "Request body for creating a multipart upload for artifacts",
+      "properties": {
+        "artifactType": {
+          "type": "string",
+          "description": "Type of artifact"
+        },
+        "customPartSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Custom chunk size of the file to be uploaded, in bytes. shoul\n        d be >= 5MB and <= 500MB. default is 500 in MB."
+        },
+        "filePath": {
+          "type": "string",
+          "description": "The file path for the artifact upload"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the artifact"
+        },
+        "partNumberList": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of parts to re-generate urls for"
+        },
+        "sha256": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the artifact file to be uploaded"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64",
+          "description": "total size of the artifact, in bytes"
+        },
+        "uploadID": {
+          "type": "string",
+          "description": "Upload id of an already initiated Multipart upload"
+        },
+        "version": {
+          "type": "string",
+          "description": "Artifact version"
+        }
+      }
+    },
+    "MultipartUploadCreateResponse": {
+      "type": "object",
+      "description": "Response body for creating a multipart upload for artifacts",
+      "properties": {
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "partSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The size of each part upload in bytes"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        },
+        "uploadID": {
+          "type": "string",
+          "description": "The unique ID assigned for this multipart upload to associate \n        all upload parts. This is the basic base64 encoded data of the\n         MultipartUploadIDSchema"
+        },
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of presigned urls for upload"
+        }
+      }
+    },
+    "MultipartUploadIDSchema": {
+      "type": "object",
+      "description": "Schema for base64 encoded stringified Upload ID that is relayed during \n    multipart upload of artifacts",
+      "properties": {
+        "dekMeta": {
+          "type": "string",
+          "description": "DEK metadata for encrypted enabled orgs"
+        },
+        "sha256": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the entire file"
+        },
+        "uploadID": {
+          "type": "string",
+          "description": "CSP upload ID"
+        }
+      }
+    },
+    "NotifyMalwareScanResultResponse": {
+      "type": "object",
+      "description": "Notify malware scan result response",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Malware scan status"
+        }
+      }
+    },
+    "NvcfContainerConfiguration": {
+      "type": "object",
+      "description": "NVCF container configuration parameters",
+      "properties": {
+        "apiBodyFormat": {
+          "type": "string",
+          "description": "API body format"
+        },
+        "containerArgs": {
+          "type": "string",
+          "description": "Container arguments"
+        },
+        "containerEnvironment": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/MetaData"
+          },
+          "description": "Container environment consisting of key value pair"
+        },
+        "containerImage": {
+          "type": "string",
+          "description": "Container Image"
+        },
+        "healthUri": {
+          "type": "string",
+          "description": "Health URI"
+        },
+        "inferencePort": {
+          "type": "string",
+          "description": "Inference port"
+        },
+        "inferenceUrl": {
+          "type": "string",
+          "description": "Inference url"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/NvcfContainerModel"
+          },
+          "description": "Models version object metadata"
+        }
+      }
+    },
+    "NvcfContainerModel": {
+      "type": "object",
+      "description": "Models version object metadata",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Model name"
+        },
+        "uri": {
+          "type": "string",
+          "description": "Model URI"
+        },
+        "version": {
+          "type": "string",
+          "description": "Model version"
+        }
+      }
+    },
+    "NvcfDeploymentSpecification": {
+      "type": "object",
+      "description": "NVCF deployment specification",
+      "properties": {
+        "gpuCount": {
+          "type": "integer",
+          "description": "GPU count"
+        },
+        "gpuType": {
+          "type": "string",
+          "description": "GPU type"
+        },
+        "instanceType": {
+          "type": "string",
+          "description": "Instance type"
+        },
+        "maxConcurrency": {
+          "type": "integer",
+          "description": "Maximum concurrency"
+        }
+      }
+    },
+    "PaginationInfo": {
+      "type": "object",
+      "description": "Pagination Information",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Page index of results"
+        },
+        "nextPage": {
+          "type": "string",
+          "description": "Serialized pointer to the next results page. Should be used fo\n        r fetching next page. Can be empty"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Number of results in page"
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total number of pages available"
+        },
+        "totalResults": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total number of results available"
+        }
+      }
+    },
+    "Recipe": {
+      "type": "object",
+      "description": "Recipe object",
+      "properties": {
+        "accessType": {
+          "type": "string"
+        },
+        "advanced": {
+          "type": "string",
+          "description": "Text for describing advanced information"
+        },
+        "application": {
+          "type": "string"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "Organization that built the recipe"
+        },
+        "canGuestDownload": {
+          "type": "boolean",
+          "description": "Indicates if a guest user can download"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the recipe"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "hasSignedVersion": {
+          "type": "boolean",
+          "description": "Indicates if the recipe has any signed versions"
+        },
+        "isFavourite": {
+          "type": "boolean",
+          "description": "Flag indicating if recipe is user's favorite"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Determines if this recipe is publicly accessible"
+        },
+        "isReadOnly": {
+          "type": "boolean",
+          "description": "indicate if current user has read only permissions"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "latestVersionId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Deprecated: Please use latestVersionIdStr instead. ID of the \n        latest version"
+        },
+        "latestVersionIdStr": {
+          "type": "string",
+          "description": "ID of the latest version"
+        },
+        "latestVersionSizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size of the latest version in bytes"
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the model"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "modelFormat": {
+          "type": "string",
+          "description": "Format of the model this recipe produces"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the recipe"
+        },
+        "orgName": {
+          "type": "string",
+          "description": "Name of the org that the recipe belongs to"
+        },
+        "performance": {
+          "type": "string",
+          "description": "Text describing performance of the recipe results"
+        },
+        "policyLabels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "list of policy labels on the artifact"
+        },
+        "precision": {
+          "type": "string"
+        },
+        "productNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product names"
+        },
+        "publicDatasetUsed": {
+          "$ref": "#/components/schemas/Dataset"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "Organization that published this recipe"
+        },
+        "quickStartGuide": {
+          "type": "string",
+          "description": "Text with a guide to getting started"
+        },
+        "relatedModels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Model"
+          }
+        },
+        "setup": {
+          "type": "string",
+          "description": "Text describing recipe setup"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the recipe"
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team that the recipe belongs to"
+        },
+        "trainingFramework": {
+          "type": "string"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "Updated date in ISO-8601 format"
+        }
+      }
+    },
+    "RecipeCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new recipe",
+      "properties": {
+        "advanced": {
+          "type": "string",
+          "description": "Text for describing advanced information"
+        },
+        "application": {
+          "type": "string"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the recipe"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the recipe"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the recipe"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "modelFormat": {
+          "type": "string",
+          "description": "Format of the model this recipe produces"
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the recipe"
+        },
+        "performance": {
+          "type": "string",
+          "description": "Text describing performance of the recipe results"
+        },
+        "precision": {
+          "type": "string"
+        },
+        "publicDatasetUsed": {
+          "$ref": "#/components/schemas/Dataset"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the recipe"
+        },
+        "quickStartGuide": {
+          "type": "string",
+          "description": "Text with a guide to getting started"
+        },
+        "setup": {
+          "type": "string",
+          "description": "Text describing recipe setup"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the recipe"
+        },
+        "trainingFramework": {
+          "type": "string"
+        }
+      }
+    },
+    "RecipeFile": {
+      "type": "object",
+      "description": "Recipe file object",
+      "properties": {
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the file"
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative file path from the root of the recipe"
+        },
+        "sha256_base64": {
+          "type": "string",
+          "description": "Base64 encoded sha256 hash of the artifact file"
+        },
+        "sizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Size of the file in bytes"
+        }
+      }
+    },
+    "RecipeListResponse": {
+      "type": "object",
+      "description": "Response to list recipes request",
+      "properties": {
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "recipes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Recipe"
+          }
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "RecipeResponse": {
+      "type": "object",
+      "description": "Response to recipe request",
+      "properties": {
+        "recipe": {
+          "$ref": "#/components/schemas/Recipe",
+          "x-description": "Recipe object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "RecipeUpdateRequest": {
+      "type": "object",
+      "description": "Request to create a new recipe",
+      "properties": {
+        "advanced": {
+          "type": "string",
+          "description": "Text for describing advanced information"
+        },
+        "application": {
+          "type": "string"
+        },
+        "builtBy": {
+          "type": "string",
+          "description": "organization that built the recipe"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the recipe"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labelsV2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licenseTerms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/LicenseMetadata"
+          },
+          "description": "License information for the recipe"
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL for the logo image"
+        },
+        "modelFormat": {
+          "type": "string",
+          "description": "Format of the model this recipe produces"
+        },
+        "performance": {
+          "type": "string",
+          "description": "Text describing performance of the recipe results"
+        },
+        "precision": {
+          "type": "string"
+        },
+        "publicDatasetUsed": {
+          "$ref": "#/components/schemas/Dataset"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "organization that published the recipe"
+        },
+        "quickStartGuide": {
+          "type": "string",
+          "description": "Text with a guide to getting started"
+        },
+        "relatedModels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ModelSimplified"
+          }
+        },
+        "setup": {
+          "type": "string",
+          "description": "Text describing recipe setup"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the recipe"
+        },
+        "trainingFramework": {
+          "type": "string"
+        }
+      }
+    },
+    "RecipeVersion": {
+      "type": "object",
+      "description": "Recipe version object",
+      "properties": {
+        "accuracyReached": {
+          "type": "number",
+          "description": "Accuracy this recipe reached"
+        },
+        "batchSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Batch size this recipe was trained with"
+        },
+        "createdByUser": {
+          "type": "string",
+          "description": "Id of the user who created this recipe"
+        },
+        "createdDate": {
+          "type": "string",
+          "description": "Creation date in ISO-8601 format"
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetricGroup"
+          },
+          "description": "Custom Metrics key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the recipe version"
+        },
+        "gpuModel": {
+          "type": "string",
+          "description": "GPU model and memory"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Deprecated: Please use versionId instead. Unique ID of the ve\n        rsion"
+        },
+        "isSigned": {
+          "type": "boolean",
+          "description": "Indicates if the version is signed"
+        },
+        "malwareScanDate": {
+          "type": "string",
+          "description": "Scan date in ISO-8601 format"
+        },
+        "malwareScanStatus": {
+          "type": "string",
+          "description": "Malware scan status"
+        },
+        "memoryFootprint": {
+          "type": "string",
+          "description": "recipe size/memory footprint for inference"
+        },
+        "numberOfEpochs": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of epochs this recipe trained"
+        },
+        "otherContents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "List of external contents"
+        },
+        "performance": {
+          "type": "string",
+          "description": "Text describing performance of the recipe results"
+        },
+        "policy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Policy label to be added to a specific version"
+        },
+        "quickStartGuide": {
+          "type": "string",
+          "description": "Text with a guide to getting started"
+        },
+        "releaseNotes": {
+          "type": "string",
+          "description": "Text describing this release"
+        },
+        "releaseType": {
+          "type": "string",
+          "description": "Release type enum for the artifact version in the \n        product lifecycle."
+        },
+        "setup": {
+          "type": "string",
+          "description": "Text describing recipe setup"
+        },
+        "status": {
+          "type": "string",
+          "description": "Version status"
+        },
+        "storageVersion": {
+          "type": "string",
+          "description": "The storage version i.e. the format the file and their content\n        s are persisted in in object store. Possible values include V1\n         - for legacy artifact versions with files, V2 - for new artifact vers\n        ions with blob registry, `` - for artifact versions without any files."
+        },
+        "totalFileCount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total file count"
+        },
+        "totalSizeInBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total size of the recipe in bytes"
+        },
+        "versionId": {
+          "type": "string",
+          "description": "Unique version id. Please use this instead of 'id'"
+        }
+      }
+    },
+    "RecipeVersionCreateRequest": {
+      "type": "object",
+      "description": "Request to create a new recipe version",
+      "properties": {
+        "accuracyReached": {
+          "type": "number",
+          "description": "Accuracy this recipe reached"
+        },
+        "batchSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Batch size this recipe was trained with"
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetricGroup"
+          },
+          "description": "Custom Metrics key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the recipe version"
+        },
+        "gpuModel": {
+          "type": "string",
+          "description": "GPU model and memory"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Deprecated: Please use version instead. Unique ID of the vers\n        ion"
+        },
+        "memoryFootprint": {
+          "type": "string",
+          "description": "Recipe size/memory footprint for inference"
+        },
+        "numberOfEpochs": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of epochs this recipe trained"
+        },
+        "otherContents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "List of external contents"
+        },
+        "performance": {
+          "type": "string",
+          "description": "Text describing performance of the recipe results"
+        },
+        "quickStartGuide": {
+          "type": "string",
+          "description": "Text with a guide to getting started"
+        },
+        "releaseNotes": {
+          "type": "string",
+          "description": "Text describing this release"
+        },
+        "setup": {
+          "type": "string",
+          "description": "Text describing recipe setup"
+        },
+        "versionId": {
+          "type": "string",
+          "description": "Unique version id. Please use this instead of 'id'"
+        }
+      }
+    },
+    "RecipeVersionFileListResponse": {
+      "type": "object",
+      "description": "Response to list files for recipe version request",
+      "properties": {
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "recipe": {
+          "$ref": "#/components/schemas/Recipe",
+          "x-description": "Recipe object"
+        },
+        "recipeFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RecipeFile"
+          }
+        },
+        "recipeVersion": {
+          "$ref": "#/components/schemas/RecipeVersion",
+          "x-description": "Recipe version object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "RecipeVersionListResponse": {
+      "type": "object",
+      "description": "Response to list recipe versions request",
+      "properties": {
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "recipe": {
+          "$ref": "#/components/schemas/Recipe",
+          "x-description": "Recipe object"
+        },
+        "recipeVersions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/RecipeVersion"
+          }
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "RecipeVersionResponse": {
+      "type": "object",
+      "description": "Response to recipe version request",
+      "properties": {
+        "recipe": {
+          "$ref": "#/components/schemas/Recipe",
+          "x-description": "Recipe object"
+        },
+        "recipeVersion": {
+          "$ref": "#/components/schemas/RecipeVersion",
+          "x-description": "Recipe version object"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "RecipeVersionUpdateRequest": {
+      "type": "object",
+      "description": "Request to create a new recipe version",
+      "properties": {
+        "accuracyReached": {
+          "type": "number",
+          "description": "Accuracy this recipe reached"
+        },
+        "batchSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Batch size this recipe was trained with"
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CustomMetricGroup"
+          },
+          "description": "Custom Metrics key/value pairs"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the recipe version"
+        },
+        "gpuModel": {
+          "type": "string",
+          "description": "GPU model and memory"
+        },
+        "memoryFootprint": {
+          "type": "string",
+          "description": "Recipe size/memory footprint for inference"
+        },
+        "numberOfEpochs": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of epochs this recipe trained"
+        },
+        "otherContents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactAttribute"
+          },
+          "description": "List of external contents"
+        },
+        "performance": {
+          "type": "string",
+          "description": "Text describing performance of the recipe results"
+        },
+        "quickStartGuide": {
+          "type": "string",
+          "description": "Text with a guide to getting started"
+        },
+        "releaseNotes": {
+          "type": "string",
+          "description": "Text describing this release"
+        },
+        "setup": {
+          "type": "string",
+          "description": "Text describing recipe setup"
+        },
+        "status": {
+          "type": "string",
+          "description": "Version status"
+        }
+      }
+    },
+    "RequestStatus": {
+      "type": "object",
+      "description": "Request status information",
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "description": "Request ID"
+        },
+        "serverId": {
+          "type": "string",
+          "description": "Server ID"
+        },
+        "statusCode": {
+          "type": "string",
+          "description": "Describes response status reported by the server."
+        },
+        "statusDescription": {
+          "type": "string",
+          "description": "Status description"
+        }
+      }
+    },
+    "Response": {
+      "type": "object",
+      "properties": {
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        }
+      }
+    },
+    "UpdateArtifactVersionConfigs": {
+      "type": "object",
+      "description": "Request to publish an artifact",
+      "properties": {
+        "policy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Policy label to be added to a specific version"
+        }
+      }
+    },
+    "UpdateReleaseTypeRequest": {
+      "type": "object",
+      "description": "Request to update release type of an artifact version",
+      "properties": {
+        "releaseType": {
+          "type": "string",
+          "description": "Release type enum for the artifact version in the \n        product lifecycle."
+        },
+        "version": {
+          "type": "string",
+          "description": "Artifact version"
+        }
+      }
+    },
+    "VersionsOwnersListResponse": {
+      "type": "object",
+      "description": "Response to list versions owners",
+      "properties": {
+        "paginationInfo": {
+          "$ref": "#/components/schemas/PaginationInfo",
+          "x-description": "Pagination Information"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        },
+        "versionsOwnersList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ArtifactOwnerDetails"
+          }
+        }
+      }
+    },
+    "WorkflowStatusResponse": {
+      "type": "object",
+      "description": "Response containing workflow status information",
+      "properties": {
+        "cloneStatus": {
+          "$ref": "#/components/schemas/CloneStatus",
+          "x-description": "Progress of cloning artifact version files"
+        },
+        "duration": {
+          "type": "string",
+          "description": "Wall-clock execution duration as an ISO-8601 duration (e.g. PT\n        1H30M5S, PT0.001S); Omitted while IN_PROGRESS."
+        },
+        "endTime": {
+          "type": "string",
+          "description": "UTC instant when the workflow reached a closed state; omitted \n        while IN_PROGRESS."
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable message about the workflow status"
+        },
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "UTC instant when the workflow execution started."
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the workflow"
+        },
+        "workflowType": {
+          "type": "string",
+          "description": "Workflow type."
+        }
+      }
+    },
+    "WorkflowStatusUrlResponse": {
+      "type": "object",
+      "description": "Response containing workflow status URL and ID",
+      "properties": {
+        "requestStatus": {
+          "$ref": "#/components/schemas/RequestStatus",
+          "x-description": "Request status information"
+        },
+        "statusUrl": {
+          "type": "string",
+          "description": "URL to check the workflow status"
+        },
+        "workflowId": {
+          "type": "string",
+          "description": "ID of the workflow"
+        }
+      }
+    }
+  }
+}
