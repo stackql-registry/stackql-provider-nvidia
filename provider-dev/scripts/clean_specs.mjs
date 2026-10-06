@@ -503,6 +503,19 @@ fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 for (const [file, spec] of cleaned) {
   fs.writeFileSync(path.join(cleanedDir, file), JSON.stringify(spec, null, 2) + '\n');
 }
+// Keep the committed report byte-identical when nothing but the run date
+// would change: `generated` records the last run that changed the findings,
+// so a rebuild on a later day does not trip CI's generation-drift check.
+if (fs.existsSync(reportPath)) {
+  try {
+    const previous = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+    if (previous.generated && JSON.stringify(previous.sources) === JSON.stringify(report.sources)) {
+      report.generated = previous.generated;
+    }
+  } catch {
+    // unreadable previous report: write the fresh one
+  }
+}
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
 console.log(`Cleaned ${cleaned.size} spec(s) -> ${cleanedDir}`);
 console.log(`Fix report -> ${reportPath}`);
