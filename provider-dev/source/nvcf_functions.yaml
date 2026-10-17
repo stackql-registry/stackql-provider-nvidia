@@ -2,11 +2,26 @@ openapi: 3.1.0
 info:
   title: NVIDIA Cloud Functions - Functions
   description: 'NVCF functions and versions, function metadata, authorizations (function sharing grants), secrets and rate limits (source: the published NVCF OpenAPI specification; management operations served from api.ngc.nvidia.com).'
-  version: 2.256.0
+  version: 2.261.2
 paths:
+  /v2/nvcf/authorizations/functions:
+    get:
+      description: 'Lists all the function versions in an account that have been shared/authorized  with/to other accounts. Response includes the nca-ids of the authorized  accounts. If a function version is not shared/authorized, then it is not  included in the response. Access to this functionality mandates the inclusion of a bearer token with the  ''authorize_clients'' scope in the HTTP Authorization header '
+      operationId: getAuthorizedPartiesForAllFunctions
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAuthorizedPartiesResponse'
+          description: OK
+      summary: List Functions Authorized/Shared With Other Accounts
+      tags:
+        - Function Sharing
+      parameters: []
   /v2/nvcf/authorizations/functions/{function_id}:
     get:
-      description: 'Lists NVIDIA Cloud Account IDs that are authorized to invoke any version of the  specified function. The response includes an array showing authorized accounts  for each version. Individual versions of a function can have their own  authorized accounts. So, each object in the array can have different  authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  ''authorize_clients'' scope in the HTTP Authorization header '
+      description: 'Lists function versions of the specified function and their corresponding  authorized accounts allowed to invoke the function version. Individual  versions of a function can have their own authorized accounts. So, each  object in the array can have different authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  ''authorize_clients'' scope in the HTTP Authorization header '
       operationId: getAuthorizedPartiesForAllVersions
       parameters:
         - description: Function id
@@ -25,7 +40,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ListAuthorizedPartiesResponse'
           description: OK
-      summary: List Account Authorizations For Function
+      summary: List Function Versions with Authorized Accounts For Specified Function
       tags:
         - Function Sharing
     post:
@@ -721,15 +736,6 @@ paths:
         - User Secret Management
 components:
   schemas:
-    AuthorizedPartiesResponse:
-      description: Parties authorized to invoke function
-      properties:
-        function:
-          $ref: '#/components/schemas/AuthorizedPartiesByFunctionDto'
-          description: Function with authorized parties and other details
-      required:
-        - function
-      type: object
     ListAuthorizedPartiesResponse:
       description: Parties authorized to invoke function
       properties:
@@ -742,6 +748,15 @@ components:
           type: array
       required:
         - functions
+      type: object
+    AuthorizedPartiesResponse:
+      description: Parties authorized to invoke function
+      properties:
+        function:
+          $ref: '#/components/schemas/AuthorizedPartiesByFunctionDto'
+          description: Function with authorized parties and other details
+      required:
+        - function
       type: object
     AuthorizedPartiesRequest:
       description: Request to associated authorized parties for a specific version or allversions of a function
@@ -1570,7 +1585,7 @@ components:
       description: LLM-specific configuration for a model
       properties:
         routingMethod:
-          description: Routing method for this model.
+          description: 'Routing method for this model: a request router algorithm name, optionally followed by '';name=value'' tuning parameters, for example pulsar;seed=stable-a. The API checks only the format. The request router checks the algorithm and parameters on each request.'
           format: UTF-8
           maxLength: 262144
           minLength: 0
@@ -1604,7 +1619,7 @@ components:
       description: Partial update payload for LLM-specific model configuration fields.
       properties:
         routingMethod:
-          description: Updated routing method for the model. When omitted, the existing value is preserved.
+          description: Updated routing method for the model, in the same format as llmConfig.routingMethod on create. When omitted, the existing value is preserved.
           format: UTF-8
           maxLength: 262144
           minLength: 0
@@ -1616,6 +1631,21 @@ components:
           maxLength: 262144
           minLength: 0
           type: string
+          nullable: true
+        tokenizer:
+          description: Cannot be changed after creation. A request that sets it is rejected with 400.
+          format: UTF-8
+          maxLength: 262144
+          minLength: 0
+          type: string
+          nullable: true
+        uris:
+          description: Cannot be changed after creation. A request that sets it is rejected with 400.
+          items:
+            type: string
+          maxItems: 2147483647
+          minItems: 0
+          type: array
           nullable: true
       type: object
 servers:

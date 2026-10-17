@@ -258,6 +258,10 @@ function classifyNvcf(p, verb, op) {
       const versioned = p.includes('/versions/');
       const res = 'authorizations';
       const m = versioned ? '_version' : '';
+      // NVCF 2.261.2: every function with its authorized parties in one read
+      // ({functions: [AuthorizedPartiesByFunctionDto]} - the same row shape as
+      // the per-function read, no path parameters, so a unique signature)
+      if (p === '/v2/nvcf/authorizations/functions' && verb === 'get') return r('nvcf_functions', res, 'list_all', 'select', 'the sharing audit across the fleet: one row per function with its authorized parties');
       if (verb === 'get') return r('nvcf_functions', res, `list${m}`, 'select');
       if (verb === 'post') return r('nvcf_functions', res, `set${m}`, 'replace', 'POST replaces the full authorized-party list - grants-as-data set operation');
       if (p.endsWith('/add')) return r('nvcf_functions', res, `add${m}`, 'insert');

@@ -47,7 +47,7 @@ REGISTRY PULL nvidia;
 
 ## Scope
 
-This provider covers the NGC control plane served from `https://api.ngc.nvidia.com` and, for queue details and invocation, `https://api.nvcf.nvidia.com`: NVIDIA Cloud Functions management (`nvcf_functions`, `nvcf_deployments`, `nvcf_queues`, `nvcf_invocation`), the NGC private registry (`private_registry`), the public catalog (`catalog`) and organization administration (`orgs`). Registry artifacts are surfaced as metadata; binary push and pull of artifact files is the registry data plane and is not mapped. Streaming and gRPC function invocation are not mapped; the HTTP-polling form is. NVIDIA's official Terraform provider (`NVIDIA/terraform-provider-ngc`) covers NVCF functions and telemetry endpoints; the surface here is generated mechanically from the published NVCF OpenAPI document and the NGC API definitions behind the NGC API explorer (342 operations across 7 services and 83 resources), with response schemas for the registry taken from the `ngcsdk` Python SDK's data classes.
+This provider covers the NGC control plane served from `https://api.ngc.nvidia.com` and, for queue details and invocation, `https://api.nvcf.nvidia.com`: NVIDIA Cloud Functions management (`nvcf_functions`, `nvcf_deployments`, `nvcf_queues`, `nvcf_invocation`), the NGC private registry (`private_registry`), the public catalog (`catalog`) and organization administration (`orgs`). Registry artifacts are surfaced as metadata; binary push and pull of artifact files is the registry data plane and is not mapped. Streaming and gRPC function invocation are not mapped; the HTTP-polling form is. Container images are served by the separate container registry API, whose definition NVIDIA does not publish, and are not in this provider. NVIDIA's official Terraform provider (`NVIDIA/terraform-provider-ngc`) covers NVCF functions and telemetry endpoints; the surface here is generated mechanically from the published NVCF OpenAPI document and the NGC API definitions behind the NGC API explorer (335 operations across 7 services and 82 resources, plus the `vw_gpu_capacity` view), with response schemas for the registry taken from the `ngcsdk` Python SDK's data classes.
 
 ## Authentication
 
@@ -65,7 +65,26 @@ $env:NGC_API_KEY = 'nvapi-...'
 $env:NGC_ORG = '0123456789ab'
 ```
 
-The public catalog (`nvidia.catalog`) serves public artifact metadata and the GPU catalog without any credential; the variable still has to be set for the provider to run, but any value works for those reads.
+The public catalog (`nvidia.catalog`) serves public artifact metadata and the GPU catalog without any credential; the variable still has to be set for the provider to run, but any value works for those reads. A key that NGC rejects answers `403 Access Denied` on organization and registry reads and `403 Authorization failed` on NVCF reads; the NGC CLI's `ngc config set` validates a key against the same service NVIDIA uses for both.
+
+<details>
+
+<summary>Using different environment variables</summary>
+
+To use different environment variables (instead of the defaults), use the `--auth` flag of the `stackql` program. For example:
+
+```bash
+AUTH='{ "nvidia": { "type": "bearer", "credentialsenvvar": "MY_OTHER_VAR" }}'
+stackql shell --auth="${AUTH}"
+```
+
+or using PowerShell:
+
+```powershell
+$Auth = "{ 'nvidia': { 'type': 'bearer', 'credentialsenvvar': 'MY_OTHER_VAR' }}"
+stackql.exe shell --auth=$Auth
+```
+</details>
 
 ## Organization scope
 
@@ -90,21 +109,35 @@ FROM nvidia.private_registry.models
 WHERE team_name = 'ml-platform';
 ```
 
-NVCF resources carry no organization in their paths: the key determines the organization.
+A `JOIN` cannot fan out across organizations on `org_name` (the rows do not echo the server variable); to report across several organizations compose one statement per organization with `UNION ALL`. NVCF resources carry no organization in their paths: the key determines the organization.
 
 ## Pagination and casing
 
-NGC core collections (organizations, users, teams, registry artifacts and versions) page with `page-number` and `page-size`; StackQL follows `paginationInfo.index` / `totalPages` transparently, so a `SELECT` returns every row, and `SELECT ... LIMIT n` is pushed to the wire as `page-size`. Columns are snake_case aliases of the camelCase wire properties (`displayName` -> `display_name`); query parameters are addressed in snake_case too (`resolve_labels`, `page_size`) and translated to the kebab-case wire names.
+NGC core collections (organizations, users, teams, registry artifacts and versions) page with `page-number` and `page-size`; StackQL follows `paginationInfo.index` / `totalPages` transparently, so a `SELECT` returns every row, and `SELECT ... LIMIT n` is pushed to the wire as `page-size`. Columns are snake_case aliases of the camelCase wire properties (`displayName` -> `display_name`); query parameters are addressed in snake_case too (`resolve_labels`, `page_size`) and translated to the kebab-case wire names. `UPDATE` marshals every `SET` value as a string; `INSERT` and `EXEC` send typed JSON, and `EXEC` cannot carry a boolean.
+
+## Rate limit
+
+NVIDIA publishes no request limit for the NGC and NVCF control-plane APIs. A `429` is surfaced as an error on the statement that received it; wide statements that fan out (a `JOIN` from a list to a per-row `get`, or `UNION ALL` across organizations) issue one request per row and are the ones to pace.
 
 ## Deprecations
 
-NVIDIA's NGC deprecated API reference ends team-scoped (`/teams/{team}`) paths for NVCF and sibling services on 2026-09-30; those path families are excluded from the provider. Private Registry team scoping is exempt from that schedule and stays mapped (the `*_by_team` methods). Refreshes of the provider are reviewed spec diffs against content-hash pins.
+NVIDIA's NGC deprecated API reference ends team-scoped (`/teams/{team}`) paths for NVCF and sibling services on 2026-09-30; those path families are excluded from the provider. Private Registry team scoping is exempt from that schedule and stays mapped (the `*_by_team` methods). Operations NVIDIA marks deprecated inline keep their marker in the method description; those with a published replacement are not mapped. Refreshes of the provider are reviewed spec diffs against content-hash pins.
 
-## Example queries
+## Example Queries
+
+Try the following queries using `stackql shell`, or run them from a script or CI pipeline with `stackql exec`.
 
 ### GPU capacity by cluster group
 
-What GPU capacity exists, and where - the NVCF cluster groups the organization can deploy to, with their GPU types and instance types:
+What GPU capacity exists, and where - one row per cluster group, GPU type and instance type the organization can deploy to, through the `vw_gpu_capacity` view:
+
+```sql
+SELECT cluster_group, gpu, instance_type, is_default, cluster
+FROM nvidia.nvcf_deployments.vw_gpu_capacity
+ORDER BY cluster_group, gpu, instance_type;
+```
+
+The same estate straight from the `cluster_groups` resource, with `json_each` over the `gpus` column:
 
 ```sql
 SELECT cg.name AS cluster_group,
@@ -133,7 +166,9 @@ LEFT JOIN nvidia.nvcf_deployments.deployments d
 WHERE f.status = 'ACTIVE';
 ```
 
-Deployed functions with more than one minimum instance - the standing GPU spend:
+### Standing GPU spend
+
+A deployed function's minimum instance count is the GPU capacity it holds whether or not it is invoked:
 
 ```sql
 SELECT function_name, function_status,
@@ -146,9 +181,13 @@ WHERE function_id = 'fe97aa46-c8ea-4237-ba56-1212036f4d0f'
 
 ### Function sharing audit
 
-Which NVIDIA Cloud Accounts may invoke a function - the authorization grants as data:
+Which NVIDIA Cloud Accounts may invoke which function - the authorization grants as data, one row per function across the fleet, or for one function by id:
 
 ```sql
+SELECT id AS function_id, version_id, nca_id AS owner,
+       json_extract(authorized_parties, '$[*].ncaId') AS authorized_accounts
+FROM nvidia.nvcf_functions.authorizations;
+
 SELECT id AS function_id, version_id, nca_id AS owner,
        json_extract(authorized_parties, '$[*].ncaId') AS authorized_accounts
 FROM nvidia.nvcf_functions.authorizations
@@ -168,7 +207,9 @@ FROM nvidia.private_registry.models
 ORDER BY updated_date DESC;
 ```
 
-Helm charts, endpoints, blueprints, agents, playbooks, APIs and skills through the generic artifacts resource (`artifact_type` takes the plural path segment: `helm-charts`, `endpoints`, `agents`, `blueprints`, `apis`, `playbooks`, `skills`; models, resources and recipes have their own resources; container images are served by the separate container registry API and are not in this provider):
+### Generic registry artifacts
+
+Helm charts, endpoints, blueprints, agents, playbooks, APIs and skills through the generic artifacts resource (`artifact_type` takes the plural path segment: `helm-charts`, `endpoints`, `agents`, `blueprints`, `apis`, `playbooks`, `skills`; models, resources and recipes have their own resources):
 
 ```sql
 SELECT name, display_name, latest_version_id_str, updated_date
@@ -177,6 +218,8 @@ WHERE artifact_type = 'helm-charts';
 ```
 
 ### Public catalog, no account needed
+
+Public model metadata and the GPU catalog, readable with any value in `NGC_API_KEY`:
 
 ```sql
 SELECT name, org_name, display_name, framework
@@ -197,9 +240,9 @@ SELECT email, name, is_active, last_login_date,
 FROM nvidia.orgs.users;
 ```
 
-### Provisioning
+### Provisioning a function
 
-Mutations use the same SQL grammar - `INSERT` creates, `UPDATE` patches, `DELETE` removes, and lifecycle actions are `EXEC` methods. Body columns are the snake_case spellings of the wire properties. A function with a first version, its deployment on the smallest instance, and the teardown:
+Mutations use the same SQL grammar - `INSERT` creates, `UPDATE` patches, `DELETE` removes, and lifecycle actions are `EXEC` methods; body columns are the snake_case spellings of the wire properties. A function with a first version, its deployment on the smallest instance, a sharing grant and the teardown:
 
 ```sql
 -- create the function (and its first version)
@@ -223,7 +266,9 @@ DELETE FROM nvidia.nvcf_functions.function_versions
 WHERE function_id = 'fe97aa46-...' AND function_version_id = '868d2192-...';
 ```
 
-Invoke a function through the HTTP-polling form and read the result:
+### Invoking a function
+
+The HTTP-polling invocation form is an `EXEC` whose opaque JSON body is the function's own request, and the result is read back by request id:
 
 ```sql
 EXEC nvidia.nvcf_invocation.invocations.invoke
@@ -235,7 +280,9 @@ FROM nvidia.nvcf_invocation.invocation_status
 WHERE request_id = '<NVCF-REQID from the invoke>';
 ```
 
-Registry metadata is provisioned the same way:
+### Provisioning registry metadata
+
+A private registry model is created, patched and removed with the same verbs (`UPDATE` sends every `SET` value as a string):
 
 ```sql
 INSERT INTO nvidia.private_registry.models (name, display_name, framework, precision, application, short_description)
@@ -251,11 +298,11 @@ WHERE model_name = 'resnet50-finetuned';
 
 ### The whole GPU estate in one statement
 
-NVCF cluster-group GPU types alongside the hyperscaler GPU instance inventory, using the `aws`, `google` and `azure` providers:
+NVCF cluster-group GPU types alongside the hyperscaler GPU instance inventory, using the `aws` and `google` providers:
 
 ```sql
-SELECT 'nvcf' AS platform, cg.name AS location, json_extract(g.value, '$.name') AS gpu
-FROM nvidia.nvcf_deployments.cluster_groups cg, json_each(cg.gpus) g
+SELECT 'nvcf' AS platform, cluster_group AS location, gpu
+FROM nvidia.nvcf_deployments.vw_gpu_capacity
 UNION ALL
 SELECT 'aws', region, json_extract(gpu_info, '$.Gpus[0].Name')
 FROM aws.ec2.instance_types

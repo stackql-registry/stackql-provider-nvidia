@@ -1,38 +1,73 @@
 #!/usr/bin/env node
-// Post-docgen sanitizer for the generated provider docs.
+// Post-docgen sanitizer for the generated provider docs. Run after
+// `generate-docs`, before building the website (`make docs` does both).
 //
-// AWS descriptions carry literal angle-bracket placeholders (<region>,
-// <account-id>), stray unpaired HTML (</code>, <p>) and XML samples
-// (<Grantee xsi:type="...">). MDX v3 parses any raw <token> as JSX and
-// fails the build on the first mismatch; braces ({...}) parse as JSX
-// expressions with the same failure mode.
+// 1. MDX safety. Vendor descriptions carry literal angle-bracket placeholders
+//    (<region>), stray unpaired HTML, XML samples and regex fragments. MDX v3
+//    parses any raw <token> as JSX and fails the build on the first
+//    mismatch; braces parse as JSX expressions. The generator's structure is
+//    line-shaped (one <td>...</td> per line; description text only ever
+//    appears as td inner content or TabItem prose), so: inside every
+//    description cell escape angle brackets, braces and square brackets
+//    (protecting backtick-wrapped `<placeholder>` tokens as <code>), and
+//    leave every structural line byte-for-byte untouched.
 //
-// The doc generator's own structure is line-shaped: one `<td>...</td>`
-// cell per line, and description text ONLY ever appears as td inner
-// content. So the deterministic fix: inside every description cell,
-// escape ALL angle brackets and braces (protecting the stage-1
-// backtick-wrapped `<placeholder>` tokens as <code> spans); leave
-// every other line - tables, Tabs/TabItem/CodeBlock, CopyableCode,
-// index link lists - byte-for-byte untouched.
+// 2. Scope annotations (when provider.js exports scopeVariable and
+//    scopeEnvVar). docgen merges server variables into every method's
+//    required parameters and example WHERE clauses, which is right only
+//    when the env var is unset; every `<var> = '{{ <var> }}' -- required`
+//    example is annotated "required unless <ENV> is set".
 //
-// Run after `npm run generate-docs`, before building the website.
+// 3. Landing-page resource count. docgen's total includes each service
+//    index page; recount from the generated service directories.
+//
+// 4. nvidia-specific: the NGC core query parameters are kebab-case on the
+//    wire (page-size, resolve-labels, exclude-from-team) and the engine
+//    accepts their snake_case spelling (request.nativeCasing: kebab), which
+//    is the user surface the rest of the docs present. The kebab parameter
+//    tokens in the parameter tables, the method tables' parameter links, the
+//    anchors and the SQL examples of the resource pages are rewritten to
+//    snake_case; description prose is left alone.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const docsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'docs');
+const siteDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const docsDir = path.join(siteDir, 'docs');
+// provider.js is an ES module in a package without "type": "module" (the
+// vendored shared config is CommonJS), so read the two exports as text.
+const providerJs = fs.readFileSync(path.join(siteDir, 'provider.js'), 'utf8');
+const exportOf = (name) => {
+  const m = providerJs.match(new RegExp(`export\\s+const\\s+${name}\\s*=\\s*(?:'([^']*)'|"([^"]*)"|(null))`));
+  return m ? (m[1] ?? m[2] ?? null) : null;
+};
+const SCOPE_VAR = exportOf('scopeVariable');
+const SCOPE_ENV = exportOf('scopeEnvVar');
 
 const TD_LINE = /^(\s*<td>)(.*)(<\/td>\s*)$/;
 const LINK_TOKEN = '<a href="#[^"]*">(?:<CopyableCode\\b[^<>]*\\/>|<code>[^<>]*<\\/code>)<\\/a>';
 const LINK_TOKEN_CELL = new RegExp(`^${LINK_TOKEN}(?:,\\s*${LINK_TOKEN})*$`);
 const BACKTICKED = /`<([A-Za-z][A-Za-z0-9_.:-]*)>`/g;
 // Control-char sentinels: cannot occur in generated markdown.
-const OPEN = '';
-const CLOSE = '';
+const OPEN = '\u0001';
+const CLOSE = '\u0002';
 
 let filesChanged = 0;
 let cellsEscaped = 0;
+let scopeAnnotated = 0;
+
+function annotateScope(lines) {
+  if (!SCOPE_VAR || !SCOPE_ENV) return false;
+  const sqlRe = new RegExp(`(${SCOPE_VAR}\\s*=\\s*'\\{\\{ ${SCOPE_VAR} \\}\\}'\\s*--\\s*required)(?!\\s+unless)`);
+  const execRe = new RegExp(`(@${SCOPE_VAR}='\\{\\{ ${SCOPE_VAR} \\}\\}'\\s*--required)(?!\\s+unless)`);
+  let changed = false;
+  for (let i = 0; i < lines.length; i++) {
+    if (sqlRe.test(lines[i])) { lines[i] = lines[i].replace(sqlRe, `$1 unless ${SCOPE_ENV} is set`); changed = true; scopeAnnotated++; }
+    else if (execRe.test(lines[i])) { lines[i] = lines[i].replace(execRe, `$1 unless ${SCOPE_ENV} is set`); changed = true; scopeAnnotated++; }
+  }
+  return changed;
+}
 
 function escapeDescription(inner) {
   let out = inner.replace(BACKTICKED, (m, name) => OPEN + name + CLOSE);
@@ -42,24 +77,21 @@ function escapeDescription(inner) {
     .replace(/\{/g, '&#123;')
     .replace(/\}/g, '&#125;')
     // Regex fragments in descriptions ("s3://([^/]+)(/.*)?") read as
-    // markdown links ("[...](...)") and crash the link resolver.
+    // markdown links and crash the link resolver.
     .replace(/\[/g, '&#91;')
     .replace(/\]/g, '&#93;')
-    // GFM autolinks bare "scheme://..." literals on the DECODED text
-    // tree (entity escapes cannot evade it) and Docusaurus crashes on
-    // regex-shaped ones ("https://.+"). A zero-width space inside "://"
-    // is invisible in rendering but breaks the autolink prefix match.
+    // GFM autolinks bare "scheme://..." literals on the DECODED text tree
+    // and Docusaurus crashes on regex-shaped ones. A zero-width space inside
+    // "://" is invisible in rendering but breaks the autolink prefix match.
     .replace(/:\/\//g, ':​//');
   out = out.split(OPEN).join('<code>&lt;').split(CLOSE).join('&gt;</code>');
   return out;
 }
 
 // Inside a CodeBlock template literal, a lone backslash before u/x is a JS
-// string escape (backslash-u007F evaluates to a DEL byte at build time), and ${
-// starts interpolation. Double the backslash / escape the $ so the source
-// text renders verbatim.
-// The (?<!\\) guards skip sequences that are already escaped in the
-// source (e.g. IAM session policies carry literal "\${Transfer:UserName}").
+// string escape and ${ starts interpolation. Double the backslash / escape
+// the $ so the source text renders verbatim. The (?<!\\) guards skip
+// sequences that are already escaped in the source.
 function escapeTemplateLiteral(line) {
   return line
     .replace(/(?<!\\)\\(?=[ux])/g, '\\\\')
@@ -68,24 +100,18 @@ function escapeTemplateLiteral(line) {
 
 function sanitize(text) {
   const lines = text.split('\n');
-  let changed = false;
+  let changed = annotateScope(lines);
   let inFence = false;
   let inTabItemProse = false;
   let inCodeBlock = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
-    if (trimmed.startsWith('```')) {
-      inFence = !inFence;
-      continue;
-    }
+    if (trimmed.startsWith('```')) { inFence = !inFence; continue; }
     if (inFence) continue;
     // <CodeBlock>{`...`}</CodeBlock> spans hold verbatim SQL in a JSX
-    // template literal. The MDX/HTML escapes applied elsewhere must NOT
-    // touch these lines, but JS still evaluates the template literal, so
-    // sequences like backslash-u007F in AWS description text become raw control
-    // characters in the built HTML. Neutralize JS escape starts (\u, \x)
-    // and interpolation (${) so the text survives verbatim.
+    // template literal: the MDX/HTML escapes must not touch these lines,
+    // but JS still evaluates the literal, so neutralize escape starts.
     if (inCodeBlock) {
       if (/<\/CodeBlock>/.test(line)) inCodeBlock = false;
       const esc = escapeTemplateLiteral(line);
@@ -98,32 +124,20 @@ function sanitize(text) {
       if (esc !== line) { lines[i] = esc; changed = true; }
       continue;
     }
-    if (/^<TabItem\b/.test(trimmed)) {
-      inTabItemProse = true;
-      continue;
-    }
-    if (/^<\/TabItem>/.test(trimmed)) {
-      inTabItemProse = false;
-      continue;
-    }
+    if (/^<TabItem\b/.test(trimmed)) { inTabItemProse = true; continue; }
+    if (/^<\/TabItem>/.test(trimmed)) { inTabItemProse = false; continue; }
 
     // Description table cells (one <td>...</td> per line).
     const m = TD_LINE.exec(line);
     if (m) {
       const inner = m[2];
       if (/^<CopyableCode\b[^<>]*\/>$/.test(inner)) continue;
-      // Structural link cells in the Methods/Parameters tables: one or
-      // more comma-separated anchor-wrapped tokens
-      // (<a href="#m"><CopyableCode .../></a> or
-      // <a href="#parameter-x"><code>x</code></a>). Generated structure,
-      // not description text - must stay verbatim.
+      // Structural link cells in the Methods/Parameters tables stay verbatim.
       if (LINK_TOKEN_CELL.test(inner)) continue;
       const codeCell = /^<code>([^<>]*)<\/code>$/.exec(inner);
       if (codeCell) {
-        // Type/pattern cells: regex patterns form accidental markdown
-        // links ("[...](...)" inside character classes) and MDX brace
-        // expressions ({4,7} quantifiers). Neutralise both; entities
-        // decode inside the <code> element so rendering is unchanged.
+        // Type/pattern cells: regex patterns form accidental markdown links
+        // and MDX brace expressions ({4,7} quantifiers).
         const escaped = codeCell[1]
           .replace(/\[/g, '&#91;')
           .replace(/\]/g, '&#93;')
@@ -146,10 +160,9 @@ function sanitize(text) {
       continue;
     }
 
-    // Method-description prose inside <TabItem> blocks (the paragraphs
-    // between the TabItem opener and the ```sql fence). Prose never
-    // starts with '<'; anything with raw angle brackets or braces there
-    // is hostile description content.
+    // Method-description prose inside <TabItem> blocks. Prose never starts
+    // with '<'; anything with raw angle brackets or braces there is hostile
+    // description content.
     if (inTabItemProse && trimmed && !trimmed.startsWith('<') && /[<>{}]/.test(line)) {
       const escaped = escapeDescription(line);
       if (escaped !== line) {
@@ -162,13 +175,8 @@ function sanitize(text) {
   return { text: lines.join('\n'), changed };
 }
 
-// nvidia-specific: the NGC core query parameters are kebab-case on the wire
-// (page-size, resolve-labels, exclude-from-team) and the engine accepts
-// their snake_case spelling (request.nativeCasing: kebab), which is the
-// user surface the rest of the docs present. Rewrite the kebab parameter
-// tokens in the parameter tables, the method tables' parameter links, the
-// anchors and the SQL examples to snake_case. Description prose is left
-// alone.
+// nvidia-specific (4.): kebab-case parameter tokens rendered as snake_case
+// on the resource pages.
 const KEBAB = '[a-z][a-z0-9]*(?:-[a-z0-9]+)+';
 let kebabRewrites = 0;
 function snakeKebabParams(text) {
@@ -183,26 +191,11 @@ function snakeKebabParams(text) {
   return out;
 }
 
-// docgen counts each service index as a resource; recount from the tree
-function recountResources(indexPath) {
-  const servicesDir = path.join(docsDir, 'services');
-  if (!fs.existsSync(servicesDir) || !fs.existsSync(indexPath)) return;
-  let resources = 0;
-  for (const svc of fs.readdirSync(servicesDir, { withFileTypes: true })) {
-    if (!svc.isDirectory()) continue;
-    resources += fs.readdirSync(path.join(servicesDir, svc.name), { withFileTypes: true }).filter((d) => d.isDirectory()).length;
-  }
-  const before = fs.readFileSync(indexPath, 'utf8');
-  const after = before.replace(/total resources: __\d+__/, `total resources: __${resources}__`);
-  if (after !== before) fs.writeFileSync(indexPath, after);
-}
-
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      walk(p);
-    } else if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) {
+    if (entry.isDirectory()) walk(p);
+    else if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) {
       const before = fs.readFileSync(p, 'utf8');
       let { text: after, changed } = sanitize(before);
       // parameter casing only applies to the resource pages (the landing
@@ -211,14 +204,34 @@ function walk(dir) {
         const cased = snakeKebabParams(after);
         if (cased !== after) { after = cased; changed = true; }
       }
-      if (changed) {
-        fs.writeFileSync(p, after);
-        filesChanged++;
-      }
+      if (changed) { fs.writeFileSync(p, after); filesChanged++; }
     }
   }
 }
 
+// Landing-page resource count: docgen's `total resources: __N__` counts each
+// service index page as a resource; recount the resource pages under
+// docs/services/<service>/*/ and rewrite the number.
+function fixResourceCount() {
+  const servicesDir = path.join(docsDir, 'services');
+  const indexFiles = fs.readdirSync(docsDir).filter((f) => /^index\.mdx?$/.test(f));
+  if (!fs.existsSync(servicesDir) || indexFiles.length === 0) return 0;
+  let resources = 0;
+  for (const svc of fs.readdirSync(servicesDir, { withFileTypes: true })) {
+    if (!svc.isDirectory()) continue;
+    for (const res of fs.readdirSync(path.join(servicesDir, svc.name), { withFileTypes: true })) if (res.isDirectory()) resources++;
+  }
+  const indexPath = path.join(docsDir, indexFiles[0]);
+  const text = fs.readFileSync(indexPath, 'utf8');
+  const fixed = text.replace(/(total resources:\s*__)\d+(__)/, `$1${resources}$2`);
+  if (fixed !== text) { fs.writeFileSync(indexPath, fixed); return resources; }
+  return 0;
+}
+
+if (!fs.existsSync(docsDir)) {
+  console.error(`sanitize-docs: ${docsDir} does not exist - run generate-docs first`);
+  process.exit(1);
+}
 walk(docsDir);
-recountResources(path.join(docsDir, 'index.md'));
-console.log(`sanitize-docs: escaped ${cellsEscaped} description cell(s) across ${filesChanged} file(s); ${kebabRewrites} kebab parameter token(s) rendered as snake_case`);
+const recount = fixResourceCount();
+console.log(`sanitize-docs: escaped ${cellsEscaped} description cell(s) across ${filesChanged} file(s); ${scopeAnnotated} scope annotation(s); ${kebabRewrites} kebab parameter token(s) rendered as snake_case${recount ? `; landing page resource count set to ${recount}` : ''}`);

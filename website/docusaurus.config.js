@@ -7,9 +7,8 @@ const config = createConfig({
   providerTitle,
   prismThemes,
   overrides: {
-    // Docusaurus Faster (rspack + swc, via @docusaurus/faster) - not
-    // strictly required at this site's page count, but kept for build
-    // speed and consistency with the other provider microsites.
+    // Docusaurus Faster (rspack + swc, via @docusaurus/faster), consistent
+    // with the other provider microsites.
     future: {
       v4: true,
       faster: true,
@@ -17,15 +16,15 @@ const config = createConfig({
   },
 });
 
-// Date-stamp every doc page ("Last updated on ...") - the shared config
-// ships showLastUpdateTime: false, so flip it here. Docs are generated and
-// committed, so git history supplies the timestamps.
+// Date-stamp every doc page ("Last updated on ..."). The pages are
+// regenerated and committed on every provider refresh, so the stamp is the
+// regeneration date.
 config.presets[0][1].docs.showLastUpdateTime = true;
 
-// Use the locally vendored registry-branded logos (STACKQL>> | REGISTRY,
-// matching the awscc microsite) instead of the shared config's hotlinked
-// main-site wordmark - self-contained assets, no cross-origin fetch.
-// global.css swaps in the -mobile variants below 996px.
+// Use the locally vendored registry-branded logos (STACKQL>> | REGISTRY)
+// instead of the shared config's hotlinked main-site wordmark -
+// self-contained assets, no cross-origin fetch. global.css swaps in the
+// -mobile variants below 996px.
 const registryLogo = {
   alt: 'StackQL',
   href: '/',

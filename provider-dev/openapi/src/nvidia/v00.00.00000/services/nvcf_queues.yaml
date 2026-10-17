@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: NVIDIA Cloud Functions - Queues
   description: NVCF request queue details per function and version, and queue position per request (served from api.nvcf.nvidia.com).
-  version: 2.256.0
+  version: 2.261.2
 paths:
   /v2/nvcf/queues/functions/{function_id}:
     get:

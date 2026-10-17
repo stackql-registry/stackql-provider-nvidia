@@ -406,6 +406,10 @@
             "type": "string"
           }
         },
+        "required": [
+          "name",
+          "shortDescription"
+        ],
         "type": "object"
       },
       "ArtifactDownloadAllResponse": {
@@ -2515,23 +2519,20 @@
         },
         "type": "object"
       },
-      "HealthComponent": {
-        "properties": {
-          "description": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "HealthResponse": {
         "description": "This API is invoked by monitoring tools, other services and infrastructure to retrieve health status the targeted service, this is unprotected method",
         "properties": {
           "health": {
             "$ref": "#/components/schemas/Health",
             "description": "object that describes health of the service"
+          }
+        },
+        "type": "object"
+      },
+      "KaizenHealthStatus": {
+        "properties": {
+          "status": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -2626,6 +2627,11 @@
             "type": "boolean"
           }
         },
+        "required": [
+          "governingTerms",
+          "licenseId",
+          "licenseVersion"
+        ],
         "type": "object"
       },
       "LicenseTag": {
@@ -5036,6 +5042,79 @@
         },
         "type": "oauth2"
       },
+      "ngc-ssa": {
+        "flows": {
+          "clientCredentials": {
+            "scopes": {
+              "addArtifactToCollectionFromAnotherOrgOrTeam": "{scope}",
+              "cloneArtifact": "{scope}",
+              "createArtifact": "{scope}",
+              "createArtifactVersion": "{scope}",
+              "createCollection": "{scope}",
+              "createGpuByPci": "{scope}",
+              "createModel": "{scope}",
+              "createModelVersion": "{scope}",
+              "createNimMetadata": "{scope}",
+              "createRecipe": "{scope}",
+              "createRecipeVersion": "{scope}",
+              "deleteArtifact": "{scope}",
+              "deleteArtifactVersion": "{scope}",
+              "deleteArtifacts": "{scope}",
+              "deleteGpuByPci": "{scope}",
+              "downloadArtifactVersionFile": "{scope}",
+              "downloadArtifactVersionFileFilterByOrgEnablement": "{scope}",
+              "getArtifact": "{scope}",
+              "getArtifactVersion": "{scope}",
+              "getArtifactVersionOwners": "{scope}",
+              "getCollection": "{scope}",
+              "getModel": "{scope}",
+              "getModelVersion": "{scope}",
+              "getModelVersionFilterByOrgEnablement": "{scope}",
+              "getPublicFlags": "{scope}",
+              "getRecipe": "{scope}",
+              "getRecipeVersion": "{scope}",
+              "getRecipeVersionFilterByOrgEnablement": "{scope}",
+              "helmProxy": "{scope}",
+              "kas": "{scope}",
+              "listArtifactVersionFiles": "{scope}",
+              "listArtifactVersionFilesFilterByOrgEnablement": "{scope}",
+              "listArtifactVersions": "{scope}",
+              "listArtifacts": "{scope}",
+              "listCollectionArtifacts": "{scope}",
+              "listModelVersionFiles": "{scope}",
+              "listModelVersionFilesFilterByOrgEnablement": "{scope}",
+              "listModelVersions": "{scope}",
+              "listModels": "{scope}",
+              "listRecipeVersionFiles": "{scope}",
+              "listRecipeVersionFilesFilterByOrgEnablement": "{scope}",
+              "listRecipeVersions": "{scope}",
+              "listRecipes": "{scope}",
+              "notifyScanResult": "{scope}",
+              "patchCollectionArtifacts": "{scope}",
+              "publishArtifact": "{scope}",
+              "publishCollection": "{scope}",
+              "purgeArtifact": "{scope}",
+              "readGpuByPci": "{scope}",
+              "recreateArtifactVersionZip": "{scope}",
+              "signArtifactVersion": "{scope}",
+              "syncReleaseTypeLabels": "{scope}",
+              "undoPublishArtifact": "{scope}",
+              "undoPublishCollection": "{scope}",
+              "updateArtifact": "{scope}",
+              "updateArtifactVersion": "{scope}",
+              "updateCollection": "{scope}",
+              "updateGpuByPci": "{scope}",
+              "updateModel": "{scope}",
+              "updateModelVersion": "{scope}",
+              "updateRecipe": "{scope}",
+              "updateRecipeVersion": "{scope}",
+              "writeArtifacts": "{scope}"
+            },
+            "tokenUrl": "https://osyjw74z3274aq96bfvexmu2fpcahruj9udchmlgqbs.ssa.nvidia.com/token"
+          }
+        },
+        "type": "oauth2"
+      },
       "ssa": {
         "description": "A bearer token in the format of a JWS and conforms to the specifications for JWT included in RFC7519.  SSA attempts to support the applicable best current practices outlined in RFC8725",
         "flows": {
@@ -5151,7 +5230,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HealthComponent"
+                  "$ref": "#/components/schemas/KaizenHealthStatus"
                 }
               }
             },
@@ -17519,458 +17598,6 @@
         ]
       }
     },
-    "/v1/org/{org-name}/models/{model-name}/shares/org": {
-      "delete": {
-        "description": "This operation revokes a shared org model with the org.",
-        "operationId": "revokeShareModelInOrgWithOrg",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Revoke shared org model with the org",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      },
-      "put": {
-        "description": "This operation shares an org model with the org.",
-        "operationId": "shareModelInOrgWithOrg",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Share org model with the org",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      }
-    },
-    "/v1/org/{org-name}/models/{model-name}/shares/team/{target-team}": {
-      "delete": {
-        "description": "This operation revokes a shared org model with the team.",
-        "operationId": "revokeShareModelInOrgWithTeam",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Target team name",
-            "in": "path",
-            "name": "target-team",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Revoke shared org model with the specified team",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      },
-      "put": {
-        "description": "This operation shares an org model with the team.",
-        "operationId": "shareModelInOrgWithTeam",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Target team name",
-            "in": "path",
-            "name": "target-team",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Share org model with the specified team",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      }
-    },
     "/v1/org/{org-name}/models/{model-name}/versions": {
       "get": {
         "description": "List model versions in org",
@@ -25960,506 +25587,6 @@
           }
         ],
         "summary": "Disassociate encryption key from model in team",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      }
-    },
-    "/v1/org/{org-name}/team/{team-name}/models/{model-name}/shares/org": {
-      "delete": {
-        "description": "This operation revokes a shared team model with the org.",
-        "operationId": "revokeShareModelInTeamWithOrg",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Team name",
-            "in": "path",
-            "name": "team-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Revoke shared team model with the org",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      },
-      "put": {
-        "description": "This operation shares a team model with the org.",
-        "operationId": "shareModelInTeamWithOrg",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Team name",
-            "in": "path",
-            "name": "team-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Share team model with the org",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      }
-    },
-    "/v1/org/{org-name}/team/{team-name}/models/{model-name}/shares/team/{target-team}": {
-      "delete": {
-        "description": "This operation revokes a shared team model with the team.",
-        "operationId": "revokeShareModelInTeamWithTeam",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Team name",
-            "in": "path",
-            "name": "team-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Target team name",
-            "in": "path",
-            "name": "target-team",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Revoke shared team model with the specified team",
-        "tags": [
-          "Models"
-        ],
-        "x-ssa-scopes": [
-          "kas"
-        ]
-      },
-      "put": {
-        "description": "This operation shares a team model with the team.",
-        "operationId": "shareModelInTeamWithTeam",
-        "parameters": [
-          {
-            "description": "Organization name",
-            "in": "path",
-            "name": "org-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Team name",
-            "in": "path",
-            "name": "team-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Model name",
-            "in": "path",
-            "name": "model-name",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          },
-          {
-            "description": "Target team name",
-            "in": "path",
-            "name": "target-team",
-            "required": true,
-            "schema": {
-              "format": "UTF-8",
-              "maxLength": 255,
-              "minLength": 0,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Too many requests"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            },
-            "description": "Internal Error"
-          }
-        },
-        "security": [
-          {
-            "ssa": [
-              "kas"
-            ]
-          }
-        ],
-        "summary": "Share team model with the specified team",
         "tags": [
           "Models"
         ],

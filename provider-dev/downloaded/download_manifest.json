@@ -6,11 +6,14 @@
         "docsPage": "https://docs.nvidia.com/nvcf/api",
         "openapi": "3.1.0",
         "title": "Cloud Functions",
-        "specVersion": "2.256.0"
+        "specVersion": "2.261.2"
       }
     },
     "ngc_models.json": {
       "url": "https://models.ngc.nvidia.com/v3/openapi",
+      "fixes": {
+        "stable-swagger-resources-operation-ids": 0
+      },
       "info": {
         "explorer": "https://docs.ngc.nvidia.com/api/",
         "explorerName": "Private Artifacts (Models) API",
@@ -21,6 +24,9 @@
     },
     "ngc_kas.json": {
       "url": "https://api.ngc.nvidia.com/v3/api-docs",
+      "fixes": {
+        "stable-swagger-resources-operation-ids": 21
+      },
       "info": {
         "explorer": "https://docs.ngc.nvidia.com/api/",
         "explorerName": "KASv1 API (Deprecated)",

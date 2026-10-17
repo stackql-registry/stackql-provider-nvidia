@@ -18,7 +18,7 @@ private_registry service documentation.
 
 :::info[Service Summary]
 
-total resources: __31__  
+total resources: __30__  
 
 :::
 
@@ -39,15 +39,14 @@ total resources: __31__
 <a href="/services/private_registry/artifacts/">artifacts</a><br />
 <a href="/services/private_registry/collection_artifacts/">collection_artifacts</a><br />
 <a href="/services/private_registry/collection_product_shares/">collection_product_shares</a><br />
-<a href="/services/private_registry/collections/">collections</a><br />
-<a href="/services/private_registry/encryption_keys/">encryption_keys</a>
+<a href="/services/private_registry/collections/">collections</a>
 </div>
 <div class="providerDocColumn">
+<a href="/services/private_registry/encryption_keys/">encryption_keys</a><br />
 <a href="/services/private_registry/helm_chart_versions/">helm_chart_versions</a><br />
 <a href="/services/private_registry/license_acceptances/">license_acceptances</a><br />
 <a href="/services/private_registry/model_encryption_keys/">model_encryption_keys</a><br />
 <a href="/services/private_registry/model_files/">model_files</a><br />
-<a href="/services/private_registry/model_shares/">model_shares</a><br />
 <a href="/services/private_registry/model_versions/">model_versions</a><br />
 <a href="/services/private_registry/models/">models</a><br />
 <a href="/services/private_registry/recipe_files/">recipe_files</a><br />

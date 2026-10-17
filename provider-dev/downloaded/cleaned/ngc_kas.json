@@ -2841,7 +2841,7 @@
     },
     "/swagger-resources": {
       "delete": {
-        "operationId": "swaggerResources_6",
+        "operationId": "swaggerResources_delete",
         "responses": {
           "200": {
             "content": {
@@ -3008,7 +3008,7 @@
         ]
       },
       "get": {
-        "operationId": "swaggerResources_4",
+        "operationId": "swaggerResources_get",
         "responses": {
           "200": {
             "content": {
@@ -3175,7 +3175,7 @@
         ]
       },
       "head": {
-        "operationId": "swaggerResources_1",
+        "operationId": "swaggerResources_head",
         "responses": {
           "200": {
             "content": {
@@ -3342,7 +3342,7 @@
         ]
       },
       "options": {
-        "operationId": "swaggerResources",
+        "operationId": "swaggerResources_options",
         "responses": {
           "200": {
             "content": {
@@ -3509,7 +3509,7 @@
         ]
       },
       "patch": {
-        "operationId": "swaggerResources_2",
+        "operationId": "swaggerResources_patch",
         "responses": {
           "200": {
             "content": {
@@ -3676,7 +3676,7 @@
         ]
       },
       "post": {
-        "operationId": "swaggerResources_3",
+        "operationId": "swaggerResources_post",
         "responses": {
           "200": {
             "content": {
@@ -3843,7 +3843,7 @@
         ]
       },
       "put": {
-        "operationId": "swaggerResources_5",
+        "operationId": "swaggerResources_put",
         "responses": {
           "200": {
             "content": {
@@ -4012,7 +4012,7 @@
     },
     "/swagger-resources/configuration/security": {
       "delete": {
-        "operationId": "securityConfiguration_6",
+        "operationId": "securityConfiguration_delete",
         "responses": {
           "200": {
             "content": {
@@ -4176,7 +4176,7 @@
         ]
       },
       "get": {
-        "operationId": "securityConfiguration_4",
+        "operationId": "securityConfiguration_get",
         "responses": {
           "200": {
             "content": {
@@ -4340,7 +4340,7 @@
         ]
       },
       "head": {
-        "operationId": "securityConfiguration_1",
+        "operationId": "securityConfiguration_head",
         "responses": {
           "200": {
             "content": {
@@ -4504,7 +4504,7 @@
         ]
       },
       "options": {
-        "operationId": "securityConfiguration",
+        "operationId": "securityConfiguration_options",
         "responses": {
           "200": {
             "content": {
@@ -4668,7 +4668,7 @@
         ]
       },
       "patch": {
-        "operationId": "securityConfiguration_2",
+        "operationId": "securityConfiguration_patch",
         "responses": {
           "200": {
             "content": {
@@ -4832,7 +4832,7 @@
         ]
       },
       "post": {
-        "operationId": "securityConfiguration_3",
+        "operationId": "securityConfiguration_post",
         "responses": {
           "200": {
             "content": {
@@ -4996,7 +4996,7 @@
         ]
       },
       "put": {
-        "operationId": "securityConfiguration_5",
+        "operationId": "securityConfiguration_put",
         "responses": {
           "200": {
             "content": {
@@ -5162,7 +5162,7 @@
     },
     "/swagger-resources/configuration/ui": {
       "delete": {
-        "operationId": "uiConfiguration_6",
+        "operationId": "uiConfiguration_delete",
         "responses": {
           "200": {
             "content": {
@@ -5326,7 +5326,7 @@
         ]
       },
       "get": {
-        "operationId": "uiConfiguration_4",
+        "operationId": "uiConfiguration_get",
         "responses": {
           "200": {
             "content": {
@@ -5490,7 +5490,7 @@
         ]
       },
       "head": {
-        "operationId": "uiConfiguration_1",
+        "operationId": "uiConfiguration_head",
         "responses": {
           "200": {
             "content": {
@@ -5654,7 +5654,7 @@
         ]
       },
       "options": {
-        "operationId": "uiConfiguration",
+        "operationId": "uiConfiguration_options",
         "responses": {
           "200": {
             "content": {
@@ -5818,7 +5818,7 @@
         ]
       },
       "patch": {
-        "operationId": "uiConfiguration_2",
+        "operationId": "uiConfiguration_patch",
         "responses": {
           "200": {
             "content": {
@@ -5982,7 +5982,7 @@
         ]
       },
       "post": {
-        "operationId": "uiConfiguration_3",
+        "operationId": "uiConfiguration_post",
         "responses": {
           "200": {
             "content": {
@@ -6146,7 +6146,7 @@
         ]
       },
       "put": {
-        "operationId": "uiConfiguration_5",
+        "operationId": "uiConfiguration_put",
         "responses": {
           "200": {
             "content": {

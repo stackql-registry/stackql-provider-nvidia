@@ -765,14 +765,14 @@ The following methods are available for this resource:
 <tr>
     <td><a href="#create_by_team"><CopyableCode code="create_by_team" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-team_name"><code>team_name</code></a>, <a href="#parameter-artifact_type"><code>artifact_type</code></a></td>
+    <td><a href="#parameter-team_name"><code>team_name</code></a>, <a href="#parameter-artifact_type"><code>artifact_type</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-short_description"><code>short_description</code></a></td>
     <td></td>
     <td>Create artifact in team</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
-    <td><a href="#parameter-artifact_type"><code>artifact_type</code></a></td>
+    <td><a href="#parameter-artifact_type"><code>artifact_type</code></a>, <a href="#parameter-name"><code>name</code></a>, <a href="#parameter-short_description"><code>short_description</code></a></td>
     <td></td>
     <td>Create artifact in org</td>
 </tr>
@@ -1200,11 +1200,11 @@ SELECT
 '{{ labels_v2 }}',
 '{{ license_terms }}',
 '{{ logo }}',
-'{{ name }}',
+'{{ name }}' /* required */,
 '{{ privacy }}',
 '{{ publisher }}',
 '{{ safety_and_security }}',
-'{{ short_description }}',
+'{{ short_description }}' /* required */,
 '{{ team_name }}',
 '{{ artifact_type }}'
 RETURNING
@@ -1247,11 +1247,11 @@ SELECT
 '{{ labels_v2 }}',
 '{{ license_terms }}',
 '{{ logo }}',
-'{{ name }}',
+'{{ name }}' /* required */,
 '{{ privacy }}',
 '{{ publisher }}',
 '{{ safety_and_security }}',
-'{{ short_description }}',
+'{{ short_description }}' /* required */,
 '{{ artifact_type }}'
 RETURNING
 artifact,

@@ -1857,7 +1857,7 @@
         "description": "LLM-specific configuration for a model",
         "properties": {
           "routingMethod": {
-            "description": "Routing method for this model.",
+            "description": "Routing method for this model: a request router algorithm name, optionally followed by ';name=value' tuning parameters, for example pulsar;seed=stable-a. The API checks only the format. The request router checks the algorithm and parameters on each request.",
             "format": "UTF-8",
             "maxLength": 262144,
             "minLength": 0,
@@ -1905,7 +1905,7 @@
         "description": "Partial update payload for LLM-specific model configuration fields.",
         "properties": {
           "routingMethod": {
-            "description": "Updated routing method for the model. When omitted, the existing value is preserved.",
+            "description": "Updated routing method for the model, in the same format as llmConfig.routingMethod on create. When omitted, the existing value is preserved.",
             "format": "UTF-8",
             "maxLength": 262144,
             "minLength": 0,
@@ -1921,6 +1921,28 @@
             "minLength": 0,
             "type": [
               "string",
+              "null"
+            ]
+          },
+          "tokenizer": {
+            "description": "Cannot be changed after creation. A request that sets it is rejected with 400.",
+            "format": "UTF-8",
+            "maxLength": 262144,
+            "minLength": 0,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "uris": {
+            "description": "Cannot be changed after creation. A request that sets it is rejected with 400.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2147483647,
+            "minItems": 0,
+            "type": [
+              "array",
               "null"
             ]
           }
@@ -2849,7 +2871,7 @@
     },
     "termsOfService": "https://www.nvidia.com/en-us/legal_info",
     "title": "Cloud Functions",
-    "version": "2.256.0"
+    "version": "2.261.2"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -3012,6 +3034,28 @@
         ]
       }
     },
+    "/v2/nvcf/authorizations/functions": {
+      "get": {
+        "description": "Lists all the function versions in an account that have been shared/authorized  with/to other accounts. Response includes the nca-ids of the authorized  accounts. If a function version is not shared/authorized, then it is not  included in the response. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header ",
+        "operationId": "getAuthorizedPartiesForAllFunctions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAuthorizedPartiesResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "List Functions Authorized/Shared With Other Accounts",
+        "tags": [
+          "Function Sharing"
+        ]
+      }
+    },
     "/v2/nvcf/authorizations/functions/{functionId}": {
       "delete": {
         "description": "Deletes authorizations at the function level. This impacts all versions of  the function. If a function versions has its own set of authorizations,  those are not deleted. If the specified function is public, then  Account Admin cannot perform this operation. Note that the response does  not include any authz accounts at version level. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header ",
@@ -3048,7 +3092,7 @@
         ]
       },
       "get": {
-        "description": "Lists NVIDIA Cloud Account IDs that are authorized to invoke any version of the  specified function. The response includes an array showing authorized accounts  for each version. Individual versions of a function can have their own  authorized accounts. So, each object in the array can have different  authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header ",
+        "description": "Lists function versions of the specified function and their corresponding  authorized accounts allowed to invoke the function version. Individual  versions of a function can have their own authorized accounts. So, each  object in the array can have different authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header ",
         "operationId": "getAuthorizedPartiesForAllVersions",
         "parameters": [
           {
@@ -3076,7 +3120,7 @@
             "description": "OK"
           }
         },
-        "summary": "List Account Authorizations For Function",
+        "summary": "List Function Versions with Authorized Accounts For Specified Function",
         "tags": [
           "Function Sharing"
         ]

@@ -224,11 +224,15 @@ class Smoke:
     def read_smokes(self) -> None:
         print("== tier 1: public catalog ==")
         self.step("show services", "SHOW SERVICES IN nvidia", expect_rows=True, contains="nvcf_functions")
-        models = self.step("catalog models (public, paginated, LIMIT pushdown)", "SELECT name, org_name, display_name FROM nvidia.catalog.models LIMIT 5", expect_rows=True)
+        models = self.step("catalog models (public, paginated, LIMIT pushdown)", "SELECT name, org_name, team_name, display_name FROM nvidia.catalog.models LIMIT 10", expect_rows=True)
         if models:
+            # a model published under a team (nvidia/nemo/...) is addressed
+            # by the *_by_team twin; team_name routes the statement there
             first = models[0]
-            self.step("catalog model get ($.model, by org_name + model_name)", f"SELECT name, display_name, latest_version_id_str FROM nvidia.catalog.models WHERE org_name = '{first['org_name']}' AND model_name = '{first['name']}'", expect_rows=True, contains=str(first["name"]))
-            self.step("catalog model versions ($.modelVersions)", f"SELECT version_id, status FROM nvidia.catalog.model_versions WHERE org_name = '{first['org_name']}' AND model_name = '{first['name']}'")
+            scope = f"org_name = '{first['org_name']}'" + (f" AND team_name = '{first['team_name']}'" if first.get("team_name") else "")
+            twin = " (get_by_team twin)" if first.get("team_name") else ""
+            self.step(f"catalog model get ($.model, by org_name + model_name{twin})", f"SELECT name, display_name, latest_version_id_str FROM nvidia.catalog.models WHERE {scope} AND model_name = '{first['name']}'", expect_rows=True, contains=str(first["name"]))
+            self.step(f"catalog model versions ($.modelVersions{twin})", f"SELECT version_id, status FROM nvidia.catalog.model_versions WHERE {scope} AND model_name = '{first['name']}'")
         self.step("catalog GPU catalog (bare array)", "SELECT display_name, pci_device_id, memory_size_gb FROM nvidia.catalog.gpus", expect_rows=True)
         self.step("catalog collections", "SELECT name, org_name, display_name FROM nvidia.catalog.collections LIMIT 5")
 
@@ -261,6 +265,7 @@ class Smoke:
         self.note("cluster groups / GPU inventory (the GPU estate)", True)
         self.step("GPU types per cluster group (json_each over gpus)", "SELECT cg.name AS cluster_group, json_extract(g.value, '$.name') AS gpu FROM nvidia.nvcf_deployments.cluster_groups cg, json_each(cg.gpus) g")
         self.step("nvcf functions (fleet state)", "SELECT id, name, status, version_id FROM nvidia.nvcf_functions.functions")
+        self.step("nvcf authorizations across the fleet (list_all, the sharing audit)", "SELECT id, version_id, nca_id FROM nvidia.nvcf_functions.authorizations")
         self.step("nvcf function ids (scalar list transform)", "SELECT function_id FROM nvidia.nvcf_functions.function_ids")
         self.step("nvcf telemetries", "SELECT telemetry_id, name, provider FROM nvidia.nvcf_deployments.telemetries")
         self.step("nvcf registry credentials", "SELECT name, registry_credential_id FROM nvidia.nvcf_deployments.registry_credentials")

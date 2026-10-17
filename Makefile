@@ -1,18 +1,31 @@
-# StackQL nvidia (NVIDIA NGC + NVIDIA Cloud Functions) provider build pipeline.
+# StackQL nvidia (NVIDIA NGC + NVIDIA Cloud Functions) provider - build,
+# test and docs pipeline.
 #
 # Every step is deterministic and re-runnable; manual mapping decisions live
-# in provider-dev/scripts, never in hand-edited artifacts. `make all` runs
-# the full chain: fetch upstream specs (fails on drift against the pin) ->
-# clean -> inventory -> split -> mappings -> pre-normalize -> normalize ->
-# generate -> post-process -> offline + integration + meta-route tests ->
-# docs -> website build. `make upgrade` is the same chain but accepts
-# upstream changes (re-pins the specs) - review the resulting diff.
-# `make smoke*` (live, needs credentials) is separate so `all` never
-# touches a real account.
+# in provider-dev/scripts (classification rules and skip codes in
+# build_inventory.mjs, response-class rules and fix classes in
+# clean_specs.mjs, passes in pre_normalize.mjs, numbered rules in
+# post_process.mjs), never in hand-edited artifacts. `make all` runs the
+# full chain:
+#   fetch/pin the three upstream inputs -> clean -> inventory -> split
+#   service specs -> mappings -> pre-normalize -> normalize -> generate
+#   (+ post-process, views, GraphQL merge) -> offline + integration +
+#   meta-route tests -> docs -> website.
+# `make all` never needs credentials and never bills; the live smoke targets
+# (`make smoke*`) are separate and source .env when present. `make upgrade`
+# is `all` with the upstream change ACCEPTED (re-pins the inputs - review
+# the resulting diff).
 #
-# Requirements: Node >= 20, GNU make, a stackql binary ($STACKQL, ./stackql
-# or on PATH), Python 3 (a venv with pystackql is created on demand for the
-# smoke suite), yarn for the website. Runs under Linux / WSL / macOS.
+# One deliberate difference from the template: `build` verifies the
+# committed downloads against the pins offline (`pin-check`) instead of
+# re-downloading, because the inputs are three documents plus a 2.4 MB PyPI
+# wheel; `all` and CI run `fetch-spec` (network, fails on drift) first.
+#
+# Requirements: Node >= 22.19, GNU make + bash, a stackql binary ($STACKQL,
+# ./stackql or on PATH - bin/start-server.sh downloads one if none is found),
+# Python 3 (a venv with pystackql is created on demand for the smoke suite),
+# yarn for the website. Runs on Linux, macOS or WSL (under WSL keep the venv
+# off the DrvFs mount: `make smoke VENV=$HOME/.venvs/stackql-nvidia`).
 #
 # Live credentials for the smoke suite (never committed - .env is
 # gitignored; the smoke targets source it if present; see .env.example):
@@ -24,36 +37,38 @@ SHELL := bash
 .DEFAULT_GOAL := help
 
 PROVIDER := nvidia
+VERSION := v00.00.00000
+OPENAPI_DIR := provider-dev/openapi
+SERVICES_DIR := $(OPENAPI_DIR)/src/$(PROVIDER)
+PROVIDER_DIR := $(SERVICES_DIR)/$(VERSION)
+SOURCE_DIR := provider-dev/source
+CONFIG_DIR := provider-dev/config
+GRAPHQL_DIR := provider-dev/source-graphql
+# The repository docgen links from the Provider Summary on the docs landing
+# page (the label is the URL's last path segment). Always this repository's
+# URL; override on the command line for a fork hosted elsewhere.
 SOURCE_PROJECT ?= https://github.com/stackql-registry/stackql-provider-$(PROVIDER)
-SERVICES_DIR := provider-dev/openapi/src/$(PROVIDER)
-# Bearer auth from NGC_API_KEY; snake_case_aliases presents the camelCase
-# wire properties (displayName, createdDate, ...) as snake_case columns,
-# paired with request.nativeCasing (camel / kebab per method, set in
-# post_process) so snake_case WHERE keys and body columns resolve.
-PROVIDER_CONFIG := {"auth": {"type": "bearer", "credentialsenvvar": "NGC_API_KEY"}, "snake_case_aliases": true}
-# NOTE: servers are per service (two hosts) and org-scoped paths ride a
-# path-level server template - both come from the endpoint inventory (split
-# + post_process), so no --servers / --service-config is passed here.
+PORT ?= 5444
 VENV := .venv
 PY := $(VENV)/bin/python
 ENV_FILE := .env
 
-.PHONY: help deps fetch-specs refresh-specs pin-check clean-specs inventory split mappings pre-normalize normalize generate post-process build \
+.PHONY: help deps fetch-spec refresh-spec pin-check clean-specs inventory split mappings mappings-report pre-normalize normalize generate post-process graphql-merge build \
         test-offline test-integration test-meta test venv smoke smoke-live smoke-read-only smoke-nvcf smoke-cleanup \
-        docs website website-start clean all upgrade
+        docs website website-start start-server stop-server server-status clean all upgrade
 
 help: ## show this help
-	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-18s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-24s %s\n", $$1, $$2}'
 
-deps: ## install node dependencies (latest @stackql/provider-utils + @stackql/pgwire-lite per package.json ranges)
+deps: ## install node dependencies (latest @stackql/provider-utils, @stackql/pgwire-lite and swagger-parser per package.json ranges)
 	npm install
 
 # ---------------------------------------------------------------- pipeline
 
-fetch-specs: ## download the NVCF spec, harvest the NGC definitions + ngcsdk schemas, and verify against the pins (fails on drift)
+fetch-spec: ## download the NVCF spec, harvest the NGC definitions + ngcsdk schemas, and verify against the pins (fails on drift)
 	npm run fetch-specs -- --check
 
-refresh-specs: ## download everything and ACCEPT the upstream change (rewrites the pins - review the diff)
+refresh-spec: ## download everything and ACCEPT the upstream change (rewrites the pins - review the diff)
 	npm run fetch-specs
 
 pin-check: ## verify the committed downloads against provider-dev/config/spec_pin.json (no network)
@@ -69,47 +84,70 @@ split: ## split the cleaned specs into per-service specs on their hosts, org-sco
 	npm run split -- --provider-name $(PROVIDER) --overwrite
 
 mappings: ## regenerate all_services.csv from scratch and apply the inventory mappings (fails on unmapped ops; prints the mapping diff)
-	rm -f provider-dev/config/all_services.csv
-	npm run generate-mappings -- --provider-name $(PROVIDER) --input-dir provider-dev/source --output-dir provider-dev/config
+	rm -f $(CONFIG_DIR)/all_services.csv
+	npm run generate-mappings -- --provider-name $(PROVIDER) --input-dir $(SOURCE_DIR) --output-dir $(CONFIG_DIR)
 	npm run map-operations
 
-pre-normalize: ## nvidia-specific spec adjustments before the generic normalize pass
+mappings-report: ## print every derived mapping without writing (design the inventory rules)
+	npm run map-operations -- --report
+
+pre-normalize: ## nvidia-specific spec surgery on provider-dev/source before the generic normalize pass
 	npm run pre-normalize
 
-normalize: ## generic provider-utils normalize pass (allOf flatten, opaque objects, param lifting, bare-array wrap)
-	npm run normalize -- --api-dir provider-dev/source
+normalize: ## generic provider-utils normalize pass (allOf flatten, oneOf/anyOf lowering, opaque objects, bare-array wrap)
+	npm run normalize -- --api-dir $(SOURCE_DIR)
 
-generate: ## generate the provider (bearer auth, snake_case aliases, naive request body translate)
-	rm -rf provider-dev/openapi/*
+# No --servers / --service-config: servers are per service (two hosts) and
+# the org-scoped paths ride a path-level server template - both come from
+# the endpoint inventory (split + post-process). Views under
+# ./views/<service>/views.yaml are spliced automatically.
+generate: ## generate the provider (bearer auth, snake_case aliases, naive request bodies, views), then post-process and GraphQL merge
+	rm -rf $(OPENAPI_DIR)/*
 	npm run generate-provider -- \
 	  --provider-name $(PROVIDER) \
-	  --input-dir provider-dev/source \
+	  --input-dir $(SOURCE_DIR) \
 	  --output-dir $(SERVICES_DIR) \
-	  --config-path provider-dev/config/all_services.csv \
-	  --provider-config '$(PROVIDER_CONFIG)' \
+	  --config-path $(CONFIG_DIR)/all_services.csv \
+	  --provider-config $(CONFIG_DIR)/provider_config.json \
 	  --naive-req-body-translate \
 	  --overwrite
 	$(MAKE) post-process
+	$(MAKE) graphql-merge
 
-post-process: ## re-apply generated-provider fixes (org server templates + NGC_ORG, casing, pagination, LIMIT pushdown, objectKeys)
+post-process: ## re-apply everything the generator cannot express (org server templates + NGC_ORG, casing, pagination, LIMIT pushdown, objectKeys, transforms)
 	npm run post-process
+
+graphql-merge: ## merge GraphQL-backed resources from provider-dev/source-graphql (no-op: NVIDIA publishes no GraphQL API)
+	npm run graphql-merge -- --provider-dir $(PROVIDER_DIR) --source-dir $(GRAPHQL_DIR)
 
 build: pin-check clean-specs inventory split mappings pre-normalize normalize generate ## full spec -> provider pipeline from the committed pins
 
 # ------------------------------------------------------------------- tests
 
-test-offline: ## quick offline validation against the local file registry (SHOW / DESCRIBE, NGC_ORG behaviour)
+test-offline: ## offline validation against the local file registry (SHOW / DESCRIBE, NGC_ORG behaviour, views, no network)
 	npm run test-offline
 
-test-integration: ## row-level integration tests against the mock NGC + NVCF servers (no account required)
+test-integration: ## row-level and wire-level assertions against the mock NGC + NVCF API (no account required)
 	npm run test-integration
 
-test-meta: ## meta-route suite against a local stackql server (walks every service/resource/method)
-	npm run start-server -- --provider $(PROVIDER) --registry "$$(pwd)/provider-dev/openapi"
-	npm run test-meta-routes -- $(PROVIDER) || (npm run stop-server; exit 1)
-	npm run stop-server
+# The server is always torn down and the meta-route walk's exit status is
+# preserved so a failure stops `make all`.
+test-meta: ## meta-route walk (every service, resource, method) against a local stackql server
+	bash bin/start-server.sh --provider $(PROVIDER) --registry "$(CURDIR)/$(OPENAPI_DIR)" --port $(PORT)
+	node bin/test-meta-routes.cjs $(PROVIDER) --port $(PORT); status=$$?; bash bin/stop-server.sh --port $(PORT); exit $$status
 
-test: test-offline test-integration test-meta ## all non-live test layers
+test: test-offline test-integration test-meta ## all credential-free test layers
+
+start-server: ## start a local stackql server on PORT (default 5444) over provider-dev/openapi
+	bash bin/start-server.sh --provider $(PROVIDER) --registry "$(CURDIR)/$(OPENAPI_DIR)" --port $(PORT)
+
+stop-server: ## stop the local stackql server
+	bash bin/stop-server.sh --port $(PORT)
+
+server-status: ## status of the local stackql server
+	bash bin/server-status.sh --port $(PORT)
+
+# ------------------------------------------------------------------- smoke
 
 $(VENV)/bin/activate:
 	python3 -m venv $(VENV)
@@ -117,11 +155,11 @@ $(VENV)/bin/activate:
 
 venv: $(VENV)/bin/activate ## create the python venv with pystackql for the smoke suite
 
-# smoke targets source .env when present so a developer checkout works
-# without exporting anything; CI sets variables from secrets.
+# The smoke targets source .env when present so a developer checkout works
+# without exporting anything; CI sets the variables from secrets.
 with_env = set -a; [ -f $(ENV_FILE) ] && source <(tr -d '\r' < $(ENV_FILE)); set +a;
 
-smoke: venv ## live smoke suite with the locally generated provider - catalog + org/registry reads, cheap write lifecycles (needs NGC_API_KEY, NGC_ORG)
+smoke: venv ## live smoke suite with the locally generated provider - catalog + org/registry reads, cheap self-cleaning write lifecycles (needs .env)
 	@$(with_env) $(PY) tests/smoke_test.py
 
 smoke-live: venv ## live smoke suite against the PUBLISHED provider in the stackql registry (post-publish verification)
@@ -133,30 +171,32 @@ smoke-read-only: venv ## live read smokes only, no writes
 smoke-nvcf: venv ## live suite INCLUDING the gated NVCF function deploy lifecycle (billable GPU minutes, smallest instance, always torn down)
 	@$(with_env) $(PY) tests/smoke_test.py --with-nvcf-deploy
 
-smoke-cleanup: venv ## sweep stackql-smoke-* breadcrumbs (functions, registry artifacts) and exit
+smoke-cleanup: venv ## sweep stackql-smoke-* breadcrumbs (registry models, NVCF functions and deployments) and exit
 	@$(with_env) $(PY) tests/smoke_test.py --cleanup-only
 
 # -------------------------------------------------------------------- docs
 
-docs: ## generate the website docs (snake_case surface), then sanitize for MDX v3
+docs: ## generate the website docs (snake_case surface, source project link), then sanitize for MDX
 	npm run generate-docs -- \
 	  --provider-name $(PROVIDER) \
-	  --provider-dir ./$(SERVICES_DIR)/v00.00.00000 \
+	  --provider-dir ./$(PROVIDER_DIR) \
 	  --output-dir ./website \
 	  --provider-data-dir ./provider-dev/docgen/provider-data \
 	  --snake-case-aliases \
 	  --source-project $(SOURCE_PROJECT)
 	npm run sanitize-docs
 
-website: ## build the docusaurus microsite (vendors shared config first)
+website: ## build the docusaurus microsite (vendors the shared stackql config first)
 	cd website && yarn install && yarn build
 
 website-start: ## run the docusaurus dev server
 	cd website && yarn install && yarn start
 
-clean: ## remove regenerable artifacts (provider output, docs, website build, test registry copy)
-	rm -rf provider-dev/openapi/* website/build website/.docusaurus website/docs tests/integration/.registry-tmp
+# ------------------------------------------------------------------- misc
 
-all: deps fetch-specs build test docs website ## everything non-live: deps, upstream drift check, pipeline, tests, docs, site build
+clean: ## remove generated artifacts (provider output, docs, website build, test registry copy)
+	rm -rf $(OPENAPI_DIR)/* website/build website/.docusaurus website/docs/services tests/integration/.registry-tmp stackql-server.log
 
-upgrade: deps refresh-specs build test docs website ## accept upstream spec changes (re-pin), then the full pipeline, tests, docs and site build
+all: deps fetch-spec build test docs website ## everything non-live: deps, upstream drift check, pipeline, tests, docs, site build
+
+upgrade: deps refresh-spec build test docs website ## accept upstream changes (re-pin), then the full pipeline, tests, docs and site build

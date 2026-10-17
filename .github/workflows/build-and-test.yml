@@ -4,9 +4,11 @@ name: build-and-test
 # credential-free test layer on each push / PR; the live smoke suite runs
 # only where the NGC secrets are configured (never the NVCF deploy
 # lifecycle - that is `make smoke-nvcf`, run deliberately); a scheduled
-# drift job re-downloads the upstream inputs (the NVCF spec, the NGC API
-# explorer definitions, the ngcsdk wheel) and diffs them against the pins,
-# and checks the NGC deprecation schedule page for changes.
+# upstream-drift job re-downloads the three upstream inputs (the NVCF spec,
+# the NGC API definitions, the ngcsdk wheel), diffs them against the pins,
+# checks the NGC deprecation schedule page for changes, and opens an issue
+# when anything moves (NVIDIA serves unversioned definitions, so drift is
+# expected and must be reviewed, never silent).
 
 on:
   push:
@@ -23,12 +25,18 @@ jobs:
   build-and-test:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+    # Consumed by the smoke job's `if`: a job-level condition cannot read
+    # secrets or another job's step outputs directly, so both gates are
+    # computed here and exported.
+    outputs:
+      pinned: ${{ steps.pin.outputs.pinned }}
+      smoke_creds: ${{ steps.creds.outputs.present }}
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -42,38 +50,91 @@ jobs:
       - name: stackql version
         run: stackql --version
 
+      # The pins are written by `make refresh-spec`; without them there is
+      # nothing to build or test.
+      - name: Detect whether the specs are pinned
+        id: pin
+        run: |
+          if [ -f provider-dev/config/spec_pin.json ]; then
+            echo "pinned=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pinned=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=No pinned specs::provider-dev/config/spec_pin.json does not exist - the build, drift check, tests and docs steps were skipped. Run 'make refresh-spec' to pin the upstream inputs."
+          fi
+
+      # Only presence is recorded, never the value. The notice is raised only
+      # where the smoke job would otherwise have run (not a pull request), so
+      # PRs from forks stay quiet.
+      - name: Detect whether the smoke credentials are configured
+        id: creds
+        env:
+          NGC_API_KEY: ${{ secrets.NGC_API_KEY }}
+        run: |
+          if [ -n "$NGC_API_KEY" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            if [ "${{ steps.pin.outputs.pinned }}" = "true" ] && [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+              echo "::notice title=Live smoke suite skipped::NGC_API_KEY / NGC_ORG are not configured - the smoke job was skipped. Credential-free coverage still ran via the mock-server integration suite."
+            fi
+          fi
+
+      # Drift is reported, not fatal, here: the committed pins are what gets
+      # built and tested (fetch-spec refreshes provider-dev/downloaded in
+      # place, so the pinned inputs are restored after a failure). The
+      # upstream-drift job below opens the review issue.
+      - name: Verify the pinned inputs against upstream (warns on drift)
+        if: steps.pin.outputs.pinned == 'true'
+        run: |
+          if ! make fetch-spec; then
+            echo "::warning title=Upstream drift::One or more upstream inputs no longer match provider-dev/config/spec_pin.json - run 'make upgrade' and review the diff. Building from the committed pins."
+            git checkout -- provider-dev/downloaded
+          fi
+
       - name: Build provider from the committed pins (pin check, clean, inventory, split, mappings, normalize, generate, post-process)
+        if: steps.pin.outputs.pinned == 'true'
         run: make build
 
       - name: Fail on uncommitted generation drift
+        if: steps.pin.outputs.pinned == 'true'
         run: |
           git add -N .
-          if ! git diff --quiet -- provider-dev/openapi provider-dev/config provider-dev/source; then
+          if ! git diff --quiet -- provider-dev/openapi provider-dev/config provider-dev/source provider-dev/downloaded; then
             echo "Generated output differs from the committed artifacts - run 'make build' and commit (a diff in provider-dev/config/all_services.csv is a mapping change: review it as a breaking-change candidate)."
-            git diff --stat -- provider-dev/openapi provider-dev/config provider-dev/source
+            git diff --stat -- provider-dev/openapi provider-dev/config provider-dev/source provider-dev/downloaded
             exit 1
           fi
 
       - name: Offline validation
+        if: steps.pin.outputs.pinned == 'true'
         run: make test-offline
 
       - name: Integration tests (mock NGC + NVCF)
+        if: steps.pin.outputs.pinned == 'true'
         run: make test-integration
 
       - name: Meta-route tests
+        if: steps.pin.outputs.pinned == 'true'
         run: make test-meta
 
       - name: Generate docs (sanity - the site build runs on the web workflows)
+        if: steps.pin.outputs.pinned == 'true'
         run: make docs
 
   smoke:
-    # secret-gated live smoke suite against a test organization; skipped
-    # with a notice when the secrets are not configured (forks, PRs from
-    # outside). The NVCF deploy lifecycle is NOT run here - trigger it
+    # Live smoke suite against the dedicated test organization. Skipped at
+    # the job level, so no runner is consumed, on pull requests (secrets are
+    # not available to forks), on the schedule, until the specs are pinned
+    # and until the secrets are configured; the last two arrive as
+    # build-and-test outputs. Never the NVCF deploy lifecycle - trigger that
     # deliberately with `make smoke-nvcf`.
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: github.event_name != 'pull_request' && github.event_name != 'schedule'
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.event_name != 'schedule' &&
+      needs.build-and-test.outputs.pinned == 'true' &&
+      needs.build-and-test.outputs.smoke_creds == 'true'
     env:
       NGC_API_KEY: ${{ secrets.NGC_API_KEY }}
       NGC_ORG: ${{ secrets.NGC_ORG }}
@@ -83,7 +144,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - uses: actions/setup-python@v7
@@ -94,19 +155,12 @@ jobs:
         run: npm ci
 
       - name: Live smoke suite (catalog + org/registry reads, cheap write lifecycles, NVCF reads where enabled)
-        if: env.NGC_API_KEY != ''
         run: make smoke
-
-      - name: Live smoke skipped (no credentials)
-        if: env.NGC_API_KEY == ''
-        run: |
-          echo "::notice title=Live smoke suite skipped::NGC_API_KEY / NGC_ORG secrets are not configured - the live smoke suite did not run. Credential-free coverage still ran via the mock-server integration suite."
 
   upstream-drift:
     # Re-download every upstream input and diff against the pins on a
     # schedule and on demand; check the NGC deprecation schedule page for
-    # changes; open an issue when anything moves. NVIDIA serves unversioned
-    # definitions, so drift is expected and must be reviewed, never silent.
+    # changes; open a labelled issue when anything moves.
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     permissions:
@@ -117,7 +171,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -127,7 +181,7 @@ jobs:
         id: drift
         run: |
           set +e
-          make fetch-specs > fetch.log 2>&1
+          make fetch-spec > fetch.log 2>&1
           rc=$?
           set -e
           cat fetch.log
@@ -135,6 +189,7 @@ jobs:
             echo "drift=false" >> "$GITHUB_OUTPUT"
           else
             echo "drift=true" >> "$GITHUB_OUTPUT"
+            # the refreshed downloads are in the working tree; materialise the diff for the issue body
             git diff --stat -- provider-dev/downloaded > drift.txt || true
             cat drift.txt
           fi
@@ -154,7 +209,7 @@ jobs:
             const stat = fs.existsSync('drift.txt') ? fs.readFileSync('drift.txt', 'utf8') : '';
             const dep = fs.existsSync('deprecation.log') ? fs.readFileSync('deprecation.log', 'utf8') : '';
             const title = 'NVIDIA NGC / NVCF upstream drift detected';
-            const body = 'One or more upstream inputs no longer match the pins in provider-dev/config/spec_pin.json, or the NGC deprecation schedule page changed.\n\nSpec drift:\n```\n' + (stat || '(none)') + '\n```\nDeprecation page:\n```\n' + dep + '\n```\nRun `make upgrade` (refresh-specs, build, test, docs, website), review the generated diff - new or removed operations, mapping changes in all_services.csv, new deprecation families in build_inventory.mjs - update NOTES.md, and commit.';
+            const body = 'One or more upstream inputs no longer match the pins in provider-dev/config/spec_pin.json, or the NGC deprecation schedule page changed.\n\nSpec drift:\n```\n' + (stat || '(none)') + '\n```\nDeprecation page:\n```\n' + dep + '\n```\nRun `make upgrade` (refresh-spec, build, test, docs, website), review the generated diff - new or removed operations, mapping changes in all_services.csv, new deprecation families in build_inventory.mjs - update NOTES.md, and commit.';
             await core.summary.addHeading(title).addCodeBlock(stat + '\n' + dep).write();
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'upstream-drift'

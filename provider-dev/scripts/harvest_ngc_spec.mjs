@@ -116,12 +116,35 @@ const manifest = fs.existsSync(manifestPath)
   : { files: {} };
 manifest.files = manifest.files || {};
 
+// Fix class: stable operationIds for the /swagger-resources family. springdoc
+// numbers the seven same-named handlers of each of these paths
+// (swaggerResources, securityConfiguration, uiConfiguration) with _N
+// suffixes in reflection order, which differs between server instances - two
+// fetches minutes apart on 2026-10-16 swapped the suffixes among the verbs,
+// so a byte pin would drift on bytes that carry no meaning (the family is a
+// service-infra skip). Verb-keyed ids are deterministic. Counted per file.
+function stabilizeSwaggerResourceIds(spec) {
+  let n = 0;
+  for (const [p, item] of Object.entries(spec.paths || {})) {
+    if (!p.startsWith('/swagger-resources')) continue;
+    for (const [verb, op] of Object.entries(item)) {
+      if (!op || typeof op !== 'object' || typeof op.operationId !== 'string') continue;
+      const base = op.operationId.replace(/_\d+$/, '');
+      const stable = `${base}_${verb}`;
+      if (op.operationId !== stable) { op.operationId = stable; n++; }
+    }
+  }
+  return n;
+}
+
 for (const [file, { text, url, name, spec }] of outputs) {
+  const fixes = { 'stable-swagger-resources-operation-ids': stabilizeSwaggerResourceIds(spec) };
   // written as canonical JSON (sorted keys): the definition servers
   // serialise maps in a non-deterministic order between fetches
   fs.writeFileSync(path.join(downloadDir, file), canonicalJson(spec));
   manifest.files[file] = {
     url,
+    fixes,
     info: {
       explorer: EXPLORER_URL,
       explorerName: name,

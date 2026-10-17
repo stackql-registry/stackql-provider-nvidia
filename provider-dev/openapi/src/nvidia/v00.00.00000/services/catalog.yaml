@@ -7859,6 +7859,10 @@ components:
         needsAcceptance:
           description: Indicator if user needs to accept this license
           type: boolean
+      required:
+        - governingTerms
+        - licenseId
+        - licenseVersion
       type: object
     CountableResource:
       description: Countable Resource object

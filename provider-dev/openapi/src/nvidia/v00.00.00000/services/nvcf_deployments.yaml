@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: NVIDIA Cloud Functions - Deployments
   description: 'NVCF deployments and GPU specifications, cluster groups and GPU inventory, registry credentials and telemetry endpoints (source: the published NVCF OpenAPI specification; served from api.ngc.nvidia.com).'
-  version: 2.256.0
+  version: 2.261.2
 paths:
   /v2/nvcf/clusterGroups:
     get:
@@ -1959,7 +1959,7 @@ components:
       description: LLM-specific configuration for a model
       properties:
         routingMethod:
-          description: Routing method for this model.
+          description: 'Routing method for this model: a request router algorithm name, optionally followed by '';name=value'' tuning parameters, for example pulsar;seed=stable-a. The API checks only the format. The request router checks the algorithm and parameters on each request.'
           format: UTF-8
           maxLength: 262144
           minLength: 0
@@ -2298,5 +2298,67 @@ components:
         delete:
           - $ref: '#/components/x-stackQL-resources/telemetries/methods/delete'
         replace: []
+    vw_gpu_capacity:
+      name: vw_gpu_capacity
+      id: nvidia.nvcf_deployments.vw_gpu_capacity
+      title: GPU Capacity
+      config:
+        docs:
+          description: The GPU estate the organization can deploy NVIDIA Cloud Functions to, one row per cluster group x GPU type x instance type, flattened from the cluster_groups resource (clusterGroups[].gpus[].instanceTypes[]).
+          fields:
+            - name: cluster_group
+              type: string
+              description: Cluster group name (the backend named in a deployment specification).
+            - name: cluster_group_id
+              type: string
+              description: Cluster group id.
+            - name: gpu
+              type: string
+              description: GPU type available in the cluster group (for example L40
+              H100).: null
+            - name: instance_type
+              type: string
+              description: Instance type name for the GPU (the instanceType of a deployment specification).
+            - name: instance_description
+              type: string
+              description: Vendor description of the instance type.
+            - name: is_default
+              type: boolean
+              description: Whether the instance type is the default for the GPU.
+            - name: cluster
+              type: string
+              description: Name of the first cluster in the group.
+            - name: nca_id
+              type: string
+              description: NVIDIA Cloud Account that owns the cluster group.
+        views:
+          select:
+            predicate: sqlDialect == "sqlite3"
+            ddl: |-
+              SELECT cg.name AS cluster_group,
+                     cg.id AS cluster_group_id,
+                     json_extract(g.value, '$.name') AS gpu,
+                     json_extract(it.value, '$.name') AS instance_type,
+                     json_extract(it.value, '$.description') AS instance_description,
+                     json_extract(it.value, '$.default') AS is_default,
+                     json_extract(cg.clusters, '$[0].name') AS cluster,
+                     cg.nca_id
+              FROM nvidia.nvcf_deployments.cluster_groups cg,
+                   json_each(cg.gpus) g,
+                   json_each(json_extract(g.value, '$.instanceTypes')) it
+            fallback:
+              predicate: sqlDialect == "postgres"
+              ddl: |-
+                SELECT cg.name AS cluster_group,
+                       cg.id AS cluster_group_id,
+                       g.value->>'name' AS gpu,
+                       it.value->>'name' AS instance_type,
+                       it.value->>'description' AS instance_description,
+                       (it.value->>'default')::boolean AS is_default,
+                       cg.clusters::jsonb->0->>'name' AS cluster,
+                       cg.nca_id
+                FROM nvidia.nvcf_deployments.cluster_groups cg,
+                     jsonb_array_elements(cg.gpus::jsonb) AS g(value),
+                     jsonb_array_elements(g.value->'instanceTypes') AS it(value)
 servers:
   - url: https://api.ngc.nvidia.com

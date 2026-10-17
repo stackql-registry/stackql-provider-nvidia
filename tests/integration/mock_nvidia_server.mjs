@@ -294,6 +294,10 @@ async function handle(req, res, log) {
       return send(res, 204, undefined);
     }
   }
+  // NVCF 2.261.2: every function with its authorized parties in one read
+  if (m === 'GET' && p === '/v2/nvcf/authorizations/functions') {
+    return send(res, 200, { functions: [...state.authorizations.entries()].map(([id, parties]) => ({ id, ncaId: NCA_ID, versionId: VERSION_ID, authorizedParties: parties })) });
+  }
   if ((x = p.match(/^\/v2\/nvcf\/authorizations\/functions\/([^/]+)(\/versions\/([^/]+))?(\/add|\/remove)?$/))) {
     if (!state.functions.has(x[1])) return send(res, 404, { type: 'about:blank', title: 'Not Found', detail: 'function not found' });
     const parties = state.authorizations.get(x[1]) || [];

@@ -97,8 +97,9 @@ const startTime = new Date();
 
 // resources whose select response is a scalar (text) body - a single
 // anonymous column at query time, so DESCRIBE EXTENDED is legitimately
-// empty. Currently empty: pods_log gets a response transform (one row per
-// log line) in post_process.mjs, so it has real columns.
+// empty. Keep it empty unless a resource genuinely returns a scalar; a
+// response transform in post_process.mjs that yields real columns is the
+// better fix.
 const SCALAR_RESPONSE_RESOURCES = new Set([]);
 
 const results = {
@@ -111,6 +112,8 @@ const results = {
   nonSelectableResources: [],
   scalarResponseResources: [],
   failures: [],
+  errors: [],
+  summary: { errors: 0 },
 };
 
 /**
@@ -131,9 +134,9 @@ async function executeQuery(query, description) {
     
     if (!verbose) {
       if (result.data && result.data.length) {
-        console.log(`✅ (${result.data.length} rows)`);
+        console.log(`OK (${result.data.length} rows)`);
       } else {
-        console.log('✅');
+        console.log('OK');
       }
     } else {
       console.info(result.data);
@@ -142,7 +145,7 @@ async function executeQuery(query, description) {
     return result.data;
   } catch (error) {
     if (!verbose) {
-      console.log('❌');
+      console.log('FAIL');
     }
     
     results.errors.push({
@@ -175,7 +178,7 @@ async function executeQuery(query, description) {
  */
 async function testMetaRoutes() {
   try {
-    console.log(`\n🔍 Testing meta routes for provider: ${provider}\n`);
+    console.log(`\nTesting meta routes for provider: ${provider}\n`);
     
     // SHOW PROVIDERS to verify provider exists
     const registryQuery = "SHOW PROVIDERS";
@@ -206,7 +209,7 @@ async function testMetaRoutes() {
     // for each service
     for (const service of services) {
       const serviceName = service.name;
-      console.log(`\n📊 Processing service: ${serviceName}`);
+      console.log(`\nProcessing service: ${serviceName}`);
       
       // SHOW RESOURCES IN <provider>.<service>
       const resourcesQuery = `SHOW RESOURCES IN ${provider}.${serviceName}`;
@@ -223,7 +226,7 @@ async function testMetaRoutes() {
       // for each resource
       for (const resource of resources) {
         const resourceName = resource.name;
-        console.log(`\n  🔹 Testing resource: ${resourceName}`);
+        console.log(`\n  Testing resource: ${resourceName}`);
         
         const resourceFQRN = `${provider}.${serviceName}.${resourceName}`;
         const resourceData = {
@@ -334,15 +337,15 @@ async function testMetaRoutes() {
     results.executionTime = executionTime;
     
     // Output summary
-    console.log("\n📋 Test Summary:");
+    console.log("\nTest Summary:");
     console.info(results);
 
     if (results.failures.length > 0) {
-      console.error(`\n❌ ${results.failures.length} failure(s):`);
+      console.error(`\nFAIL ${results.failures.length} failure(s):`);
       for (const f of results.failures) console.error(`  - ${f}`);
       process.exit(1);
     }
-    console.log("\n✅ All meta route tests passed");
+    console.log("\nOK All meta route tests passed");
 
     // Save results to file
     // const resultsDir = path.join(baseDir, 'test-results');
@@ -431,7 +434,7 @@ async function testMetaRoutes() {
     //     ...results.resources
     //       .sort((a, b) => (b.methodCount || 0) - (a.methodCount || 0))
     //       .slice(0, 20)
-    //       .map(r => `| ${r.name} | ${r.service} | ${r.methodCount || 0} | ${r.selectable ? '✓' : '✗'} |`),
+    //       .map(r => `| ${r.name} | ${r.service} | ${r.methodCount || 0} | ${r.selectable ? 'OK' : 'FAIL'} |`),
     //     '',
     //     '## Errors',
     //     '',

@@ -57,12 +57,12 @@ const cols = (rows) => rows.map((c) => c.name);
 const EXPECTED_SERVICES = ['catalog', 'nvcf_deployments', 'nvcf_functions', 'nvcf_invocation', 'nvcf_queues', 'orgs', 'private_registry'];
 const EXPECTED_RESOURCES = {
   catalog: ['artifact_deployment_params', 'artifact_files', 'artifact_specs', 'artifacts', 'collection_artifacts', 'collections', 'csp_deployment_params', 'csp_deployment_params_meta', 'csps', 'gpus', 'helm_chart_versions', 'model_files', 'model_versions', 'models', 'nim_metadata', 'recipe_files', 'recipe_versions', 'recipes', 'resource_files', 'resource_versions', 'resources'],
-  nvcf_deployments: ['cluster_groups', 'deployment_gpu_specs', 'deployments', 'recognized_registries', 'registry_credentials', 'telemetries', 'telemetry_secrets'],
+  nvcf_deployments: ['cluster_groups', 'deployment_gpu_specs', 'deployments', 'recognized_registries', 'registry_credentials', 'telemetries', 'telemetry_secrets', 'vw_gpu_capacity'],
   nvcf_functions: ['authorizations', 'function_ids', 'function_metadata', 'function_ratelimits', 'function_secrets', 'function_versions', 'functions'],
   nvcf_invocation: ['assets', 'invocation_status', 'invocations', 'tokens'],
   nvcf_queues: ['queue_positions', 'queues'],
   orgs: ['current_user', 'orgs', 'proto_orgs', 'roles', 'team_invitations', 'team_member_roles', 'team_members', 'teams', 'user_invitations', 'user_roles', 'users'],
-  private_registry: ['artifact_catalog_flags', 'artifact_collections', 'artifact_deployment_params', 'artifact_deployments', 'artifact_files', 'artifact_product_shares', 'artifact_shares', 'artifact_signatures', 'artifact_specs', 'artifact_version_configs', 'artifact_versions', 'artifacts', 'collection_artifacts', 'collection_product_shares', 'collections', 'encryption_keys', 'helm_chart_versions', 'license_acceptances', 'model_encryption_keys', 'model_files', 'model_shares', 'model_versions', 'models', 'recipe_files', 'recipe_versions', 'recipes', 'repository_associated_models', 'resource_files', 'resource_versions', 'resources', 'workflows']
+  private_registry: ['artifact_catalog_flags', 'artifact_collections', 'artifact_deployment_params', 'artifact_deployments', 'artifact_files', 'artifact_product_shares', 'artifact_shares', 'artifact_signatures', 'artifact_specs', 'artifact_version_configs', 'artifact_versions', 'artifacts', 'collection_artifacts', 'collection_product_shares', 'collections', 'encryption_keys', 'helm_chart_versions', 'license_acceptances', 'model_encryption_keys', 'model_files', 'model_versions', 'models', 'recipe_files', 'recipe_versions', 'recipes', 'repository_associated_models', 'resource_files', 'resource_versions', 'resources', 'workflows']
 };
 const NO_ENV = { NGC_ORG: undefined };
 const WITH_ENV = { NGC_ORG: 'mock-org' };
@@ -77,7 +77,7 @@ for (const [svc, expected] of Object.entries(EXPECTED_RESOURCES)) {
   resourceTotal += r.rows.length;
   check(`SHOW RESOURCES IN nvidia.${svc} (${expected.length})`, JSON.stringify(names(r.rows)) === JSON.stringify(expected), r.stderr || JSON.stringify(names(r.rows)));
 }
-check('83 resources in total', resourceTotal === 83, String(resourceTotal));
+check('83 resources in total (82 API resources + the vw_gpu_capacity view)', resourceTotal === 83, String(resourceTotal));
 
 // org_name server variable: required only when NGC_ORG is unset
 r = await runSql('SHOW METHODS IN nvidia.private_registry.models', NO_ENV);
@@ -127,6 +127,10 @@ r = await runSql('DESCRIBE EXTENDED nvidia.nvcf_functions.functions');
 check('DESCRIBE nvcf_functions.functions (id, name, status, version_id, container_image, inference_url)', ['id', 'name', 'status', 'version_id', 'container_image', 'inference_url'].every((c) => cols(r.rows).includes(c)), r.stderr || JSON.stringify(cols(r.rows)));
 r = await runSql('DESCRIBE EXTENDED nvidia.nvcf_deployments.cluster_groups');
 check('DESCRIBE cluster_groups (id, name, gpus, clusters, nca_id - the GPU estate)', ['id', 'name', 'gpus', 'clusters', 'nca_id'].every((c) => cols(r.rows).includes(c)), r.stderr || JSON.stringify(cols(r.rows)));
+r = await runSql('DESCRIBE EXTENDED nvidia.nvcf_deployments.vw_gpu_capacity');
+check('DESCRIBE vw_gpu_capacity (the view: cluster_group, gpu, instance_type, is_default, cluster)', ['cluster_group', 'cluster_group_id', 'gpu', 'instance_type', 'instance_description', 'is_default', 'cluster', 'nca_id'].every((c) => cols(r.rows).includes(c)), r.stderr || JSON.stringify(cols(r.rows)));
+r = await runSql('SHOW METHODS IN nvidia.nvcf_deployments.vw_gpu_capacity');
+check('vw_gpu_capacity has no required parameters (an unparameterised view)', r.code === 0 && (r.rows || []).every((m) => !(m.RequiredParams || m.required_params)), r.stderr || JSON.stringify(r.rows));
 r = await runSql('DESCRIBE EXTENDED nvidia.catalog.gpus');
 check('DESCRIBE catalog.gpus projects the GPU catalog rows (display_name, pci_device_id, memory_size_gb)', ['display_name', 'pci_device_id', 'memory_size_gb'].every((c) => cols(r.rows).includes(c)) && !cols(r.rows).includes('column_anon'), r.stderr || JSON.stringify(cols(r.rows)));
 r = await runSql('DESCRIBE EXTENDED nvidia.nvcf_functions.function_ids');

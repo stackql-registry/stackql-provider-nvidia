@@ -18,7 +18,7 @@ nvcf_deployments service documentation.
 
 :::info[Service Summary]
 
-total resources: __7__  
+total resources: __8__  
 
 :::
 
@@ -33,6 +33,7 @@ total resources: __7__
 <div class="providerDocColumn">
 <a href="/services/nvcf_deployments/registry_credentials/">registry_credentials</a><br />
 <a href="/services/nvcf_deployments/telemetries/">telemetries</a><br />
-<a href="/services/nvcf_deployments/telemetry_secrets/">telemetry_secrets</a>
+<a href="/services/nvcf_deployments/telemetry_secrets/">telemetry_secrets</a><br />
+<a href="/services/nvcf_deployments/vw_gpu_capacity/">vw_gpu_capacity</a>
 </div>
 </div>

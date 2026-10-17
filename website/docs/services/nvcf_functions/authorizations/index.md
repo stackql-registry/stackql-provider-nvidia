@@ -36,7 +36,8 @@ The following fields are returned by `SELECT` queries:
     defaultValue="list_version"
     values={[
         { label: 'list_version', value: 'list_version' },
-        { label: 'list', value: 'list' }
+        { label: 'list', value: 'list' },
+        { label: 'list_all', value: 'list_all' }
     ]}
 >
 <TabItem value="list_version">
@@ -107,6 +108,40 @@ The following fields are returned by `SELECT` queries:
 </tbody>
 </table>
 </TabItem>
+<TabItem value="list_all">
+
+<table>
+<thead>
+    <tr>
+    <th>Name</th>
+    <th>Datatype</th>
+    <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td><CopyableCode code="id" /></td>
+    <td><code>string (uuid)</code></td>
+    <td>Function id</td>
+</tr>
+<tr>
+    <td><CopyableCode code="nca_id" /></td>
+    <td><code>string (UTF-8)</code></td>
+    <td>NVIDIA Cloud Account Id (wire: ncaId)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="version_id" /></td>
+    <td><code>string (uuid)</code></td>
+    <td>Function version id (wire: versionId)</td>
+</tr>
+<tr>
+    <td><CopyableCode code="authorized_parties" /></td>
+    <td><code>array</code></td>
+    <td>Authorized parties allowed to invoke the function (wire: authorizedParties)</td>
+</tr>
+</tbody>
+</table>
+</TabItem>
 </Tabs>
 
 ## Methods
@@ -136,7 +171,14 @@ The following methods are available for this resource:
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-function_id"><code>function_id</code></a></td>
     <td></td>
-    <td>Lists NVIDIA Cloud Account IDs that are authorized to invoke any version of the  specified function. The response includes an array showing authorized accounts  for each version. Individual versions of a function can have their own  authorized accounts. So, each object in the array can have different  authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header </td>
+    <td>Lists function versions of the specified function and their corresponding  authorized accounts allowed to invoke the function version. Individual  versions of a function can have their own authorized accounts. So, each  object in the array can have different authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header </td>
+</tr>
+<tr>
+    <td><a href="#list_all"><CopyableCode code="list_all" /></a></td>
+    <td><CopyableCode code="select" /></td>
+    <td></td>
+    <td></td>
+    <td>Lists all the function versions in an account that have been shared/authorized  with/to other accounts. Response includes the nca-ids of the authorized  accounts. If a function version is not shared/authorized, then it is not  included in the response. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header </td>
 </tr>
 <tr>
     <td><a href="#add_version"><CopyableCode code="add_version" /></a></td>
@@ -229,7 +271,8 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     defaultValue="list_version"
     values={[
         { label: 'list_version', value: 'list_version' },
-        { label: 'list', value: 'list' }
+        { label: 'list', value: 'list' },
+        { label: 'list_all', value: 'list_all' }
     ]}
 >
 <TabItem value="list_version">
@@ -250,7 +293,7 @@ AND function_version_id = '{{ function_version_id }}' -- required
 </TabItem>
 <TabItem value="list">
 
-Lists NVIDIA Cloud Account IDs that are authorized to invoke any version of the  specified function. The response includes an array showing authorized accounts  for each version. Individual versions of a function can have their own  authorized accounts. So, each object in the array can have different  authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header 
+Lists function versions of the specified function and their corresponding  authorized accounts allowed to invoke the function version. Individual  versions of a function can have their own authorized accounts. So, each  object in the array can have different authorized accounts listed. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header 
 
 ```sql
 SELECT
@@ -260,6 +303,20 @@ version_id,
 authorized_parties
 FROM nvidia.nvcf_functions.authorizations
 WHERE function_id = '{{ function_id }}' -- required
+;
+```
+</TabItem>
+<TabItem value="list_all">
+
+Lists all the function versions in an account that have been shared/authorized  with/to other accounts. Response includes the nca-ids of the authorized  accounts. If a function version is not shared/authorized, then it is not  included in the response. Access to this functionality mandates the inclusion of a bearer token with the  'authorize_clients' scope in the HTTP Authorization header 
+
+```sql
+SELECT
+id,
+nca_id,
+version_id,
+authorized_parties
+FROM nvidia.nvcf_functions.authorizations
 ;
 ```
 </TabItem>

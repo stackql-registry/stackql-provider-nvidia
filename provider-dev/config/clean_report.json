@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-25",
+  "generated": "2026-10-16",
   "sources": {
     "ngc_kas.json": {
       "openapi": "3.0.1",
@@ -41,15 +41,15 @@
       "servers": [
         "https://api.ngc.nvidia.com"
       ],
-      "paths": 232,
+      "paths": 228,
       "fixes": [
         {
           "rule": "gateway-v2-path-prefix",
-          "note": "229 path(s) rewritten /v1/ -> /v2/; servers [{\"description\":\"Generated server url - production\",\"url\":\"https://models.ngc.nvidia.com\",\"x-internal\":true}] -> https://api.ngc.nvidia.com (the public gateway serving the definition)"
+          "note": "225 path(s) rewritten /v1/ -> /v2/; servers [{\"description\":\"Generated server url - production\",\"url\":\"https://models.ngc.nvidia.com\",\"x-internal\":true}] -> https://api.ngc.nvidia.com (the public gateway serving the definition)"
         },
         {
           "rule": "snake-case-path-params",
-          "note": "209 path key(s) and 986 path parameter name(s) converted to snake_case"
+          "note": "205 path key(s) and 962 path parameter name(s) converted to snake_case"
         },
         {
           "rule": "inject-sdk-operations",
@@ -68,11 +68,11 @@
     "nvcf_openapi.json": {
       "openapi": "3.1.0",
       "title": "Cloud Functions",
-      "version": "2.256.0",
+      "version": "2.261.2",
       "servers": [
         "https://api.nvcf.nvidia.com"
       ],
-      "paths": 36,
+      "paths": 37,
       "fixes": [
         {
           "rule": "snake-case-path-params",

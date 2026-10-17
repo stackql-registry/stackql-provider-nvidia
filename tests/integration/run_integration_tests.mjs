@@ -26,47 +26,15 @@
 //
 // Usage: node tests/integration/run_integration_tests.mjs [--verbose]
 
-import { spawn } from 'child_process';
 import { startMockServer, EXPECTED_TOKEN, ORG_A, ORG_B, TEAM, FUNCTION_ID, VERSION_ID, REQUEST_ID } from './mock_nvidia_server.mjs';
-import { buildTestRegistry, findStackql, repoRoot } from './registry.mjs';
+import { buildTestRegistry, registryArg, makeRunSql, findStackql } from './harness.mjs';
 
 const verbose = process.argv.includes('--verbose');
 const t0 = Date.now();
-const stackqlBin = findStackql();
 
-// IMPORTANT: must be async (spawn, not spawnSync) - the mock server runs on
-// this process's event loop, so a synchronous wait for stackql deadlocks.
-function makeRunSql(registry) {
-  return function runSql(sql, envOverrides = {}) {
-    return new Promise((resolve) => {
-      const env = { ...process.env, NGC_API_KEY: EXPECTED_TOKEN, NGC_ORG: ORG_A, ...envOverrides };
-      for (const [k, v] of Object.entries(envOverrides)) if (v === undefined) delete env[k];
-      const child = spawn(stackqlBin, [`--registry=${registry}`, 'exec', sql, '--output', 'json'], { cwd: repoRoot, env });
-      let stdout = '', stderr = '';
-      child.stdout.on('data', (d) => { stdout += d; });
-      child.stderr.on('data', (d) => { stderr += d; });
-      const timer = setTimeout(() => child.kill(), 120000);
-      child.on('error', (e) => { clearTimeout(timer); resolve({ rows: null, err: String(e) }); });
-      child.on('close', () => {
-        clearTimeout(timer);
-        stdout = stdout.trim();
-        stderr = stderr.trim();
-        if (verbose) console.log(`    sql: ${sql}\n    out: ${stdout.slice(0, 400)}${stderr ? `\n    err: ${stderr.slice(0, 400)}` : ''}`);
-        const errish = /http response status code: [45]|error|panic|FindRoute|no matching operation|cannot find matching operation|disallowed|cannot find any viable servers|not supported|required/i;
-        if (errish.test(stderr)) return resolve({ rows: null, err: stderr });
-        if (!stdout) return resolve({ rows: [], err: null });
-        try {
-          const val = (v) => (v === 'true' ? true : v === 'false' ? false : (typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v)) ? Number(v) : v);
-          const parsed = JSON.parse(stdout);
-          const rows = Array.isArray(parsed) ? parsed.map((r) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, val(v)]))) : parsed ?? [];
-          resolve({ rows, err: null, text: stdout });
-        } catch {
-          resolve({ rows: [{ _text: stdout }], err: errish.test(stdout) ? stdout : null, text: stdout }); // DML status text
-        }
-      });
-    });
-  };
-}
+// The environment the provider reads: the bearer credential and the scoping
+// variable behind the org_name server template.
+const PROVIDER_ENV = { NGC_API_KEY: EXPECTED_TOKEN, NGC_ORG: ORG_A };
 
 const results = [];
 function check(name, cond, note = '') {
@@ -75,9 +43,9 @@ function check(name, cond, note = '') {
 }
 
 const { server, port, log, state } = await startMockServer();
-const registry = buildTestRegistry(port);
-const runSql = makeRunSql(registry);
-console.log(`mock NGC + NVCF API on localhost:${port}, stackql: ${stackqlBin}`);
+const registry = registryArg(buildTestRegistry(port));
+const runSql = makeRunSql(registry, PROVIDER_ENV, { verbose });
+console.log(`mock NGC + NVCF API on localhost:${port}, stackql: ${findStackql()}`);
 
 const calls = (mark, method, p) => log.slice(mark).filter((e) => e.method === method && e.path === p);
 const has = (rows, key, value) => Array.isArray(rows) && rows.some((r) => r[key] === value);
@@ -173,6 +141,10 @@ try {
   check('function_ids (scalar list transform -> function_id column)', r.rows && r.rows.length === 1 && r.rows[0].function_id === FUNCTION_ID, r.err || JSON.stringify(r.rows));
   r = await runSql("SELECT id, name, json_extract(gpus, '$[0].name') AS first_gpu FROM nvidia.nvcf_deployments.cluster_groups");
   check('cluster_groups ($.clusterGroups) with gpus as JSON (the GPU estate query)', r.rows && r.rows.length === 2 && has(r.rows, 'first_gpu', 'L40') && has(r.rows, 'first_gpu', 'H100'), r.err || JSON.stringify(r.rows));
+  mark = log.length;
+  r = await runSql('SELECT cluster_group, gpu, instance_type, is_default, cluster FROM nvidia.nvcf_deployments.vw_gpu_capacity ORDER BY cluster_group, gpu');
+  check('vw_gpu_capacity flattens cluster group x GPU x instance type (4 rows from 2 groups)', r.rows && r.rows.length === 4 && has(r.rows, 'instance_type', 'GCP.GPU.L40S_1x') && r.rows.every((x) => x.is_default === true || x.is_default === 1) && has(r.rows, 'cluster', 'GFN-cluster-1'), r.err || JSON.stringify(r.rows));
+  check('vw_gpu_capacity issued one cluster groups read', calls(mark, 'GET', '/v2/nvcf/clusterGroups').length === 1, JSON.stringify(log.slice(mark).map((e) => e.path)));
 
   // --- NVCF function lifecycle: INSERT function, version get, authorization grants, deployment, delete
   mark = log.length;
@@ -193,6 +165,9 @@ try {
     check('authorization INSERT -> PATCH .../add with {authorizedParty: {ncaId}}', !r.err && addCall.length === 1 && addCall[0].body.authorizedParty?.ncaId === 'nca-partner-0002', r.err || JSON.stringify(addCall.map((c) => c.body)));
     r = await runSql(`SELECT id, json_extract(authorized_parties, '$[0].ncaId') AS party FROM nvidia.nvcf_functions.authorizations WHERE function_id = '${created.id}'`);
     check('authorizations list ($.functions) shows the grant', r.rows && r.rows.length === 1 && r.rows[0].party === 'nca-partner-0002', r.err || JSON.stringify(r.rows));
+    mark = log.length;
+    r = await runSql(`SELECT id, json_extract(authorized_parties, '$[0].ncaId') AS party FROM nvidia.nvcf_functions.authorizations`);
+    check('authorizations list_all (no WHERE -> GET /v2/nvcf/authorizations/functions, the fleet-wide sharing audit)', r.rows && r.rows.length === 2 && has(r.rows, 'id', FUNCTION_ID) && has(r.rows, 'id', created.id) && calls(mark, 'GET', '/v2/nvcf/authorizations/functions').length === 1, r.err || JSON.stringify({ rows: r.rows, paths: log.slice(mark).map((e) => e.path) }));
     mark = log.length;
     r = await runSql(`DELETE FROM nvidia.nvcf_functions.authorizations WHERE function_id = '${created.id}' AND authorized_party = '{"ncaId": "nca-partner-0002"}'`);
     check('authorization DELETE -> PATCH .../remove', !r.err && calls(mark, 'PATCH', `/v2/nvcf/authorizations/functions/${created.id}/remove`).length === 1, r.err || JSON.stringify(log.slice(mark).map((e) => `${e.method} ${e.path}`)));

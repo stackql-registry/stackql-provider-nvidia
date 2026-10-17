@@ -22,7 +22,10 @@
 //     (service, resource, verb), exec excluded
 // Fails without writing on any violation.
 //
-// Usage: node provider-dev/scripts/map_operations.mjs [--out PATH]
+// Usage: node provider-dev/scripts/map_operations.mjs [--out PATH] [--report]
+//   --report prints every derived mapping (service, operation, path, verb ->
+//   resource.method [sqlVerb] objectKey) and writes nothing - the way to
+//   design inventory rules.
 
 import fs from 'fs';
 import path from 'path';
@@ -105,6 +108,24 @@ if (errors.length > 0) {
   console.error(`FAILED with ${errors.length} error(s) - nothing written:`);
   for (const e of errors) console.error(`  ${e}`);
   process.exit(1);
+}
+
+// ---------------------------------------------------------------------------
+// --report: print the derived mapping table and stop (nothing written)
+// ---------------------------------------------------------------------------
+
+if (process.argv.includes('--report')) {
+  const width = (i) => Math.max(...rows.slice(1).map((r) => String(r[i] || '').length));
+  const w = { service: width(col.filename), op: width(col.operationId), path: width(col.path) };
+  for (const row of rows.slice(1)) {
+    const service = row[col.filename].replace(/\.yaml$/, '');
+    const target = row[col.stackql_resource_name]
+      ? `${row[col.stackql_resource_name]}.${row[col.stackql_method_name]} [${row[col.stackql_verb]}]${row[col.stackql_object_key] ? ' ' + row[col.stackql_object_key] : ''}`
+      : '(unmapped)';
+    console.log(`${service.padEnd(w.service)}  ${row[col.verb].toUpperCase().padEnd(6)} ${row[col.path].padEnd(w.path)}  ${row[col.operationId].padEnd(w.op)}  -> ${target}`);
+  }
+  console.log(`${rows.length - 1} operations (report only - nothing written)`);
+  process.exit(0);
 }
 
 // ---------------------------------------------------------------------------
