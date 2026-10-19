@@ -1,0 +1,11 @@
+{
+  "hosts": {
+    "ngc": "https://api.ngc.nvidia.com",
+    "nvcf": "https://api.nvcf.nvidia.com"
+  },
+  "orgVariable": {
+    "name": "org_name",
+    "x-stackQL-envVar": "NGC_ORG",
+    "description": "NGC organization name (the org id shown in the NGC console under Organization -> Setup, e.g. 0123456789ab). Resolved from the NGC_ORG environment variable when it is set (x-stackQL-envVar - the same variable the NVIDIA Terraform provider reads); otherwise it must be supplied on every org-scoped query as WHERE org_name = '<org>'. A WHERE value always takes precedence over the environment."
+  }
+}
